@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MasterEditVideo</string>
+    <string name="common_duration_default">0:00:00.000</string>
+
+    <string name="media_pick_image">Images</string>
+    <string name="media_pick_video">Videos</string>
+
+    <string name="common_empty_data">Empty List</string>
 </resources>

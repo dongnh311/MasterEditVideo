@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/main_add_track"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/colorHintNoText"
+        android:layout_height="@dimen/button_height_45dp">
+
+    </LinearLayout>
+
+
+</layout>

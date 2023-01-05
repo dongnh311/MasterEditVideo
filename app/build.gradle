@@ -44,10 +44,46 @@ android {
 }
 
 dependencies {
+    def kotlin_version = '1.7.20'
+    def core_ktx_version = "1.9.0"
 
-    implementation project(':masteredit')
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.20"
+    def flexbox_version = "3.0.0"
+    def glide_version = "4.14.2"
+    def exo_version = '2.18.2'
+
+    def timber_version = "5.0.1"
+    def gson_version = "2.10"
+
+    def lifecycle_livedata_version = "2.5.1"
+
+    implementation project(path: ':masteredit')
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:$core_ktx_version"
+
+    // Log helper
+    implementation "com.jakewharton.timber:timber:$timber_version"
+
+    // Flex box
+    implementation "com.google.android.flexbox:flexbox:$flexbox_version"
+
+    // Glide
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
+
+    // Exo player
+    implementation "com.google.android.exoplayer:exoplayer:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
+
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_livedata_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_livedata_version"
+
+    // Gson
+    implementation "com.google.code.gson:gson:$gson_version"
 
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'

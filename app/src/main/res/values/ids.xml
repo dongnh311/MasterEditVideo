@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="track_media" type="id"/>
+    <item name="track_effect" type="id"/>
+    <item name="track_graphy" type="id"/>
+    <item name="track_filter" type="id"/>
+    <item name="track_music" type="id"/>
+</resources>

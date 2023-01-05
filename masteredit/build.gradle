@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
@@ -9,7 +9,6 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.dongnh.masteredit"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -35,7 +34,7 @@ android {
 
 dependencies {
 
-    def kotlin_version = '1.8.0'
+    def kotlin_version = '1.7.20'
     def core_ktx_version = "1.9.0"
     def timber_version = "5.0.1"
     def gson_version = "2.10"

@@ -45,6 +45,10 @@ dependencies {
     def gpu_image_version = '2.1.0'
     def constraint_layout_version = "2.1.4"
 
+    def timber_version = "5.0.1"
+
+    def exo_version = '2.18.2'
+
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:$core_ktx_version"
@@ -54,7 +58,17 @@ dependencies {
 
     // Gpu image
     implementation "jp.co.cyberagent.android:gpuimage:$gpu_image_version"
-    
+
+    // Log helper
+    implementation "com.jakewharton.timber:timber:$timber_version"
+
+    // Exo player
+    implementation "com.google.android.exoplayer:exoplayer:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
+
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'

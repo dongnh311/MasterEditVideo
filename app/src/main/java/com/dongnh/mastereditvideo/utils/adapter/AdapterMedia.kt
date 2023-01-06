@@ -21,7 +21,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
 import com.dongnh.mastereditvideo.databinding.ItemMediaBinding
-import com.dongnh.mastereditvideo.model.MediaObject
+import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.mastereditvideo.utils.interfaces.OnImageClick
 import timber.log.Timber
 

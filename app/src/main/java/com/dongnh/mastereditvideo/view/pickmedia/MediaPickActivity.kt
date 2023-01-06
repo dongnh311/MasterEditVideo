@@ -7,10 +7,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.MEDIA_IMAGE
-import com.dongnh.mastereditvideo.const.MEDIA_TYPE_IMAGE
 import com.dongnh.mastereditvideo.const.NAME_SEND_PICK_MEDIA
 import com.dongnh.mastereditvideo.databinding.ActivityMediaPickBinding
-import com.dongnh.mastereditvideo.model.MediaObject
+import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.adapter.AdapterMedia
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage

@@ -12,7 +12,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.ItemTrackViewBinding
@@ -101,11 +100,11 @@ class TimeLineTrack: FrameLayout {
             if (i % 2 == 0) {
                 textView.text = (i / 2).toString()
                 textView.textSize = 6f
-                textView.setTextColor(context.getColor(com.dongnh.masteredit.R.color.colorWhite))
+                textView.setTextColor(context.getColor(R.color.colorWhite))
             } else {
                 textView.text = "■"
                 textView.textSize = 4f
-                textView.setTextColor(context.getColor(com.dongnh.masteredit.R.color.colorTextSelected))
+                textView.setTextColor(context.getColor(R.color.colorTextSelected))
             }
 
             textView.gravity = Gravity.START
@@ -170,8 +169,7 @@ class TimeLineTrack: FrameLayout {
      * Init line track for view
      */
     private fun initTimeLineForType() {
-        // Call marin
-        var marginForCurrent = 0
+        // Add item to view
         for (i in 0 until 5) {
             val layoutMedia: ItemTrackViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_track_view, null, false)
 
@@ -194,7 +192,7 @@ class TimeLineTrack: FrameLayout {
                 }
             }
 
-            marginForCurrent = if (i == 0) {
+            val marginForCurrent = if (i == 0) {
                 thumbnailSize - marginItem - marginItem / 8
             } else {
                 marginItem - marginItem / 4

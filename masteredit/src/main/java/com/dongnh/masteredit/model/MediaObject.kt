@@ -1,4 +1,4 @@
-package com.dongnh.mastereditvideo.model
+package com.dongnh.masteredit.model
 
 /**
  * Project : MasterEditVideo

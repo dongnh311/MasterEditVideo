@@ -1,7 +1,7 @@
 package com.dongnh.mastereditvideo.singleton
 
 import androidx.lifecycle.MutableLiveData
-import com.dongnh.mastereditvideo.model.MediaObject
+import com.dongnh.masteredit.model.MediaObject
 
 /**
  * Project : MasterEditVideo

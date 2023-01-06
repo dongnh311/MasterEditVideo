@@ -1,53 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#00C3CD</color>
-    <color name="colorPrimaryDark">#484848</color>
-    <color name="colorAccent">#00C3CD</color>
-    <color name="colorBlack">#FF000000</color>
-    <color name="colorWhite">#FFFFFFFF</color>
-    <color name="colorBlue">#0000FF</color>
-    <color name="colorDark">#757575</color>
-    <color name="colorDarkPale">#e2e0e1</color>
-    <color name="colorRed">#ff0000</color>
-    <color name="colorRedPale">#ff5656</color>
-    <color name="colorGreen">#00ff00</color>
-    <color name="colorBgDialog">#70585858</color>
-    <color name="colorBgApp">#343434</color>
-    <color name="colorTextApp">#2a3138</color>
-    <color name="colorStatusBar">#4A4A4A</color>
 
-    <color name="colorHintText">#EAEAEA</color>
-    <color name="colorHintNoText">#90FFFFFF</color>
-    <color name="colorBtnGoogle">#E94335</color>
-    <color name="colorBtnFacebook">#3A5999</color>
-    <color name="colorTextBtn">#545454</color>
-    <color name="colorBgAvatar">#C4C4C4</color>
-    <color name="colorBgCatalog">#CDCDCD</color>
-    <color name="colorBgSwitch">#BCBCBC</color>
-    <color name="colorBtnOffSwitch">#5F5F5F</color>
-    <color name="colorBorderAvatar">#004BD2</color>
-    <color name="colorTextRecord">#7F7F7F</color>
-    <color name="colorItemMusic">#2EE2B2</color>
-    <color name="colorItemMusicSelect">#1D2D40</color>
-    <color name="colorBgVideoEdit">#20DADADA</color>
-    <color name="colorTextSelected">#38BFC3</color>
-    <color name="colorBgLinear">#60EAEAEA</color>
-    <color name="colorShadow">#FF000000</color>
-    <color name="colorLine">#FF15FF00</color>
-    <color name="colorBgSelect">#3F3F3F</color>
-    <color name="colorItemEffectChoose">#60085458</color>
-    <color name="colorEnbaleIcon">#EAEAEA</color>
-    <color name="colorHintSearch">#75484848</color>
-    <color name="colorBgTextMedia">#95393939</color>
-
-    <color name="colorBgBtnDone">#05FFFFFF</color>
-    <color name="colorCornerBtnDone">#80FFFFFF</color>
-
-    <color name="colorMusicActive">#41FFC6</color>
-    <color name="colorBgFilter">#10FFFFFF</color>
-    <color name="colorTimeLineGraphy">#66004BD2</color>
-    <color name="colorTimeLineFilter">#6600ff00</color>
-    <color name="colorTimeLineEffect">#66ff0000</color>
-    <color name="colorTransparent">#00000000</color>
 </resources>

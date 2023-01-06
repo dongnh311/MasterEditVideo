@@ -49,7 +49,7 @@ dependencies {
 
     def flexbox_version = "3.0.0"
     def glide_version = "4.14.2"
-    def exo_version = '2.18.2'
+
 
     def timber_version = "5.0.1"
     def gson_version = "2.10"
@@ -72,11 +72,6 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
 
-    // Exo player
-    implementation "com.google.android.exoplayer:exoplayer:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_livedata_version"

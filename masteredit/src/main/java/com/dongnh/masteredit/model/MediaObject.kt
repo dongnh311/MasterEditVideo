@@ -54,6 +54,9 @@ class MediaObject(
 
     var matrixValuesLocal: FloatArray = floatArrayOf()
 
+    var beginAt: Long = 0L
+    var endAt: Long = 0L
+
     public override fun clone(): Any {
         return super.clone()
     }

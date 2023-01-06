@@ -22,3 +22,7 @@ const val CONTRAST = 2
 const val GRAMMAR = 4
 const val VOLUME = 20
 const val ALPHA = 7
+
+const val MEDIA_TYPE_VIDEO = "video"
+const val MEDIA_TYPE_IMAGE = "image"
+const val MEDIA_TYPE_TRANSITION = "transition"

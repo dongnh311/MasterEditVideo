@@ -10,7 +10,7 @@ import java.util.ArrayList
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class GlFilterGroupObject(private val filters: Collection<GLFilterObject?>) : GLFilterObject() {
+class GLFilterGroupObject(private val filters: Collection<GLFilterObject?>) : GLFilterObject() {
 
     val list: ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>> =
         ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>>()

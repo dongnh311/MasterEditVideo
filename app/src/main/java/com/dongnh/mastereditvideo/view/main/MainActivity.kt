@@ -5,20 +5,24 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import com.dongnh.masteredit.control.ManagerPlayerControl
+import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
-import com.dongnh.mastereditvideo.const.MEDIA_IMAGE
-import com.dongnh.mastereditvideo.const.MEDIA_VIDEO
-import com.dongnh.mastereditvideo.const.NAME_SEND_PICK_MEDIA
+import com.dongnh.mastereditvideo.const.*
 import com.dongnh.mastereditvideo.databinding.ActivityMainBinding
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
+import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +35,13 @@ class MainActivity : AppCompatActivity() {
 
     // Control view duration text for video
     lateinit var durationControl: DurationControl
+
+    // Manager player
+    lateinit var managerPlayerControl: ManagerPlayerControl
+
+    // Find duration of video
+    private val handleTask = Handler(Looper.myLooper()!!)
+    private var runnableDurationTimeLine: Runnable? = null
 
     // Request permission for storage
     private val requestPermissionLauncherStorage =
@@ -123,6 +134,65 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun configPlayerControl() {
+        // Event of player
+        this@MainActivity.managerPlayerControl.videoEventLister =
+            object : VideoEventLister {
+                override fun onPlayWithProgress(adjDuration: Long) {
+                    this@MainActivity.durationControl.setDuration(adjDuration)
+                }
+
+                override fun onPlayOverEnd() {
+                    this@MainActivity.moveVideoPlayToStart()
+                }
+            }
+    }
+
+    /**
+     * Need method reset play to start
+     */
+    private fun moveVideoPlayToStart() {
+        setupButtonPause()
+
+        // Check duration current, if is start, we no need srcoll to start
+        if (this@MainActivity.mainBinding.viewTimeLine.currentDurationInView != 0.0) {
+            Timber.e("========= Move to start play ============")
+            this@MainActivity.durationControl.resetValueOfDuration()
+            this@MainActivity.mainBinding.viewTimeLine.scrollToStart()
+            this@MainActivity.managerPlayerControl.seekVideoDuration(0L)
+        }
+    }
+
+    /**
+     * Setup play video
+     */
+    private fun setupButtonPlay() {
+        // Play video
+        Timber.e("========= Play ============")
+        this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PAUSE
+        this@MainActivity.mainBinding.btnPlay.setImageResource(R.drawable.ic_pause)
+
+        handleTask.removeCallbacksAndMessages(null)
+
+        this@MainActivity.isPlaying = true
+        this@MainActivity.managerPlayerControl.playVideo()
+
+        this@MainActivity.runnableDurationTimeLine?.let { handleTask.postDelayed(it, 400) }
+    }
+
+    /**
+     * Setup pause video
+     */
+    private fun setupButtonPause() {
+        // Pause or stop
+        Timber.e("========= Pause play ============")
+        this@MainActivity.managerPlayerControl.pauseAllPlay()
+        this@MainActivity.handleTask.removeCallbacksAndMessages(null)
+        this@MainActivity.isPlaying = false
+        this@MainActivity.mainBinding.btnPlay.setImageResource(R.drawable.ic_play)
+        this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
+    }
+
     /**
      * Observer data change for progress view
      */
@@ -130,7 +200,8 @@ class MainActivity : AppCompatActivity() {
         // Check data is add
         MyDataSingleton.isAddNewMedia.observe(this) {
             if (it) {
-                // Add new media
+                this@MainActivity.mainBinding.viewTimeLine
+                this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(MyDataSingleton.listMediaPick)
             }
         }
     }

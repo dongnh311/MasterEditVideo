@@ -8,10 +8,11 @@ import com.dongnh.masteredit.const.TypePlayerScale
 import com.dongnh.masteredit.gl.GLConfigChooser
 import com.dongnh.masteredit.gl.GLContextFactory
 import com.dongnh.masteredit.gl.GLFilterObject
-import com.dongnh.masteredit.gl.GlLookUpTableFilterObject
+import com.dongnh.masteredit.gl.GLLookUpTableFilterObject
 import com.dongnh.masteredit.render.GLPlayerRenderer
+import com.dongnh.masteredit.utils.exomanager.PlayerEventListener
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import timber.log.Timber
 
 /**
@@ -20,18 +21,19 @@ import timber.log.Timber
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(context, attrs) {
+class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(context, attrs), Player.Listener {
     // Render
-    var renderer: GLPlayerRenderer = GLPlayerRenderer()
+    private var renderer: GLPlayerRenderer = GLPlayerRenderer()
 
     var videoAspect = 1f
     var heightVideo = 0f
     var widthVideo = 0f
     var ratioScreen: String = ""
+    private var surface: Surface? = null
     private var typePlayerScale = TypePlayerScale.RESIZE_FIT_WIDTH
 
     // Using Exoplayer
-    var simpleExoPlayer: SimpleExoPlayer? = null
+    private var exoPlayer: ExoPlayer? = null
 
     init {
         setEGLContextFactory(GLContextFactory())
@@ -42,7 +44,7 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             override fun onGLFilterAdded(filter: GLFilterObject?) {
                 if (filter != null) {
                     filter.release()
-                    if (filter is GlLookUpTableFilterObject) {
+                    if (filter is GLLookUpTableFilterObject) {
                         filter.releaseLutBitmap()
                     }
                 }
@@ -53,18 +55,23 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             }
 
             override fun needConfigInputSource(surface: Surface) {
-                this@GLPlayerView.simpleExoPlayer?.setVideoSurface(surface)
+                this@GLPlayerView.surface =  surface
+                this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
             }
         }
     }
 
-    fun setSimpleExoPlayer(player: SimpleExoPlayer): GLPlayerView {
-        if (this@GLPlayerView.simpleExoPlayer != null) {
-            this@GLPlayerView.simpleExoPlayer!!.release()
-            this@GLPlayerView.simpleExoPlayer = null
+    /**
+     * Config exoplayer
+     */
+    fun setExoPlayer(player: ExoPlayer): GLPlayerView {
+        if (this@GLPlayerView.exoPlayer != null) {
+            this@GLPlayerView.exoPlayer!!.release()
+            this@GLPlayerView.exoPlayer = null
         }
-        this@GLPlayerView.simpleExoPlayer = player
-        //this@GLPlayerView.simpleExoPlayer!!.addVideoListener(this)
+        this@GLPlayerView.exoPlayer = player
+        this@GLPlayerView.surface?.let { player.setVideoSurface(it) }
+        this@GLPlayerView.exoPlayer!!.addListener(PlayerEventListener(player))
         return this
     }
 
@@ -89,6 +96,13 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
     }
 
     /**
+     * Add filter
+     */
+    fun addFilterRender(glFilter: GLFilterObject) {
+        renderer.addGLFilter(glFilter)
+    }
+
+    /**
      * Config type for scale
      */
     fun setTypePlayerScale(TypePlayerScale: TypePlayerScale) {
@@ -101,8 +115,29 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
         renderer.release()
     }
 
+    /**
+     * Set rotate for render
+     */
+    fun setRotate(
+        rotate: Int,
+        ratioScreen: String,
+        isFlipVertical: Boolean,
+        isFlipHorizontal: Boolean
+    ) {
+        this@GLPlayerView.ratioScreen = ratioScreen
+        this@GLPlayerView.renderer.setRotation(
+            rotate,
+            ratioScreen,
+            isFlipVertical,
+            isFlipHorizontal
+        )
+    }
+
+    /**
+     * Release render
+     */
     fun releaseAll() {
         renderer.release()
-        simpleExoPlayer?.release()
+        exoPlayer?.release()
     }
 }

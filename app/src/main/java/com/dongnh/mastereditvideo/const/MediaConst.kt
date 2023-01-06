@@ -20,3 +20,6 @@ const val MEDIA_AUDIO_SUFFIXES = ".mp3"
 
 // Name for send type pick data
 const val NAME_SEND_PICK_MEDIA = "mode pick media"
+
+const val VIDEO_IS_PLAY = 1
+const val VIDEO_IS_PAUSE = 2

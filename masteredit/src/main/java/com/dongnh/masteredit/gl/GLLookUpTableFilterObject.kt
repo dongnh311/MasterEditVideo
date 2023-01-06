@@ -12,7 +12,7 @@ import com.dongnh.masteredit.utils.glutils.EglUtil
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class GlLookUpTableFilterObject : GLFilterObject {
+class GLLookUpTableFilterObject : GLFilterObject {
 
     private var hTex = 0
 

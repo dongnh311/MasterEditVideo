@@ -2,17 +2,14 @@ package com.dongnh.mastereditvideo.view.main
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import com.dongnh.masteredit.control.ManagerPlayerControl
+import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
@@ -37,10 +34,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var durationControl: DurationControl
 
     // Manager player
-    lateinit var managerPlayerControl: ManagerPlayerControl
+    lateinit var managerPlayerControl: ManagerPlayerMedia
 
     // Find duration of video
     private val handleTask = Handler(Looper.myLooper()!!)
+
+    // Update scroll to view
     private var runnableDurationTimeLine: Runnable? = null
 
     // Request permission for storage
@@ -75,6 +74,27 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // Init tag for default
+        this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
+
+        // Init manager
+        managerPlayerControl = ManagerPlayerMedia(this@MainActivity, mainBinding.viewPlayer)
+
+        // Event of player
+        this@MainActivity.managerPlayerControl.videoEventLister =
+            object : VideoEventLister {
+                override fun onPlayWithProgress(adjDuration: Long) {
+                    this@MainActivity.durationControl.setDuration(adjDuration)
+                }
+
+                override fun onPlayOverEnd() {
+                    this@MainActivity.moveVideoPlayToStart()
+                }
+            }
+
+        // Init handler duration
+        initHandleDuration()
+
         // Event
         configEventOfButtonLayout()
 
@@ -86,6 +106,9 @@ class MainActivity : AppCompatActivity() {
 
         // Change duration in view
         configEventSeerDuration()
+
+        // Lister play event
+        configPlayerControl()
     }
 
     /**
@@ -104,6 +127,15 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, MediaPickActivity::class.java)
             intent.putExtra(NAME_SEND_PICK_MEDIA, MEDIA_VIDEO)
             startActivity(intent)
+        }
+
+        // Button play and pause
+        mainBinding.btnPlay.setOnClickListener {
+            if (this@MainActivity.mainBinding.btnPlay.tag == null || this@MainActivity.mainBinding.btnPlay.tag == VIDEO_IS_PLAY) {
+                setupButtonPlay()
+            } else {
+                setupButtonPause()
+            }
         }
     }
 
@@ -177,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         this@MainActivity.isPlaying = true
         this@MainActivity.managerPlayerControl.playVideo()
 
-        this@MainActivity.runnableDurationTimeLine?.let { handleTask.postDelayed(it, 400) }
+        runnableDurationTimeLine?.let { handleTask.postDelayed(it, 400) }
     }
 
     /**
@@ -188,6 +220,7 @@ class MainActivity : AppCompatActivity() {
         Timber.e("========= Pause play ============")
         this@MainActivity.managerPlayerControl.pauseAllPlay()
         this@MainActivity.handleTask.removeCallbacksAndMessages(null)
+        runnableDurationTimeLine?.let { this@MainActivity.handleTask.removeCallbacks(it) }
         this@MainActivity.isPlaying = false
         this@MainActivity.mainBinding.btnPlay.setImageResource(R.drawable.ic_play)
         this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
@@ -200,8 +233,20 @@ class MainActivity : AppCompatActivity() {
         // Check data is add
         MyDataSingleton.isAddNewMedia.observe(this) {
             if (it) {
-                this@MainActivity.mainBinding.viewTimeLine
+                this@MainActivity.mainBinding.viewTimeLine.addMediaAndCreateItemView(MyDataSingleton.listMediaPick)
                 this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(MyDataSingleton.listMediaPick)
+            }
+        }
+    }
+
+    /**
+     * Make duration auto play
+     */
+    private fun initHandleDuration() {
+        this@MainActivity.runnableDurationTimeLine = Runnable {
+            this@MainActivity.mainBinding.viewTimeLine.updateScrollOfMainView()
+            this@MainActivity.runnableDurationTimeLine?.let {
+                if (this@MainActivity.isPlaying) {handleTask.postDelayed(it, 50)} else handleTask.removeCallbacks(it)
             }
         }
     }

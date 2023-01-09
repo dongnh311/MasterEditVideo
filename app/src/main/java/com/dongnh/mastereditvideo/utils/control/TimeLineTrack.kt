@@ -114,7 +114,7 @@ class TimeLineTrack: FrameLayout {
     private fun initializeViewForDuration() {
         this@TimeLineTrack.itemTimeLineBinding.layoutDuration.removeAllViews()
         val sizeToCreate =
-            totalThumbnailCreated * 2 + 1
+            totalThumbnailCreated * 2 + 2
         for (i in 0 until sizeToCreate) {
             val textView = TextView(context)
             if (i % 2 == 0) {
@@ -145,7 +145,7 @@ class TimeLineTrack: FrameLayout {
             )
         }
 
-        maxWidthOfDuration = (totalThumbnailCreated * thumbnailSize) + (marginToCenter * 2) - thumbnailSize + (marginItem / 2)
+        maxWidthOfDuration = (totalThumbnailCreated * thumbnailSize) + (marginToCenter * 2) - thumbnailSize + (marginItem)
         val layoutOfDuration = ConstraintLayout.LayoutParams(maxWidthOfDuration, ConstraintLayout.LayoutParams.WRAP_CONTENT)
         layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
 
@@ -245,6 +245,8 @@ class TimeLineTrack: FrameLayout {
         // Re draw timeline
         initializeViewForDuration()
 
+        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.removeAllViews()
+        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
         // Re draw track
         initTimeLineForType()
     }
@@ -261,9 +263,6 @@ class TimeLineTrack: FrameLayout {
 
         this@TimeLineTrack.totalDuration = totalDuration
         this@TimeLineTrack.totalThumbnailCreated = (this@TimeLineTrack.totalDuration / 1000.0).toInt()
-
-        // Set new width for track
-        maxWidthOfDuration = (totalThumbnailCreated * thumbnailSize) + (marginToCenter * 2) - thumbnailSize + (marginItem / 2)
 
         // Re draw timeline
         initializeViewForDuration()
@@ -282,6 +281,8 @@ class TimeLineTrack: FrameLayout {
 
         this@TimeLineTrack.itemTimeLineBinding.layoutEdit.removeAllViews()
         this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+        // Re draw track
+        initTimeLineForType()
 
         val layoutOfTrack: LinearLayout = this@TimeLineTrack.itemTimeLineBinding.layoutEdit[0] as LinearLayout
         this@TimeLineTrack.listMedia.forEachIndexed { index, mediaObject ->
@@ -345,13 +346,13 @@ class TimeLineTrack: FrameLayout {
             }
 
             val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
 
             // Margin first item
             if (index == 0) {
-                layoutParams.setMargins(marginToCenter, 0, 0, 0)
+                layoutParams.setMargins(marginToCenter - thumbnailSize + marginItem , 0, 0, 0)
             }
 
             linearLayoutAddThumb.layoutParams = layoutParams
@@ -443,5 +444,17 @@ class TimeLineTrack: FrameLayout {
                     return false
                 }
             }).into(imageView)
+    }
+
+    /**
+     * Scroll list track when play
+     */
+    fun updateScrollOfMainView() {
+        val duration = ((thumbnailSize + (marginItem / 4)) * 100.0 / 1000)
+        this@TimeLineTrack.currentDurationInView += duration
+        this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
+            (currentDurationInView).toInt(),
+            0
+        )
     }
 }

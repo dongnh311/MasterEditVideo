@@ -9,11 +9,11 @@ import com.dongnh.masteredit.filter.GLContrastFilterObject
 import com.dongnh.masteredit.filter.GLGammaFilterObject
 import com.dongnh.masteredit.gl.GLFilterObject
 import com.dongnh.masteredit.gl.GLFilterGroupObject
-import com.dongnh.masteredit.utils.exomanager.ExoManager
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.view.GLPlayerView
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.lang.Math.abs
 
 /**
@@ -22,9 +22,8 @@ import java.lang.Math.abs
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class PlayerMediaControl(context: Context) {
+class PreViewLayoutControl(context: Context) {
     val glPlayerView: GLPlayerView = GLPlayerView(context, null)
-    val exoManager: ExoManager = ExoManager(context)
 
     // Default filter
     private var filterBrightness = GLBrightnessFilterObject()
@@ -34,38 +33,16 @@ class PlayerMediaControl(context: Context) {
     // List filter
     private val listFilterAdded = mutableListOf<GLFilterObject>()
 
-    // lister when play to end
-    var playEndListener: MediaPlayEndListener? = null
-
     // Config for view
     var rotate = 0
     var ratioScreen: String = VIEW_SIZE_16_9
     var flipVertical: Boolean = false
     var flipHorizontal: Boolean = false
 
-    // Send data to view
-    val playbackProgressObservable = flow {
-        delay(200)
-        emit(this@PlayerMediaControl.exoManager.exoPlayer.currentPosition)
-    }
-
     /**
      * Init and prepare to view
      */
-    fun initViewAndPrepareData() {
-        // Call back to view
-        exoManager.mediaPlayEndListener = object : MediaPlayEndListener {
-            override fun onPreparePlay(position: Long, duration: Long) {
-                playEndListener?.onPreparePlay(position, duration)
-            }
-
-            override fun onEndPlay(position: Long, duration: Long) {
-                playEndListener?.onEndPlay(position, duration)
-            }
-        }
-
-        glPlayerView.setExoPlayer(exoManager.exoPlayer)
-
+    fun initViewSizeToView() {
         val layoutParam = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -96,7 +73,7 @@ class PlayerMediaControl(context: Context) {
 
         glPlayerView.post {
             glPlayerView.setRotate(
-                abs(rotate),
+                kotlin.math.abs(rotate),
                 ratioScreen,
                 flipVertical,
                 flipHorizontal
@@ -122,24 +99,10 @@ class PlayerMediaControl(context: Context) {
     }
 
     /**
-     * Start play video
-     */
-    fun playVideo() {
-        if (exoManager.exoPlayer.playWhenReady) {
-            pauseVideo()
-        } else {
-            exoManager.exoPlayer.playWhenReady = true
-        }
-    }
-
-    /**
      * Pause player
      */
     fun onPause() {
         glPlayerView.onPause()
     }
 
-    fun pauseVideo() {
-        exoManager.exoPlayer.playWhenReady = false
-    }
 }

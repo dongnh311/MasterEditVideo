@@ -2,6 +2,9 @@ package com.dongnh.mastereditvideo.utils.control
 
 import android.widget.TextView
 import com.dongnh.mastereditvideo.utils.exts.stringForTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Project : MasterEditVideo
@@ -20,7 +23,9 @@ class DurationControl(private val viewDuration: TextView) {
     fun setDuration(durationFormat: Long) {
         this@DurationControl.adjDuration = durationFormat
         this@DurationControl.currentDuration += durationFormat
-        this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        CoroutineScope(Dispatchers.Main).launch {
+            this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        }
     }
 
     /**
@@ -28,7 +33,9 @@ class DurationControl(private val viewDuration: TextView) {
      */
     fun setDurationSeek(durationFormat: Long) {
         this@DurationControl.currentDuration = durationFormat
-        this@DurationControl.viewDuration.text = durationFormat.stringForTime()
+        CoroutineScope(Dispatchers.Main).launch {
+            this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        }
     }
 
     /**
@@ -38,6 +45,8 @@ class DurationControl(private val viewDuration: TextView) {
         currentDuration = 0L
         adjDuration = 0L
         totalDuration = 0L
-        this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        CoroutineScope(Dispatchers.Main).launch {
+            this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        }
     }
 }

@@ -35,6 +35,9 @@ class MediaPickActivity : AppCompatActivity() {
             }
         }
 
+        // Reset value
+        MyDataSingleton.resetValue()
+
         initEventForView()
         initAdapter()
 

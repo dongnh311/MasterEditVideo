@@ -13,6 +13,9 @@ import com.dongnh.masteredit.render.GLPlayerRenderer
 import com.dongnh.masteredit.utils.exomanager.PlayerEventListener
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
 import com.google.android.exoplayer2.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
@@ -55,8 +58,10 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             }
 
             override fun needConfigInputSource(surface: Surface) {
-                this@GLPlayerView.surface =  surface
-                this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
+                CoroutineScope(Dispatchers.Main).launch {
+                    this@GLPlayerView.surface =  surface
+                    this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
+                }
             }
         }
     }

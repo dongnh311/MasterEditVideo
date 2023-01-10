@@ -78,7 +78,6 @@ abstract class GLFrameBufferObjectRenderer : GLSurfaceView.Renderer {
                 glfilter.draw(it, null)
             }
         }
-
     }
 
     @Throws(Throwable::class)

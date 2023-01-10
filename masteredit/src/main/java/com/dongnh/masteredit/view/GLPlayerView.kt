@@ -1,10 +1,14 @@
 package com.dongnh.masteredit.view
 
 import android.content.Context
+import android.graphics.SurfaceTexture
+import android.media.MediaFormat
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.Surface
 import com.dongnh.masteredit.const.TypePlayerScale
+import com.dongnh.masteredit.const.VIEW_SIZE_16_9
+import com.dongnh.masteredit.const.VIEW_SIZE_9_16
 import com.dongnh.masteredit.gl.GLConfigChooser
 import com.dongnh.masteredit.gl.GLContextFactory
 import com.dongnh.masteredit.gl.GLFilterObject
@@ -13,6 +17,8 @@ import com.dongnh.masteredit.render.GLPlayerRenderer
 import com.dongnh.masteredit.utils.exomanager.PlayerEventListener
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.video.VideoFrameMetadataListener
+import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,17 +59,31 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
                 }
             }
 
-            override fun needRequestRender() {
-                this@GLPlayerView.requestRender()
+            override fun needRequestRender(surfaceTexture: SurfaceTexture?) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Timber.e("needRequestRender")
+                    this@GLPlayerView.requestRender()
+                }
+            }
+
+            override fun requestRender() {
+                CoroutineScope(Dispatchers.Main).launch {
+                    this@GLPlayerView.requestRender()
+                }
             }
 
             override fun needConfigInputSource(surface: Surface) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    this@GLPlayerView.surface =  surface
-                    this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
+                this@GLPlayerView.surface = surface
+                this@GLPlayerView.exoPlayer?.setVideoFrameMetadataListener { presentationTimeUs, releaseTimeNs, format, mediaFormat ->
+                    Timber.e(
+                        "Data : $presentationTimeUs, releaseTimeNs : $releaseTimeNs, format : $format, mediaFormat : $mediaFormat"
+                    )
                 }
+                //this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
             }
         }
+
+        renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
     }
 
     /**
@@ -71,12 +91,12 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
      */
     fun setExoPlayer(player: ExoPlayer): GLPlayerView {
         if (this@GLPlayerView.exoPlayer != null) {
-            this@GLPlayerView.exoPlayer!!.release()
             this@GLPlayerView.exoPlayer = null
         }
         this@GLPlayerView.exoPlayer = player
-        this@GLPlayerView.surface?.let { player.setVideoSurface(it) }
-        this@GLPlayerView.exoPlayer!!.addListener(PlayerEventListener(player))
+        //this@GLPlayerView.surface?.let { player.setVideoSurface(it) }
+
+        this@GLPlayerView.renderer.configPlayer(player)
         return this
     }
 
@@ -96,8 +116,34 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             }
         }
 
-        Timber.d("onMeasure viewWidth = $viewWidth viewHeight = $viewHeight")
+        Timber.e("onMeasure viewWidth = $viewWidth viewHeight = $viewHeight")
         setMeasuredDimension(viewWidth, viewHeight)
+    }
+
+    /**
+     * Config video size to view
+     */
+    fun configSizeOfVideoToView(videoSize: VideoSize) {
+        videoAspect = videoSize.width.toFloat() / videoSize.height * videoSize.pixelWidthHeightRatio
+        if (ratioScreen == VIEW_SIZE_9_16) {
+            if (videoSize.width > videoSize.height) {
+                typePlayerScale = TypePlayerScale.RESIZE_FIT_WIDTH
+            }
+        } else if (ratioScreen == VIEW_SIZE_16_9) {
+            if (videoSize.height > videoSize.width) {
+                typePlayerScale = TypePlayerScale.RESIZE_FIT_HEIGHT
+            }
+        } else {
+            typePlayerScale = if (videoSize.width > videoSize.height) {
+                TypePlayerScale.RESIZE_FIT_WIDTH
+            } else {
+                TypePlayerScale.RESIZE_FIT_HEIGHT
+            }
+        }
+        heightVideo = videoSize.height.toFloat()
+        widthVideo = videoSize.width.toFloat()
+        Timber.e("configSizeOfVideoToView viewWidth = $widthVideo viewHeight = $heightVideo")
+        requestLayout()
     }
 
     /**

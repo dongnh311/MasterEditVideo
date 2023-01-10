@@ -4,6 +4,8 @@ import android.content.Context
 import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
+import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
+import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -21,15 +23,21 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
 
     val exoManager: ExoManager = ExoManager(context)
 
+    // Save current player
+    private var isPlaying = false
+
     // Duration play
     var currentDurationPlayer = 0L
+
+    // Video size
+    var viewChangeSizeListener: ViewChangeSizeListener? = null
 
     // Send data to view
     override val playbackProgressObservable = flow {
         repeat(100000) {
-            if (currentCoroutineContext().isActive && exoManager.exoPlayer.playWhenReady) {
+            if (currentCoroutineContext().isActive && isPlaying) {
                 delay(200)
-                currentDurationPlayer = this@VideoPlayerControl.exoManager.exoPlayer.currentPosition
+                val currentDurationPlayer = this@VideoPlayerControl.exoManager.exoPlayer.currentPosition - mediaObject.beginAt
                 emit(currentDurationPlayer)
             }
         }
@@ -41,9 +49,9 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
     /**
      * Init media
      */
-    override fun initMediaPlayer(index: Int, mediaObject: MediaObject) {
+    override fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject) {
         this@VideoPlayerControl.mediaObject = mediaObject
-        this@VideoPlayerControl.indexOfMedia = index
+        this@VideoPlayerControl.indexOfMedia = indexOfMedia
 
         // Call back to view
         exoManager.mediaPlayEndListener = object : MediaPlayEndListener {
@@ -54,30 +62,50 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
             override fun onEndPlay(position: Long, duration: Long) {
                 playEndListener?.onEndPlay(position, duration)
             }
+
+            override fun onVideoSizeChange(videoSize: VideoSize) {
+                viewChangeSizeListener?.onVideoSizeChange(videoSize)
+            }
         }
 
         // Init media to play
         exoManager.createMediaItems(arrayListOf(mediaObject))
+        exoManager.exoPlayer.prepare()
     }
 
     /**
      * Start play video
      */
     override fun playerMedia() {
-        super.playerMedia()
-        if (exoManager.exoPlayer.playWhenReady) {
-            pauseMedia()
-        } else {
+        if (!isPlaying) {
+            isPlaying = true
             exoManager.exoPlayer.playWhenReady = true
+        } else {
+            exoManager.exoPlayer.playWhenReady = false
+            pauseMedia()
         }
-
     }
 
     /**
      * Pause video
      */
     override fun pauseMedia() {
-        super.pauseMedia()
+        isPlaying = false
         exoManager.exoPlayer.playWhenReady = false
+    }
+
+    /**
+     * Seek to duration
+     */
+    override fun seekTo(currentPosition: Long) {
+        this@VideoPlayerControl.currentDurationPlayer = currentPosition + mediaObject.beginAt
+        exoManager.exoPlayer.seekTo(this@VideoPlayerControl.currentDurationPlayer)
+    }
+
+    /**
+     * Release
+     */
+    override fun releaseMedia() {
+        exoManager.exoPlayer.release()
     }
 }

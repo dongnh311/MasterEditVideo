@@ -4,6 +4,7 @@ import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.video.VideoSize
 
 /**
  * Project : MasterEditVideo
@@ -35,5 +36,10 @@ class PlayerEventListener(private val exoPlayer: ExoPlayer) : Player.Listener {
             ExoPlayer.STATE_READY -> {}
             else -> {}
         }
+    }
+
+    override fun onVideoSizeChanged(videoSize: VideoSize) {
+        super.onVideoSizeChanged(videoSize)
+        mediaPlayEndListener?.onVideoSizeChange(videoSize)
     }
 }

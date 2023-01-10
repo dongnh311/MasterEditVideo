@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
+import java.util.concurrent.Flow
 
 /**
  * Project : MasterEditVideo
@@ -23,25 +24,30 @@ abstract class BasePlayerControl {
     var indexOfMedia = -1
 
     // Send data to view
-    open val playbackProgressObservable = flow<Long> {}.flowOn(Dispatchers.Main)
+    abstract val playbackProgressObservable : kotlinx.coroutines.flow.Flow<Long>
 
     /**
      * Init media
      */
-    open fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject) {}
+    abstract fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject)
 
     /**
      * Play media
      */
-    open fun playerMedia() {}
+    abstract fun playerMedia()
 
     /**
      * Pause media
      */
-    open fun pauseMedia() {}
+    abstract fun pauseMedia()
 
     /**
      * Seek media to duration
      */
-    open fun seekTo(currentPosition: Long) {}
+    abstract fun seekTo(currentPosition: Long)
+
+    /**
+     * Release media
+     */
+    abstract fun releaseMedia()
 }

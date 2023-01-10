@@ -24,15 +24,21 @@
             app:layout_constraintGuide_percent="0.65" />
 
         <LinearLayout
-            android:id="@+id/view_player"
             android:layout_width="0dp"
             android:orientation="vertical"
-            android:gravity="center"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="@id/guide_line_right"
             app:layout_constraintBottom_toBottomOf="@id/guide_line_bottom"
-            android:layout_height="0dp"/>
+            android:layout_height="0dp">
+
+            <FrameLayout
+                android:id="@+id/view_player"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/view_duration"

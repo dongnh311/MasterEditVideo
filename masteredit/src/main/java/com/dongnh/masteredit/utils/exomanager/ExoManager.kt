@@ -9,6 +9,8 @@ import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.video.VideoSize
+import timber.log.Timber
 
 /**
  * Project : MasterEditVideo
@@ -37,8 +39,7 @@ class ExoManager(context: Context) {
 
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
         val playerEventListener = PlayerEventListener(exoPlayer)
-        exoPlayer.addListener(PlayerEventListener(exoPlayer))
-
+        exoPlayer.addListener(playerEventListener)
         // Send to view
         playerEventListener.mediaPlayEndListener = object : MediaPlayEndListener {
             override fun onEndPlay(position: Long, duration: Long) {
@@ -51,9 +52,15 @@ class ExoManager(context: Context) {
                 exoPlayer.seekTo(position.toInt(), listMedia[position.toInt()].beginAt)
                 exoPlayer.prepare()
             }
+
+            override fun onVideoSizeChange(videoSize: VideoSize) {
+                Timber.e("onVideoSizeChange")
+                mediaPlayEndListener?.onVideoSizeChange(videoSize)
+            }
         }
 
-        exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
+        exoPlayer.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+        exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
         exoPlayer.playWhenReady = startAutoPlay
 
         val haveStartPosition = startWindow != C.INDEX_UNSET

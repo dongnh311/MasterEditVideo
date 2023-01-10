@@ -2,6 +2,7 @@ package com.dongnh.masteredit.control
 
 import android.content.Context
 import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.utils.exomanager.ExoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -16,6 +17,9 @@ import kotlinx.coroutines.isActive
  * Phone : +84397199197.
  */
 class ImagePlayerControl(private val context: Context) : BasePlayerControl() {
+
+    // Using exo to view image
+    val exoManager: ExoManager = ExoManager(context)
 
     // Max duration view image
     var maxDuration = 2000L
@@ -37,24 +41,27 @@ class ImagePlayerControl(private val context: Context) : BasePlayerControl() {
     }.flowOn(Dispatchers.Main)
 
     override fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject) {
-        super.initMediaPlayer(indexOfMedia, mediaObject)
         this.mediaObject = mediaObject
         this.indexOfMedia = indexOfMedia
+
+        // Init media to play
+        exoManager.createMediaItems(arrayListOf(mediaObject))
     }
 
     override fun playerMedia() {
-        super.playerMedia()
         isPlaying = true
     }
 
     override fun pauseMedia() {
-        super.pauseMedia()
         isPlaying = false
     }
 
     override fun seekTo(currentPosition: Long) {
-        super.seekTo(currentPosition)
         isPlaying = false
         countDuration = currentPosition
+    }
+
+    override fun releaseMedia() {
+
     }
 }

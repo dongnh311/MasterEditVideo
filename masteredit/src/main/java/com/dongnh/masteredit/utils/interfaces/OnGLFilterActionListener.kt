@@ -1,5 +1,6 @@
 package com.dongnh.masteredit.utils.interfaces
 
+import android.graphics.SurfaceTexture
 import android.view.Surface
 import com.dongnh.masteredit.gl.GLFilterObject
 
@@ -11,6 +12,7 @@ import com.dongnh.masteredit.gl.GLFilterObject
  */
 interface OnGLFilterActionListener {
     fun onGLFilterAdded(filter: GLFilterObject?)
-    fun needRequestRender()
+    fun requestRender()
+    fun needRequestRender(surfaceTexture: SurfaceTexture?)
     fun needConfigInputSource(surface: Surface)
 }

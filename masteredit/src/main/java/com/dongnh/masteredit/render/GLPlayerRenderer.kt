@@ -10,9 +10,12 @@ import com.dongnh.masteredit.const.VIEW_SIZE_9_16
 import com.dongnh.masteredit.gl.*
 import com.dongnh.masteredit.utils.glutils.EglUtil
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.video.VideoSize
 import timber.log.Timber
 import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 import kotlin.math.abs
 
 /**
@@ -28,6 +31,9 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     var surface: Surface? = null
     private var updateSurface = false
     private var textureId = -1
+
+    // Exo player
+    var exoPlayer: ExoPlayer? = null
 
     // Matrix
     private val mvpMatrix = FloatArray(16)
@@ -65,12 +71,13 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
         glFilter = glFilterObject
         isNewFilter = true
-        onGLFilterActionListener?.needRequestRender()
+        onGLFilterActionListener?.requestRender()
     }
 
     /**
      * Config view when surface is created
      */
+    @Synchronized
     override fun onSurfaceCreated(config: EGLConfig?) {
         // Create texture to view
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
@@ -98,7 +105,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
         // Init input source to preview
         onGLFilterActionListener?.needConfigInputSource(surface!!)
-        //simpleExoPlayer!!.setVideoSurface(surface)
+        exoPlayer?.setVideoSurface(surface)
 
         Matrix.setLookAtM(
             vMatrix, 0,
@@ -117,6 +124,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
      * Config draw when surface is ready
      */
     override fun onSurfaceChanged(width: Int, height: Int) {
+        Timber.e("onSurfaceChanged Width : $width, Height : $height")
         filterFramebufferObject!!.setup(width, height)
         previewFilter!!.setFrameSize(width, height)
         if (glFilter != null) {
@@ -165,15 +173,15 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
             }
         }
 
-        val XMatrixScale = (if (flipHorizontal) -1 else 1).toFloat()
-        val YMatrixScale: Float = if (flipVertical) -1f else 1.toFloat()
+        val xMatrixScale = (if (flipHorizontal) -1 else 1).toFloat()
+        val yMatrixScale: Float = if (flipVertical) -1f else 1.toFloat()
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         Matrix.multiplyMM(mvpMatrix, 0, vMatrix, 0, mMatrix, 0)
         Matrix.multiplyMM(mvpMatrix, 0, projMatrix, 0, mvpMatrix, 0)
 
         Matrix.rotateM(mvpMatrix, 0, rotation.toFloat(), 0f, 0f, 1f)
         if (flipHorizontal || flipVertical) {
-            Matrix.scaleM(mvpMatrix, 0, XMatrixScale, YMatrixScale, 1f)
+            Matrix.scaleM(mvpMatrix, 0, xMatrixScale, yMatrixScale, 1f)
         }
         if (rotation < 0 || rotation == 0 || rotation == 180 || rotation == 360 || rotation > 360) {
             Matrix.scaleM(mvpMatrix, 0, 1f, 1f, 1f)
@@ -263,10 +271,22 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
             filterFramebufferObject?.let { glFilter?.draw(it.getTexName(), fbo) }
         }
     }
-    
+
+    /**
+     * Config exoplayer
+     */
+    fun configPlayer(exoPlayer: ExoPlayer) {
+        this@GLPlayerRenderer.exoPlayer = exoPlayer
+        surface?.let {
+            this@GLPlayerRenderer.exoPlayer!!.setVideoSurface(it)
+            onGLFilterActionListener?.requestRender()
+        }
+    }
+
+    @Synchronized
     override fun onFrameAvailable(surfaceTexture: SurfaceTexture?) {
         updateSurface = true
-        onGLFilterActionListener?.needRequestRender()
+        onGLFilterActionListener?.needRequestRender(surfaceTexture)
     }
 
     /**

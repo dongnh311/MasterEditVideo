@@ -23,7 +23,7 @@ import java.lang.Math.abs
  * Phone : +84397199197.
  */
 class PreViewLayoutControl(context: Context) {
-    val glPlayerView: GLPlayerView = GLPlayerView(context, null)
+    var glPlayerView: GLPlayerView = GLPlayerView(context, null)
 
     // Default filter
     private var filterBrightness = GLBrightnessFilterObject()
@@ -58,7 +58,7 @@ class PreViewLayoutControl(context: Context) {
         filterContrast.contrast = 0.5f
 
         filterGrammar = GLGammaFilterObject()
-        filterGrammar.gamma = 0.5f
+        filterGrammar.gamma = 1.0f
 
         // Using group for add all
         val glFilterGroup = GLFilterGroupObject(
@@ -69,7 +69,6 @@ class PreViewLayoutControl(context: Context) {
             )
         )
         glPlayerView.addFilterRender(glFilterGroup)
-        glPlayerView.onResume()
 
         glPlayerView.post {
             glPlayerView.setRotate(
@@ -79,6 +78,10 @@ class PreViewLayoutControl(context: Context) {
                 flipHorizontal
             )
         }
+
+        glPlayerView.requestLayout()
+        glPlayerView.requestRender()
+        glPlayerView.onResume()
     }
 
     /**

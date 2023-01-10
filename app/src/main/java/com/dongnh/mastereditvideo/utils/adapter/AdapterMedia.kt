@@ -245,12 +245,14 @@ class AdapterMedia : BaseAdapter() {
                 // Only get video with duration < 60s
                 if (duration in 1..599999) {
                     imageObject.endTime = imageObject.mediaDuration
+                    imageObject.mediaType = MEDIA_TYPE_VIDEO
                     arrayImage.add(imageObject)
                 }
             } else {
                 if (stringType.contains(MEDIA_TYPE_IMAGE)) {
                     imageObject.mediaDuration = 2000
                     imageObject.endTime = 2000
+                    imageObject.mediaType = MEDIA_TYPE_IMAGE
                     arrayImage.add(imageObject)
                 }
             }

@@ -147,8 +147,12 @@ class MainActivity : AppCompatActivity() {
             override fun onDurationSeekChange(duration: Long) {
                 if (!this@MainActivity.isPlaying) {
                     var durationSeek = duration
-                    // Todo : Update to player manager
+                    if (duration > this@MainActivity.managerPlayerControl.durationOfVideoProject) {
+                        durationSeek =
+                            this@MainActivity.managerPlayerControl.durationOfVideoProject
+                    }
                     this@MainActivity.durationControl.setDurationSeek(durationSeek)
+                    this@MainActivity.managerPlayerControl.seekVideoDuration(durationSeek)
                 }
             }
 
@@ -166,6 +170,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Listener player event
+     */
     private fun configPlayerControl() {
         // Event of player
         this@MainActivity.managerPlayerControl.videoEventLister =

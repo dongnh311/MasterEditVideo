@@ -2,6 +2,7 @@ package com.dongnh.masteredit.manager
 
 import android.content.Context
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
 import com.dongnh.masteredit.control.BasePlayerControl
@@ -11,6 +12,8 @@ import com.dongnh.masteredit.control.VideoPlayerControl
 import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
+import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
+import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -27,7 +30,8 @@ import java.util.*
  * Phone : +84397199197.
  */
 class ManagerPlayerMedia(private val context: Context,
-                         private val frameLayout: LinearLayout) {
+                         private val frameLayout: FrameLayout
+) {
 
     // stack all view player
     private val stackViewPlayer: Stack<View> = Stack()
@@ -54,9 +58,9 @@ class ManagerPlayerMedia(private val context: Context,
     var videoEventLister: VideoEventLister? = null
 
     init {
+        preViewLayoutControl.initViewSizeToView()
         // Add view to player
         frameLayout.addView(preViewLayoutControl.glPlayerView)
-        preViewLayoutControl.initViewSizeToView()
     }
 
     /**
@@ -66,6 +70,9 @@ class ManagerPlayerMedia(private val context: Context,
         releaseAllPlayer()
         this@ManagerPlayerMedia.listMediaAdded.clear()
         this@ManagerPlayerMedia.listMediaAdded.addAll(listMediaObject)
+
+        // Reset duration
+        this@ManagerPlayerMedia.durationOfVideoProject = 0
 
         listMediaObject.forEachIndexed { index, mediaObject ->
             val playerControl: BasePlayerControl
@@ -79,6 +86,10 @@ class ManagerPlayerMedia(private val context: Context,
                     override fun onEndPlay(position: Long, duration: Long) {
                         Timber.e("Play end of index $position, with $duration")
                     }
+
+                    override fun onVideoSizeChange(videoSize: VideoSize) {
+                        Timber.e("playEndListener onVideoSizeChange")
+                    }
                 }
 
                 // Lister data change
@@ -91,12 +102,25 @@ class ManagerPlayerMedia(private val context: Context,
                     }.collect()
                 }
 
+                // Change size if need
+                playerControl.viewChangeSizeListener = object : ViewChangeSizeListener {
+                    override fun onVideoSizeChange(videoSize: VideoSize) {
+                        preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
+                    }
+                }
+
                 // Prepare to play
-                playerControl.initMediaPlayer(index, mediaObject)
                 preViewLayoutControl.glPlayerView.setExoPlayer(playerControl.exoManager.exoPlayer)
+
+                // Init media first
+                playerControl.initMediaPlayer(index, mediaObject)
             } else {
                 playerControl = ImagePlayerControl(this@ManagerPlayerMedia.context)
+                playerControl.initMediaPlayer(index, mediaObject)
             }
+
+            // Calc duration of all media
+            this@ManagerPlayerMedia.durationOfVideoProject += mediaObject.mediaDuration
 
             this@ManagerPlayerMedia.listControlPlayer.add(playerControl)
         }
@@ -135,8 +159,10 @@ class ManagerPlayerMedia(private val context: Context,
     fun seekVideoDuration(duration: Long) {
         // If start of video
         if (duration == 0L) {
+            if (this@ManagerPlayerMedia.listControlPlayer.isEmpty()) {
+                return
+            }
             this@ManagerPlayerMedia.listControlPlayer[0].seekTo(0L)
-            this@ManagerPlayerMedia.listControlPlayer[0].playerMedia()
         } else {
             this@ManagerPlayerMedia.durationPlayed = duration
             var durationOfClip = 0L

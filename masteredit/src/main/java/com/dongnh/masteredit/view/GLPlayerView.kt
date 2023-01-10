@@ -2,7 +2,6 @@ package com.dongnh.masteredit.view
 
 import android.content.Context
 import android.graphics.SurfaceTexture
-import android.media.MediaFormat
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.Surface
@@ -14,10 +13,8 @@ import com.dongnh.masteredit.gl.GLContextFactory
 import com.dongnh.masteredit.gl.GLFilterObject
 import com.dongnh.masteredit.gl.GLLookUpTableFilterObject
 import com.dongnh.masteredit.render.GLPlayerRenderer
-import com.dongnh.masteredit.utils.exomanager.PlayerEventListener
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.video.VideoFrameMetadataListener
 import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +34,7 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
     var videoAspect = 1f
     var heightVideo = 0f
     var widthVideo = 0f
-    var ratioScreen: String = ""
+    var ratioScreen: String = VIEW_SIZE_16_9
     private var surface: Surface? = null
     private var typePlayerScale = TypePlayerScale.RESIZE_FIT_WIDTH
 
@@ -61,7 +58,6 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
 
             override fun needRequestRender(surfaceTexture: SurfaceTexture?) {
                 CoroutineScope(Dispatchers.Main).launch {
-                    Timber.e("needRequestRender")
                     this@GLPlayerView.requestRender()
                 }
             }
@@ -79,11 +75,10 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
                         "Data : $presentationTimeUs, releaseTimeNs : $releaseTimeNs, format : $format, mediaFormat : $mediaFormat"
                     )
                 }
-                //this@GLPlayerView.exoPlayer?.setVideoSurface(surface)
             }
         }
 
-        renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+        renderMode = RENDERMODE_WHEN_DIRTY
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.dongnh.masteredit.eglcore
 
+import android.opengl.EGL14.EGL_TRUE
 import android.opengl.GLSurfaceView
 import timber.log.Timber
 import javax.microedition.khronos.egl.EGL10
@@ -23,7 +24,10 @@ open class DefaultContextFactory(version: Int) : GLSurfaceView.EGLContextFactory
         eglContextClientVersion = version
     }
 
-    val EGL_CONTEXT_CLIENT_VERSION = 0x3098
+    companion object {
+        val EGL_CONTEXT_CLIENT_VERSION = 0x3098
+        val EGL_PROTECTED_CONTENT_EXT = 0x32C0
+    }
 
     override fun createContext(egl: EGL10, display: EGLDisplay?, config: EGLConfig?): EGLContext? {
         val attribList: IntArray? = if (eglContextClientVersion != 0) {

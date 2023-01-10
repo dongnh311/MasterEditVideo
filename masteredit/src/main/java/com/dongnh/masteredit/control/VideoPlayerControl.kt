@@ -71,6 +71,9 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
         // Init media to play
         exoManager.createMediaItems(arrayListOf(mediaObject))
         exoManager.exoPlayer.prepare()
+
+        // Make it not play
+        exoManager.exoPlayer.playWhenReady = false
     }
 
     /**

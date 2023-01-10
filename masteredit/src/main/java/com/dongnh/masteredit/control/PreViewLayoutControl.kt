@@ -2,6 +2,7 @@ package com.dongnh.masteredit.control
 
 import android.content.Context
 import android.view.Gravity
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.dongnh.masteredit.const.VIEW_SIZE_16_9
 import com.dongnh.masteredit.filter.GLBrightnessFilterObject
@@ -43,22 +44,22 @@ class PreViewLayoutControl(context: Context) {
      * Init and prepare to view
      */
     fun initViewSizeToView() {
-        val layoutParam = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+        val layoutParam = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
         )
         layoutParam.gravity = Gravity.CENTER
         glPlayerView.layoutParams = layoutParam
 
         // Init all default filter
         filterBrightness = GLBrightnessFilterObject()
-        filterBrightness.brightness = 0.5f
+        filterBrightness.brightness = 0.0f
 
         filterContrast = GLContrastFilterObject()
-        filterContrast.contrast = 0.5f
+        filterContrast.contrast = 1.0f
 
         filterGrammar = GLGammaFilterObject()
-        filterGrammar.gamma = 1.0f
+        filterGrammar.gamma = 0.5f
 
         // Using group for add all
         val glFilterGroup = GLFilterGroupObject(

@@ -87,6 +87,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         previewTexture = GLSurfaceTexture(textureId)
         previewTexture!!.setOnFrameAvailableListener(this)
         GLES20.glBindTexture(previewTexture!!.getTextureTarget(), textureId)
+
         // GL_TEXTURE_EXTERNAL_OES
         EglUtil.setupSampler(
             previewTexture!!.getTextureTarget(),
@@ -95,7 +96,6 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         )
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
         filterFramebufferObject = GLFramebufferObject()
-        // GL_TEXTURE_EXTERNAL_OES
 
         // Create preview with texture
         previewFilter = GLPreviewFilterObject(previewTexture!!.getTextureTarget())

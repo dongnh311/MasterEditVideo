@@ -148,8 +148,6 @@ class ManagerPlayerMedia(private val context: Context,
      * Clear view added to layout
      */
     private fun clearAllViewAdded() {
-        this@ManagerPlayerMedia.frameLayout.removeAllViews()
-        this@ManagerPlayerMedia.frameLayout.invalidate()
         this@ManagerPlayerMedia.stackViewPlayer.clear()
     }
 
@@ -177,6 +175,8 @@ class ManagerPlayerMedia(private val context: Context,
                     durationNeed = (mediaMainObject.mediaDuration - durationSeek - 100).toInt()
                     this@ManagerPlayerMedia.currentDurationPlayer =
                         durationNeed + mediaMainObject.startTime
+
+                    findAndShowItemOnSeek(index, durationNeed.toLong())
                     break
                 }
 
@@ -234,6 +234,21 @@ class ManagerPlayerMedia(private val context: Context,
             }
             listControlPlayer.forEach {
                 it.pauseMedia()
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    /**
+     * Find view and seek to duration
+     */
+    private fun findAndShowItemOnSeek(indexOfVideo: Int, duration: Long) {
+        try {
+            when (val view = listControlPlayer[indexOfVideo]) {
+                is VideoPlayerControl -> {
+                    view.seekTo(duration)
+                }
             }
         } catch (e: Exception) {
             Timber.e(e)

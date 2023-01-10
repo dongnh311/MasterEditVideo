@@ -24,7 +24,6 @@ class PlayerEventListener(private val exoPlayer: ExoPlayer) : Player.Listener {
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
-        super.onPlaybackStateChanged(playbackState)
         when (playbackState) {
             ExoPlayer.STATE_BUFFERING -> {
 
@@ -39,7 +38,6 @@ class PlayerEventListener(private val exoPlayer: ExoPlayer) : Player.Listener {
     }
 
     override fun onVideoSizeChanged(videoSize: VideoSize) {
-        super.onVideoSizeChanged(videoSize)
         mediaPlayEndListener?.onVideoSizeChange(videoSize)
     }
 }

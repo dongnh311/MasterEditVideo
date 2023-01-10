@@ -1,17 +1,16 @@
 package com.dongnh.masteredit.control
 
 import android.content.Context
+import com.dongnh.masteredit.base.BasePlayerControl
 import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
 import com.google.android.exoplayer2.video.VideoSize
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.isActive
 
 /**
  * Project : MasterEditVideo
@@ -33,15 +32,21 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
     var viewChangeSizeListener: ViewChangeSizeListener? = null
 
     // Send data to view
-    override val playbackProgressObservable = flow {
-        repeat(100000) {
-            if (currentCoroutineContext().isActive && isPlaying) {
-                delay(200)
-                val currentDurationPlayer = this@VideoPlayerControl.exoManager.exoPlayer.currentPosition - mediaObject.beginAt
+    val playbackProgressObservable : Flow<Long> = flow {
+        while (true) {
+            if (isPlaying) {
+                val exoPlayerDuration = withContext(Dispatchers.Main) {
+                    return@withContext this@VideoPlayerControl.exoManager.exoPlayer.currentPosition
+                }
+                val currentDurationPlayer = exoPlayerDuration - mediaObject.beginAt
                 emit(currentDurationPlayer)
+
+                delay(200)
             }
         }
-    }.flowOn(Dispatchers.Main)
+    }
+
+
 
     // lister when play to end
     var playEndListener: MediaPlayEndListener? = null
@@ -60,7 +65,7 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
             }
 
             override fun onEndPlay(position: Long, duration: Long) {
-                playEndListener?.onEndPlay(position, duration)
+                playEndListener?.onEndPlay(this@VideoPlayerControl.indexOfMedia.toLong(), duration)
             }
 
             override fun onVideoSizeChange(videoSize: VideoSize) {

@@ -29,7 +29,7 @@ class PlayerEventListener(private val exoPlayer: ExoPlayer) : Player.Listener {
 
             }
             ExoPlayer.STATE_ENDED -> {
-                mediaPlayEndListener?.onEndPlay(exoPlayer.currentPosition, exoPlayer.contentDuration)
+                mediaPlayEndListener?.onEndPlay(exoPlayer.contentPosition, exoPlayer.currentPosition)
             }
             ExoPlayer.STATE_IDLE -> {}
             ExoPlayer.STATE_READY -> {}

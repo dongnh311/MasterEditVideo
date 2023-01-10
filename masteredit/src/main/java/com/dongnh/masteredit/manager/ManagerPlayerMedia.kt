@@ -3,9 +3,8 @@ package com.dongnh.masteredit.manager
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
-import com.dongnh.masteredit.control.BasePlayerControl
+import com.dongnh.masteredit.base.BasePlayerControl
 import com.dongnh.masteredit.control.ImagePlayerControl
 import com.dongnh.masteredit.control.PreViewLayoutControl
 import com.dongnh.masteredit.control.VideoPlayerControl
@@ -18,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -94,11 +94,30 @@ class ManagerPlayerMedia(private val context: Context,
 
                 // Lister data change
                 CoroutineScope(Dispatchers.Default).launch {
-                    playerControl.playbackProgressObservable.catch { error ->
+                    val castItem = playerControl as VideoPlayerControl
+                    castItem.playbackProgressObservable.catch { error ->
                         Timber.e(error)
                     }.onEach { durationPlayed ->
                         Timber.e("Duration play : $durationPlayed")
-                        videoEventLister?.onPlayWithProgress(durationPlayed)
+                        if (durationPlayed != this@ManagerPlayerMedia.currentDurationPlayer
+                            && durationPlayed < castItem.mediaObject.mediaDuration
+                        ) {
+                            if (this@ManagerPlayerMedia.currentDurationPlayer > durationPlayed) {
+                                this@ManagerPlayerMedia.currentDurationPlayer = 0
+                            }
+                            val adj = durationPlayed - this@ManagerPlayerMedia.currentDurationPlayer
+                            this@ManagerPlayerMedia.currentDurationPlayer = durationPlayed
+                            this@ManagerPlayerMedia.durationPlayed += adj
+                            Timber.e("Video played duration : ${this@ManagerPlayerMedia.durationPlayed}")
+                            videoEventLister?.onPlayWithProgress(adj)
+                        } else if (durationPlayed + castItem.mediaObject.beginAt >= castItem.mediaObject.mediaDuration) {
+                            Timber.e("Begin at : ${castItem.mediaObject.beginAt}, current : ${durationPlayed}, duration video : ${castItem.mediaObject.mediaDuration}")
+
+                            // Stop listener
+                            CoroutineScope(Dispatchers.Main).launch {
+                                castItem.pauseMedia()
+                            }
+                        }
                     }.collect()
                 }
 

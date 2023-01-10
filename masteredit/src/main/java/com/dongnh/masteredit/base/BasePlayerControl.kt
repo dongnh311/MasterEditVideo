@@ -1,4 +1,4 @@
-package com.dongnh.masteredit.control
+package com.dongnh.masteredit.base
 
 import com.dongnh.masteredit.model.MediaObject
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +22,6 @@ abstract class BasePlayerControl {
 
     // Save current index
     var indexOfMedia = -1
-
-    // Send data to view
-    abstract val playbackProgressObservable : kotlinx.coroutines.flow.Flow<Long>
 
     /**
      * Init media

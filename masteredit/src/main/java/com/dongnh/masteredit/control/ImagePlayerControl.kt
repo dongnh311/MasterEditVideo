@@ -1,6 +1,7 @@
 package com.dongnh.masteredit.control
 
 import android.content.Context
+import com.dongnh.masteredit.base.BasePlayerControl
 import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +31,7 @@ class ImagePlayerControl(private val context: Context) : BasePlayerControl() {
     // Status playing
     var isPlaying = false
 
-    override val playbackProgressObservable = flow {
+    val playbackProgressObservable = flow {
         repeat(100000) {
             if (currentCoroutineContext().isActive && isPlaying) {
                 delay(50)

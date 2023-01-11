@@ -185,8 +185,10 @@ class ExoManager(private val context: Context) {
             }
         }
 
+        val duration = (mediaObject.mediaDuration / 1000.0).toInt()
+
         val pathOfFile = createMediaTransformPath(context = context) + "/" + mediaObject.mediaName + NAME_EXIF_IMAGE_VIDEO
-        val commandToRun = "-loop 1 -framerate 30 -i ${fileInput.path} -s $withToNewVideo:$heightToNewVideo -t 2 $pathOfFile -y"
+        val commandToRun = "-loop 1 -framerate 30 -i ${fileInput.path} -s $withToNewVideo:$heightToNewVideo -t $duration $pathOfFile -y"
 
         Timber.e("Command to run : $commandToRun")
         val ffmpegSessionCompleteCallback = FFmpegSessionCompleteCallback {

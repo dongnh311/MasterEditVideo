@@ -81,7 +81,8 @@ class VideoPlayerControl(context: Context) {
      * Init media
      */
     fun initMediaPlayer(mediaObjects: MutableList<MediaObject>) {
-        this@VideoPlayerControl.mediaObjects = mediaObjects
+        this@VideoPlayerControl.mediaObjects.clear()
+        this@VideoPlayerControl.mediaObjects.addAll(mediaObjects)
 
         // Call back to view
         exoManager.mediaPlayEndListener = object : MediaPlayEndListener {
@@ -90,7 +91,7 @@ class VideoPlayerControl(context: Context) {
             }
 
             override fun onEndPlay(position: Long, duration: Long) {
-                if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > mediaObjects.size - 1) {
+                if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > this@VideoPlayerControl.mediaObjects.size - 1) {
                     return
                 }
                 playEndListener?.onEndPlay(this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex.toLong(), duration)
@@ -102,7 +103,7 @@ class VideoPlayerControl(context: Context) {
         }
 
         // Init media to play
-        exoManager.createMediaItems(mediaObjects)
+        exoManager.createMediaItems(this@VideoPlayerControl.mediaObjects)
         exoManager.exoPlayer.prepare()
 
         // Make it not play

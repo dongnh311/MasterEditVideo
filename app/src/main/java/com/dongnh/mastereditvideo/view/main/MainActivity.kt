@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
+import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
@@ -43,6 +44,9 @@ class MainActivity : AppCompatActivity() {
 
     // Update scroll to view
     private var runnableDurationTimeLine: Runnable? = null
+
+    // Save list object
+    private val listMedia = mutableListOf<MediaObject>()
 
     // Request permission for storage
     private val requestPermissionLauncherStorage =
@@ -235,8 +239,10 @@ class MainActivity : AppCompatActivity() {
         // Check data is add
         MyDataSingleton.isAddNewMedia.observe(this) {
             if (it) {
-                this@MainActivity.mainBinding.viewTimeLine.addMediaAndCreateItemView(MyDataSingleton.listMediaPick)
-                this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(MyDataSingleton.listMediaPick)
+                this@MainActivity.listMedia.addAll(MyDataSingleton.listMediaPick)
+                this@MainActivity.mainBinding.viewTimeLine.addMediaAndCreateItemView(this@MainActivity.listMedia)
+                this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(this@MainActivity.listMedia)
+                MyDataSingleton.listMediaPick.clear()
             }
         }
     }

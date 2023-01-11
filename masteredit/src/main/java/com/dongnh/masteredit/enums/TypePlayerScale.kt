@@ -1,4 +1,4 @@
-package com.dongnh.masteredit.const
+package com.dongnh.masteredit.enums
 
 /**
  * Project : MasterEditVideo

@@ -82,7 +82,7 @@ class ManagerPlayerMedia(private val context: Context,
             }
 
             override fun onEndPlay(position: Long, duration: Long) {
-                Timber.e("Play end of index $position, with $duration")
+                Timber.e("Play end of index $position, with duration : $duration")
                 if (position.toInt() == listMediaAdded.size - 1) {
                     videoPlayerControl?.pauseMedia()
                     videoEventLister?.onPlayOverEnd()
@@ -103,7 +103,9 @@ class ManagerPlayerMedia(private val context: Context,
                 this@ManagerPlayerMedia.currentDurationPlayer += adjDurationPlayed
                 if ((adjDurationPlayed + currentDurationPlayer) == this@ManagerPlayerMedia.durationOfVideoProject) {
                     Timber.e("Play end of all")
-                    videoEventLister?.onPlayOverEnd()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        videoEventLister?.onPlayOverEnd()
+                    }
                 }
             }?.collect()
         }
@@ -144,9 +146,7 @@ class ManagerPlayerMedia(private val context: Context,
      * Clear all media player added
      */
     private fun clearAllMediaPlayerCreated() {
-        this@ManagerPlayerMedia.stackViewPlayer.forEach {
-
-        }
+        videoPlayerControl?.releaseMedia()
     }
 
     /**

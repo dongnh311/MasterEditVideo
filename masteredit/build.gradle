@@ -49,6 +49,8 @@ dependencies {
 
     def exo_version = '2.18.2'
 
+    def ffmepeg_verion = "5.1"
+
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:$core_ktx_version"
@@ -67,7 +69,10 @@ dependencies {
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-transformer:$exo_version"
 
+    // FFmpeg
+    implementation "com.arthenica:ffmpeg-kit-min:$ffmepeg_verion"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'

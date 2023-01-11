@@ -54,6 +54,8 @@ class MediaObject(
     var beginAt: Long = 0L
     var endAt: Long = 0L
 
+    var pathVideoTransform : String = ""
+
     public override fun clone(): Any {
         return super.clone()
     }

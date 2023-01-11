@@ -5,7 +5,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.Surface
-import com.dongnh.masteredit.const.TypePlayerScale
+import com.dongnh.masteredit.enums.TypePlayerScale
 import com.dongnh.masteredit.const.VIEW_SIZE_16_9
 import com.dongnh.masteredit.const.VIEW_SIZE_9_16
 import com.dongnh.masteredit.gl.GLConfigChooser

@@ -2,6 +2,8 @@ package com.dongnh.masteredit.control
 
 import android.content.Context
 import com.dongnh.masteredit.base.BasePlayerControl
+import com.dongnh.masteredit.const.MEDIA_TYPE_IMAGE
+import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
 import com.dongnh.masteredit.model.MediaObject
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
@@ -11,6 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 
 /**
  * Project : MasterEditVideo
@@ -29,9 +32,6 @@ class VideoPlayerControl(context: Context) {
     // Save object
     var mediaObjects = mutableListOf<MediaObject>()
 
-    // Save current index is view
-    var indexOfMediaOnView = -1
-
     // Total duration of media added
     var totalDurationOfMediaAdded = 0L
 
@@ -45,23 +45,30 @@ class VideoPlayerControl(context: Context) {
     val playbackProgressObservable : Flow<Long> = flow {
         while (true) {
             if (isPlaying) {
-                var exoPlayerDuration = withContext(Dispatchers.Main) {
-                    return@withContext this@VideoPlayerControl.exoManager.exoPlayer.currentPosition
-                }
-                if (exoPlayerDuration < 0) {
-                    exoPlayerDuration = 0
-                }
-
+                // Find index of media first
                 val indexOfMedia = withContext(Dispatchers.Main) {
                     return@withContext this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex
                 }
 
-                val duration = findDurationForIndexMedia(indexOfMedia)
-                val adjDuration = exoPlayerDuration + duration - currentDurationPlayer
+                // Calc adj duration player
+                var exoPlayerDuration = withContext(Dispatchers.Main) {
+                    return@withContext this@VideoPlayerControl.exoManager.exoPlayer.currentPosition
+                }
 
+                if (indexOfMedia > mediaObjects.size - 1) {
+                    return@flow
+                }
+
+                // Make it > 0
+                if (exoPlayerDuration < 0) {
+                    exoPlayerDuration = 0
+                }
+
+                // Check type of media
+                val adjDuration = exoPlayerDuration - currentDurationPlayer
+                Timber.e("Exoplay duration : ${exoPlayerDuration}, adj $adjDuration")
                 emit(adjDuration)
                 currentDurationPlayer += adjDuration
-
                 delay(200)
             }
         }
@@ -83,6 +90,9 @@ class VideoPlayerControl(context: Context) {
             }
 
             override fun onEndPlay(position: Long, duration: Long) {
+                if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > mediaObjects.size - 1) {
+                    return
+                }
                 playEndListener?.onEndPlay(this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex.toLong(), duration)
             }
 
@@ -132,6 +142,7 @@ class VideoPlayerControl(context: Context) {
         // Make item start is running
         if (currentPosition == 0L) {
             exoManager.exoPlayer.seekTo(0, 0L)
+            this@VideoPlayerControl.currentDurationPlayer = 0
         } else {
             var durationOfClip = 0L
             for (index in 0 until mediaObjects.size) {
@@ -157,6 +168,7 @@ class VideoPlayerControl(context: Context) {
      * Release
      */
     fun releaseMedia() {
+        mediaObjects.clear()
         exoManager.exoPlayer.release()
     }
 

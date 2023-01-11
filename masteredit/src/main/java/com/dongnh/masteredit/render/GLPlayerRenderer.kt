@@ -278,6 +278,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     fun configPlayer(exoPlayer: ExoPlayer) {
         this@GLPlayerRenderer.exoPlayer = exoPlayer
         surface?.let {
+            //this@GLPlayerRenderer.exoPlayer!!.clearVideoSurface()
             this@GLPlayerRenderer.exoPlayer!!.setVideoSurface(it)
             onGLFilterActionListener?.requestRender()
         }

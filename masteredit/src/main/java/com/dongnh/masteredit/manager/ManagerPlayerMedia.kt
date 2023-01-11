@@ -85,6 +85,7 @@ class ManagerPlayerMedia(private val context: Context,
 
                     override fun onEndPlay(position: Long, duration: Long) {
                         Timber.e("Play end of index $position, with $duration")
+                        playerControl.pauseMedia()
                     }
 
                     override fun onVideoSizeChange(videoSize: VideoSize) {
@@ -98,7 +99,6 @@ class ManagerPlayerMedia(private val context: Context,
                     castItem.playbackProgressObservable.catch { error ->
                         Timber.e(error)
                     }.onEach { durationPlayed ->
-                        Timber.e("Duration play : $durationPlayed")
                         if (durationPlayed != this@ManagerPlayerMedia.currentDurationPlayer
                             && durationPlayed < castItem.mediaObject.mediaDuration
                         ) {
@@ -108,28 +108,30 @@ class ManagerPlayerMedia(private val context: Context,
                             val adj = durationPlayed - this@ManagerPlayerMedia.currentDurationPlayer
                             this@ManagerPlayerMedia.currentDurationPlayer = durationPlayed
                             this@ManagerPlayerMedia.durationPlayed += adj
-                            Timber.e("Video played duration : ${this@ManagerPlayerMedia.durationPlayed}")
+                            //Timber.e("Video played duration : ${this@ManagerPlayerMedia.durationPlayed}")
                             videoEventLister?.onPlayWithProgress(adj)
                         } else if (durationPlayed + castItem.mediaObject.beginAt >= castItem.mediaObject.mediaDuration) {
-                            Timber.e("Begin at : ${castItem.mediaObject.beginAt}, current : ${durationPlayed}, duration video : ${castItem.mediaObject.mediaDuration}")
+                            Timber.e("Index : ${castItem.indexOfMedia}, Begin at : ${castItem.mediaObject.beginAt}, current : ${durationPlayed}, duration video : ${castItem.mediaObject.mediaDuration}")
 
                             // Stop listener
                             CoroutineScope(Dispatchers.Main).launch {
                                 castItem.pauseMedia()
+                                findAndShowItemPlay(castItem.indexOfMedia + 1, isPlay = true)
                             }
                         }
                     }.collect()
                 }
 
-                // Change size if need
-                playerControl.viewChangeSizeListener = object : ViewChangeSizeListener {
-                    override fun onVideoSizeChange(videoSize: VideoSize) {
-                        preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
-                    }
-                }
-
                 // Prepare to play
-                preViewLayoutControl.glPlayerView.setExoPlayer(playerControl.exoManager.exoPlayer)
+                if (index == 0) {
+                    // Change size if need
+                    playerControl.viewChangeSizeListener = object : ViewChangeSizeListener {
+                        override fun onVideoSizeChange(videoSize: VideoSize) {
+                            preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
+                        }
+                    }
+                    preViewLayoutControl.glPlayerView.setExoPlayer(playerControl.exoManager.exoPlayer)
+                }
 
                 // Init media first
                 playerControl.initMediaPlayer(index, mediaObject)
@@ -266,6 +268,8 @@ class ManagerPlayerMedia(private val context: Context,
         try {
             when (val view = listControlPlayer[indexOfVideo]) {
                 is VideoPlayerControl -> {
+                    // Switch to preview
+                    preViewLayoutControl.glPlayerView.setExoPlayer(view.exoManager.exoPlayer)
                     view.seekTo(duration)
                 }
             }
@@ -282,6 +286,8 @@ class ManagerPlayerMedia(private val context: Context,
             val view = listControlPlayer[indexOfVideo]
             if (view is VideoPlayerControl) {
                 if (isPlay) {
+                    // Switch to preview
+                    preViewLayoutControl.glPlayerView.setExoPlayer(view.exoManager.exoPlayer)
                     view.playerMedia()
                 } else {
                     view.pauseMedia()

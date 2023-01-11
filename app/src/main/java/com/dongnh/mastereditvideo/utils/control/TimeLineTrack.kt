@@ -353,6 +353,8 @@ class TimeLineTrack: FrameLayout {
             // Margin first item
             if (index == 0) {
                 layoutParams.setMargins(marginToCenter - thumbnailSize + marginItem , 0, 0, 0)
+            } else {
+                layoutParams.setMargins( 0 , 0, 0, 0)
             }
 
             linearLayoutAddThumb.layoutParams = layoutParams

@@ -106,6 +106,8 @@ class VideoPlayerControl(context: Context): BasePlayerControl() {
      * Seek to duration
      */
     override fun seekTo(currentPosition: Long) {
+        isPlaying = false
+        exoManager.exoPlayer.playWhenReady = false
         this@VideoPlayerControl.currentDurationPlayer = currentPosition + mediaObject.beginAt
         exoManager.exoPlayer.seekTo(this@VideoPlayerControl.currentDurationPlayer)
     }

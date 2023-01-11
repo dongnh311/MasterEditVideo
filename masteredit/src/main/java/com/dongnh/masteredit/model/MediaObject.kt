@@ -18,9 +18,6 @@ class MediaObject(
     var isChoose: Boolean = false,
     var isSpecial: Boolean = false,
 
-    var startTime: Long = 0L,
-    var endTime: Long = 0L,
-
     var volume: Float = 1f,
 
     // For layer start time in timeline

@@ -9,6 +9,7 @@ import android.os.Looper
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
@@ -19,6 +20,7 @@ import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -81,16 +83,7 @@ class MainActivity : AppCompatActivity() {
         managerPlayerControl = ManagerPlayerMedia(this@MainActivity, mainBinding.viewPlayer)
 
         // Event of player
-        this@MainActivity.managerPlayerControl.videoEventLister =
-            object : VideoEventLister {
-                override fun onPlayWithProgress(adjDuration: Long) {
-                    this@MainActivity.durationControl.setDuration(adjDuration)
-                }
-
-                override fun onPlayOverEnd() {
-                    this@MainActivity.moveVideoPlayToStart()
-                }
-            }
+        configPlayerControl()
 
         // Init handler duration
         initHandleDuration()
@@ -225,12 +218,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupButtonPause() {
         // Pause or stop
         Timber.e("========= Pause play ============")
-        this@MainActivity.managerPlayerControl.pauseAllPlay()
-        this@MainActivity.handleTask.removeCallbacksAndMessages(null)
-        runnableDurationTimeLine?.let { this@MainActivity.handleTask.removeCallbacks(it) }
-        this@MainActivity.isPlaying = false
-        this@MainActivity.mainBinding.btnPlay.setImageResource(R.drawable.ic_play)
-        this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
+        lifecycleScope.launch {
+            this@MainActivity.managerPlayerControl.pauseAllPlay()
+            this@MainActivity.handleTask.removeCallbacksAndMessages(null)
+            runnableDurationTimeLine?.let { this@MainActivity.handleTask.removeCallbacks(it) }
+            this@MainActivity.isPlaying = false
+            this@MainActivity.mainBinding.btnPlay.setImageResource(R.drawable.ic_play)
+            this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
+        }
     }
 
     /**

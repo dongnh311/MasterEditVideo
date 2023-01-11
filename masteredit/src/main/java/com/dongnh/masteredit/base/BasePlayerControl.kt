@@ -18,7 +18,7 @@ import java.util.concurrent.Flow
 abstract class BasePlayerControl {
 
     // Save object
-    var mediaObject = MediaObject()
+    var mediaObjects = mutableListOf<MediaObject>()
 
     // Save current index
     var indexOfMedia = -1
@@ -26,7 +26,7 @@ abstract class BasePlayerControl {
     /**
      * Init media
      */
-    abstract fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject)
+    abstract fun initMediaPlayer(indexOfMedia: Int, mediaObjects: MutableList<MediaObject>)
 
     /**
      * Play media

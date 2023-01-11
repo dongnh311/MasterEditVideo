@@ -51,8 +51,8 @@ class ManagerPlayerMedia(private val context: Context,
     // Handle view
     private val preViewLayoutControl = PreViewLayoutControl(context)
 
-    // List player
-    private val listControlPlayer = mutableListOf<BasePlayerControl>()
+    // View of media
+    private var videoPlayerControl: VideoPlayerControl? = null
 
     // Lister event
     var videoEventLister: VideoEventLister? = null
@@ -74,76 +74,60 @@ class ManagerPlayerMedia(private val context: Context,
         // Reset duration
         this@ManagerPlayerMedia.durationOfVideoProject = 0
 
-        listMediaObject.forEachIndexed { index, mediaObject ->
-            val playerControl: BasePlayerControl
-            if (mediaObject.mediaType == MEDIA_TYPE_VIDEO) {
-                playerControl = VideoPlayerControl(this@ManagerPlayerMedia.context)
-                playerControl.playEndListener = object : MediaPlayEndListener {
-                    override fun onPreparePlay(position: Long, duration: Long) {
-                        Timber.e("Prepare play index $position, with $duration")
-                    }
+        videoPlayerControl = VideoPlayerControl(this@ManagerPlayerMedia.context)
 
-                    override fun onEndPlay(position: Long, duration: Long) {
-                        Timber.e("Play end of index $position, with $duration")
-                        playerControl.pauseMedia()
-                    }
-
-                    override fun onVideoSizeChange(videoSize: VideoSize) {
-                        Timber.e("playEndListener onVideoSizeChange")
-                    }
-                }
-
-                // Lister data change
-                CoroutineScope(Dispatchers.Default).launch {
-                    val castItem = playerControl as VideoPlayerControl
-                    castItem.playbackProgressObservable.catch { error ->
-                        Timber.e(error)
-                    }.onEach { durationPlayed ->
-                        if (durationPlayed != this@ManagerPlayerMedia.currentDurationPlayer
-                            && durationPlayed < castItem.mediaObject.mediaDuration
-                        ) {
-                            if (this@ManagerPlayerMedia.currentDurationPlayer > durationPlayed) {
-                                this@ManagerPlayerMedia.currentDurationPlayer = 0
-                            }
-                            val adj = durationPlayed - this@ManagerPlayerMedia.currentDurationPlayer
-                            this@ManagerPlayerMedia.currentDurationPlayer = durationPlayed
-                            this@ManagerPlayerMedia.durationPlayed += adj
-                            //Timber.e("Video played duration : ${this@ManagerPlayerMedia.durationPlayed}")
-                            videoEventLister?.onPlayWithProgress(adj)
-                        } else if (durationPlayed + castItem.mediaObject.beginAt >= castItem.mediaObject.mediaDuration) {
-                            Timber.e("Index : ${castItem.indexOfMedia}, Begin at : ${castItem.mediaObject.beginAt}, current : ${durationPlayed}, duration video : ${castItem.mediaObject.mediaDuration}")
-
-                            // Stop listener
-                            CoroutineScope(Dispatchers.Main).launch {
-                                castItem.pauseMedia()
-                                findAndShowItemPlay(castItem.indexOfMedia + 1, isPlay = true)
-                            }
-                        }
-                    }.collect()
-                }
-
-                // Prepare to play
-                if (index == 0) {
-                    // Change size if need
-                    playerControl.viewChangeSizeListener = object : ViewChangeSizeListener {
-                        override fun onVideoSizeChange(videoSize: VideoSize) {
-                            preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
-                        }
-                    }
-                    preViewLayoutControl.glPlayerView.setExoPlayer(playerControl.exoManager.exoPlayer)
-                }
-
-                // Init media first
-                playerControl.initMediaPlayer(index, mediaObject)
-            } else {
-                playerControl = ImagePlayerControl(this@ManagerPlayerMedia.context)
-                playerControl.initMediaPlayer(index, mediaObject)
+        videoPlayerControl?.playEndListener = object : MediaPlayEndListener {
+            override fun onPreparePlay(position: Long, duration: Long) {
+                Timber.e("Prepare play index $position, with $duration")
             }
 
-            // Calc duration of all media
-            this@ManagerPlayerMedia.durationOfVideoProject += mediaObject.mediaDuration
+            override fun onEndPlay(position: Long, duration: Long) {
+                Timber.e("Play end of index $position, with $duration")
+                if (position.toInt() == listMediaAdded.size - 1) {
+                    videoPlayerControl?.pauseMedia()
+                    videoEventLister?.onPlayOverEnd()
+                }
+            }
 
-            this@ManagerPlayerMedia.listControlPlayer.add(playerControl)
+            override fun onVideoSizeChange(videoSize: VideoSize) {
+                Timber.e("playEndListener onVideoSizeChange")
+            }
+        }
+
+        // Lister data change
+        CoroutineScope(Dispatchers.Default).launch {
+            videoPlayerControl?.playbackProgressObservable?.catch { error ->
+                Timber.e(error)
+            }?.onEach { adjDurationPlayed ->
+                videoEventLister?.onPlayWithProgress(adjDurationPlayed)
+                this@ManagerPlayerMedia.currentDurationPlayer += adjDurationPlayed
+                if ((adjDurationPlayed + currentDurationPlayer) == this@ManagerPlayerMedia.durationOfVideoProject) {
+                    Timber.e("Play end of all")
+                    videoEventLister?.onPlayOverEnd()
+                }
+            }?.collect()
+        }
+
+        // Change size if need
+        videoPlayerControl?.viewChangeSizeListener = object : ViewChangeSizeListener {
+            override fun onVideoSizeChange(videoSize: VideoSize) {
+                preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
+            }
+        }
+
+        // Set input source for view
+        videoPlayerControl?.exoManager?.exoPlayer?.let {
+            preViewLayoutControl.glPlayerView.setExoPlayer(
+                it
+            )
+        }
+
+        // Init media first
+        videoPlayerControl?.initMediaPlayer(listMediaObject)
+
+        // Calc duration of all media
+        listMediaObject.forEachIndexed { _, mediaObject ->
+            this@ManagerPlayerMedia.durationOfVideoProject += (mediaObject.endAt - mediaObject.beginAt)
         }
     }
 
@@ -178,31 +162,17 @@ class ManagerPlayerMedia(private val context: Context,
     fun seekVideoDuration(duration: Long) {
         // If start of video
         if (duration == 0L) {
-            if (this@ManagerPlayerMedia.listControlPlayer.isEmpty()) {
+            if (videoPlayerControl == null) {
                 return
             }
-            this@ManagerPlayerMedia.listControlPlayer[0].seekTo(0L)
+            this@ManagerPlayerMedia.durationPlayed = 0L
+            this@ManagerPlayerMedia.videoPlayerControl?.seekTo(0L)
         } else {
-            this@ManagerPlayerMedia.durationPlayed = duration
-            var durationOfClip = 0L
-
-            for (index in 0 until listMediaAdded.size) {
-                val mediaMainObject = listMediaAdded[index]
-                durationOfClip += mediaMainObject.mediaDuration
-                var durationNeed = 0
-
-                if (durationOfClip > duration) {
-                    val durationSeek = durationOfClip - duration
-                    durationNeed = (mediaMainObject.mediaDuration - durationSeek - 100).toInt()
-                    this@ManagerPlayerMedia.currentDurationPlayer =
-                        durationNeed + mediaMainObject.startTime
-
-                    findAndShowItemOnSeek(index, durationNeed.toLong())
-                    break
-                }
-
-                findAndShowItemPlay(durationNeed, true)
+            if (videoPlayerControl == null) {
+                return
             }
+            this@ManagerPlayerMedia.durationPlayed = duration
+            this@ManagerPlayerMedia.videoPlayerControl?.seekTo(duration)
         }
     }
 
@@ -211,34 +181,17 @@ class ManagerPlayerMedia(private val context: Context,
      */
     fun playVideo() {
         try {
-            if (listControlPlayer.isEmpty()) {
+            if (videoPlayerControl == null) {
                 return
             }
 
             // If play from start
             if (this@ManagerPlayerMedia.durationPlayed == 0L) {
-                this@ManagerPlayerMedia.listControlPlayer[0].seekTo(0L)
-                this@ManagerPlayerMedia.listControlPlayer[0].playerMedia()
+                this@ManagerPlayerMedia.videoPlayerControl?.seekTo(0L)
+                this@ManagerPlayerMedia.videoPlayerControl?.playerMedia()
             } else {
-                // Resume video
-                var durationOfClip = 0L
-                var isPlay = false
-                for (index in 0 until listMediaAdded.size) {
-                    val mediaMainObject = listMediaAdded[index]
-                    durationOfClip += mediaMainObject.mediaDuration
-                    if (durationOfClip > this@ManagerPlayerMedia.durationPlayed) {
-                        isPlay = true
-                        findAndShowItemPlay(index, true)
-                        break
-                    }
-
-                    // Check if play on last duration
-                    // We need move player to start
-                    if (!isPlay) {
-                        Timber.e("We need to go to start time of video")
-                        this@ManagerPlayerMedia.pauseAllPlay()
-                    }
-                }
+                this@ManagerPlayerMedia.videoPlayerControl?.seekTo(this@ManagerPlayerMedia.durationPlayed)
+                this@ManagerPlayerMedia.videoPlayerControl?.playerMedia()
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -250,58 +203,12 @@ class ManagerPlayerMedia(private val context: Context,
      */
     fun pauseAllPlay() {
         try {
-            if (listControlPlayer.isEmpty()) {
+            if (videoPlayerControl == null) {
                 return
             }
-            listControlPlayer.forEach {
-                it.pauseMedia()
-            }
+            videoPlayerControl?.pauseMedia()
         } catch (e: Exception) {
             Timber.e(e)
         }
     }
-
-    /**
-     * Find view and seek to duration
-     */
-    private fun findAndShowItemOnSeek(indexOfVideo: Int, duration: Long) {
-        try {
-            when (val view = listControlPlayer[indexOfVideo]) {
-                is VideoPlayerControl -> {
-                    // Switch to preview
-                    preViewLayoutControl.glPlayerView.setExoPlayer(view.exoManager.exoPlayer)
-                    view.seekTo(duration)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-    }
-
-    /**
-     * Find view and seek to duration
-     */
-    private fun findAndShowItemPlay(indexOfVideo: Int, isPlay: Boolean) {
-        try {
-            val view = listControlPlayer[indexOfVideo]
-            if (view is VideoPlayerControl) {
-                if (isPlay) {
-                    // Switch to preview
-                    preViewLayoutControl.glPlayerView.setExoPlayer(view.exoManager.exoPlayer)
-                    view.playerMedia()
-                } else {
-                    view.pauseMedia()
-                }
-            } else if (view is ImagePlayerControl) {
-                if (isPlay) {
-                    view.playerMedia()
-                } else {
-                    view.pauseMedia()
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-    }
-
 }

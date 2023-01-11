@@ -41,12 +41,12 @@ class ImagePlayerControl(private val context: Context) : BasePlayerControl() {
         }
     }.flowOn(Dispatchers.Main)
 
-    override fun initMediaPlayer(indexOfMedia: Int, mediaObject: MediaObject) {
-        this.mediaObject = mediaObject
+    override fun initMediaPlayer(indexOfMedia: Int, mediaObjects: MutableList<MediaObject>) {
+        this.mediaObjects = mediaObjects
         this.indexOfMedia = indexOfMedia
 
         // Init media to play
-        exoManager.createMediaItems(arrayListOf(mediaObject))
+        exoManager.createMediaItems(mediaObjects)
     }
 
     override fun playerMedia() {

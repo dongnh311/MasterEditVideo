@@ -256,6 +256,7 @@ class TimeLineTrack: FrameLayout {
      * Add media to view
      */
     fun addMediaAndCreateItemView(listMedia : MutableList<MediaObject>) {
+        this@TimeLineTrack.listMedia.clear()
         this@TimeLineTrack.listMedia.addAll(listMedia)
         this@TimeLineTrack.totalDuration = 0
         var totalThumb = 0
@@ -264,7 +265,7 @@ class TimeLineTrack: FrameLayout {
             if (it.mediaDuration - (thumb * 1000.0) > 0) {
                 thumb += 1
             }
-            totalThumb = thumb
+            totalThumb += thumb
             this@TimeLineTrack.totalDuration += (it.endAt - it.beginAt)
         }
 
@@ -391,7 +392,7 @@ class TimeLineTrack: FrameLayout {
      * Calc thumb can be create for view media
      */
     private fun calcThumbCanCreateByItem(mediaMainObject: MediaObject): Int {
-        var duration = mediaMainObject.endTime - mediaMainObject.startTime
+        var duration = mediaMainObject.endAt - mediaMainObject.beginAt
         if (duration == 0L) {
             duration = mediaMainObject.mediaDuration
         }
@@ -399,9 +400,12 @@ class TimeLineTrack: FrameLayout {
             duration = 2000
         }
 
-        val adjThumb = if (duration % mediaMainObject.speed != 0.0) 1 else 0
+        var thumb = (duration / 1000.0).toInt()
+        if (duration - (thumb *  1000.0) > 0) {
+            thumb += 1
+        }
 
-        return (duration / 1000 / mediaMainObject.speed).toInt() + adjThumb
+        return thumb
     }
 
     /**

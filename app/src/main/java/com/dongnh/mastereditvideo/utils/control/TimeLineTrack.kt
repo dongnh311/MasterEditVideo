@@ -32,6 +32,7 @@ import com.dongnh.mastereditvideo.utils.view.ShapeableImageViewHeight
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.shape.CornerFamily
 import timber.log.Timber
+import kotlin.math.round
 
 /**
  * Project : MasterEditVideo
@@ -256,13 +257,18 @@ class TimeLineTrack: FrameLayout {
      */
     fun addMediaAndCreateItemView(listMedia : MutableList<MediaObject>) {
         this@TimeLineTrack.listMedia.addAll(listMedia)
-        var totalDuration = 0L
+        this@TimeLineTrack.totalDuration = 0
+        var totalThumb = 0
         this@TimeLineTrack.listMedia.forEach {
-            totalDuration += it.mediaDuration
+            var thumb = (it.mediaDuration / 1000.0).toInt()
+            if (it.mediaDuration - (thumb * 1000.0) > 0) {
+                thumb += 1
+            }
+            totalThumb = thumb
+            this@TimeLineTrack.totalDuration += (it.endAt - it.beginAt)
         }
 
-        this@TimeLineTrack.totalDuration = totalDuration
-        this@TimeLineTrack.totalThumbnailCreated = (this@TimeLineTrack.totalDuration / 1000.0).toInt()
+        this@TimeLineTrack.totalThumbnailCreated = totalThumb
 
         // Re draw timeline
         initializeViewForDuration()

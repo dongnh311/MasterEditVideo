@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity() {
         this@MainActivity.isPlaying = true
         this@MainActivity.managerPlayerControl.playVideo()
 
-        runnableDurationTimeLine?.let { handleTask.postDelayed(it, 400) }
+        runnableDurationTimeLine?.let { handleTask.postDelayed(it, 10) }
     }
 
     /**

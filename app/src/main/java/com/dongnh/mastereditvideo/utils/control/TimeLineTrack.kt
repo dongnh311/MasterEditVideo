@@ -127,7 +127,7 @@ class TimeLineTrack: FrameLayout {
                 textView.setTextColor(context.getColor(R.color.colorWhite))
             } else {
                 textView.text = "■"
-                textView.textSize = 4f
+                textView.textSize = 6f
                 textView.setTextColor(context.getColor(R.color.colorTextSelected))
             }
 
@@ -264,7 +264,7 @@ class TimeLineTrack: FrameLayout {
         var totalThumb = 0
         this@TimeLineTrack.listMedia.forEach {
             var thumb = (it.mediaDuration / 1000.0).toInt()
-            if (it.mediaDuration - (thumb * 1000.0) > adjToPlugThumb) {
+            if ((it.mediaDuration - (thumb * 1000.0)) / 1000.0 > adjToPlugThumb) {
                 thumb += 1
             }
             totalThumb += thumb
@@ -403,7 +403,7 @@ class TimeLineTrack: FrameLayout {
         }
 
         var thumb = (duration / 1000.0).toInt()
-        if (duration - (thumb *  1000.0) > adjToPlugThumb) {
+        if ((duration - (thumb *  1000.0)) / 1000.0 > adjToPlugThumb) {
             thumb += 1
         }
 
@@ -464,7 +464,7 @@ class TimeLineTrack: FrameLayout {
      * Scroll list track when play
      */
     fun updateScrollOfMainView() {
-        val duration = ((thumbnailSize + (marginItem / 4)) * 12.3 / 1000)
+        val duration = (thumbnailSize + (marginItem / 4)) / 1000.0 * 10.0
         this@TimeLineTrack.currentDurationInView += duration
         this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
             (currentDurationInView).toInt(),

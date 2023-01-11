@@ -28,6 +28,7 @@ import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
 import com.dongnh.mastereditvideo.databinding.ItemTrackViewBinding
 import com.dongnh.mastereditvideo.databinding.LayoutTimeLineBinding
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
+import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
 import com.dongnh.mastereditvideo.utils.view.ShapeableImageViewHeight
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.shape.CornerFamily
@@ -98,6 +99,9 @@ class TimeLineTrack: FrameLayout {
 
     // List media
     private var listMedia: MutableList<MediaObject> = mutableListOf()
+
+    // Lister
+    var onItemMediaChoose: OnItemMediaChoose? = null
 
     // Create view
     init {
@@ -371,7 +375,8 @@ class TimeLineTrack: FrameLayout {
 
             // Set tag for item
             linearLayoutAddThumb.tag = index
-            //setUpEventLickChooseMedia(linearLayoutAddThumb)
+            setUpEventLickChooseMedia(linearLayoutAddThumb)
+            linearLayoutAddThumb.setBackgroundResource(R.drawable.bg_media_normal)
 
             layoutOfTrack.addView(linearLayoutAddThumb)
             layoutOfTrack.requestLayout()
@@ -471,4 +476,44 @@ class TimeLineTrack: FrameLayout {
             0
         )
     }
+
+    /**
+     * Add event click on item
+     */
+    private fun setUpEventLickChooseMedia(
+        linearLayout: LinearLayout
+    ) {
+        // Allow child click to main
+        for (index in 0 until linearLayout.childCount) {
+            linearLayout.getChildAt(index).setOnClickListener {
+                if (linearLayout.getChildAt(0).tag == null || linearLayout.getChildAt(0).tag == 0) {
+                    linearLayout.getChildAt(0).tag = 1
+                    linearLayout.setBackgroundResource(R.drawable.bg_media_click)
+                    onItemMediaChoose?.onItemMediaChoose(
+                        linearLayout.tag as Int
+                    )
+                } else {
+                    linearLayout.getChildAt(0).tag = 0
+                    linearLayout.setBackgroundResource(R.drawable.bg_media_normal)
+                    onItemMediaChoose?.onItemMediaCancel(
+                        linearLayout.tag as Int
+                    )
+                }
+
+                // Reset color of view
+                val parentView = linearLayout.parent as LinearLayout
+                for (indexInParent in 0 until parentView.childCount) {
+                    val child = parentView.getChildAt(indexInParent) as LinearLayout
+                    if (child.tag != linearLayout.tag) {
+                        child.getChildAt(0).tag = 0
+                        child.setBackgroundResource(R.drawable.bg_media_normal)
+                    }
+                }
+
+                // Reset color of parent
+                //resetParentItemBg(this@TrackTimeLineControl.dataBinding.layoutEdit.getChildAt(0) as ConstraintLayout)
+            }
+        }
+    }
+
 }

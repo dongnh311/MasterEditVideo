@@ -12,6 +12,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.utils.exts.createMediaTransformPath
+import com.dongnh.masteredit.utils.exts.deleteFolderIfExit
+import com.dongnh.masteredit.utils.exts.pathOfMedia
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
@@ -20,6 +23,7 @@ import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
+import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -47,6 +51,9 @@ class MainActivity : AppCompatActivity() {
 
     // Save list object
     private val listMedia = mutableListOf<MediaObject>()
+
+    // Save index click on media
+    private var indexMediaSelect = -1
 
     // Request permission for storage
     private val requestPermissionLauncherStorage =
@@ -79,6 +86,9 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
+
+        // Delete all temp file
+        deleteFolderIfExit(createMediaTransformPath(this))
 
         // Init tag for default
         this@MainActivity.mainBinding.btnPlay.tag = VIDEO_IS_PLAY
@@ -134,6 +144,16 @@ class MainActivity : AppCompatActivity() {
                 setupButtonPause()
             }
         }
+
+        // Button delete
+        mainBinding.btnDelete.setOnClickListener {
+            if (indexMediaSelect > -1) {
+                listMedia.removeAt(indexMediaSelect)
+                indexMediaSelect = -1
+
+                makeViewShowMedia()
+            }
+        }
     }
 
     /**
@@ -163,6 +183,25 @@ class MainActivity : AppCompatActivity() {
                             false
                     }
                 }
+            }
+        }
+
+        // Media choose
+        mainBinding.viewTimeLine.onItemMediaChoose = object : OnItemMediaChoose {
+            override fun onItemMediaChoose(index: Int) {
+                indexMediaSelect = index
+            }
+
+            override fun onItemMediaCancel(index: Int) {
+            }
+
+            override fun onLayerChoose(index: Int) {
+            }
+
+            override fun onItemSpecialChoose(index: Int) {
+            }
+
+            override fun onMusicChoose(index: Int) {
             }
         }
     }
@@ -239,12 +278,19 @@ class MainActivity : AppCompatActivity() {
         // Check data is add
         MyDataSingleton.isAddNewMedia.observe(this) {
             if (it) {
-                this@MainActivity.listMedia.addAll(MyDataSingleton.listMediaPick)
-                this@MainActivity.mainBinding.viewTimeLine.addMediaAndCreateItemView(this@MainActivity.listMedia)
-                this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(this@MainActivity.listMedia)
-                MyDataSingleton.listMediaPick.clear()
+                makeViewShowMedia()
             }
         }
+    }
+
+    /**
+     * Make view init to show media
+     */
+    private fun makeViewShowMedia() {
+        this@MainActivity.listMedia.addAll(MyDataSingleton.listMediaPick)
+        this@MainActivity.mainBinding.viewTimeLine.addMediaAndCreateItemView(this@MainActivity.listMedia)
+        this@MainActivity.managerPlayerControl.addMediasToPlayerQueue(this@MainActivity.listMedia)
+        MyDataSingleton.listMediaPick.clear()
     }
 
     /**

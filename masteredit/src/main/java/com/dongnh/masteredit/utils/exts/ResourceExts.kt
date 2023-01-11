@@ -3,6 +3,7 @@ package com.dongnh.masteredit.utils.exts
 import android.content.Context
 import com.dongnh.masteredit.enums.NAME_FOLDER_IMAGE2VIDEO
 import com.dongnh.masteredit.enums.NAME_SUB_FOLDER_IMAGE
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -36,4 +37,25 @@ fun pathOfMedia(context: Context): String {
         File(filePath.path)
     if (!file.exists()) file.mkdir()
     return file.path
+}
+
+/**
+ * Check file is exist
+ *
+ * @param filePath : target file, this is string
+ * @return : true if exist
+ */
+fun deleteFolderIfExit(filePath: String): Boolean {
+    return try {
+        val file = File(filePath)
+        if (file.exists()) {
+            file.deleteRecursively()
+            true
+        } else {
+            false
+        }
+    } catch (e: Exception) {
+        Timber.e(e)
+        false
+    }
 }

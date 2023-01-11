@@ -8,14 +8,14 @@ Project demo using openGL to edit and view video.
 
 
 Feature function :
-- [x] #Play video.
-- [] #Play image.
-- [] #Play Music.
-- [] #Merge video and image.
-- [] #Apply filter.
-- [] #Apply effect.
-- [] #Apply transition.
-- [] #Trim video.
-- [] #Trim music.
-- [] #Mix music.
-- [] #Export editer video.
+- [x] Play video.
+- [x] Play image.
+- [] Play Music.
+- [] Merge video and image.
+- [] Apply filter.
+- [] Apply effect.
+- [] Apply transition.
+- [] Trim video.
+- [] Trim music.
+- [] Mix music.
+- [] Export editer video.

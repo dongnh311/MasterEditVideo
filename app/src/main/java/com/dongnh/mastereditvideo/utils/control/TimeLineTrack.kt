@@ -66,6 +66,9 @@ class TimeLineTrack: FrameLayout {
     private var totalDuration = 0L
     private var maxWidthOfDuration = 0
 
+    // Adj to check add more thumb
+    private var adjToPlugThumb = 0.5f
+
     // Thumbnail width
     private val thumbnailSize =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45f, resources.displayMetrics)
@@ -115,7 +118,7 @@ class TimeLineTrack: FrameLayout {
     private fun initializeViewForDuration() {
         this@TimeLineTrack.itemTimeLineBinding.layoutDuration.removeAllViews()
         val sizeToCreate =
-            totalThumbnailCreated * 2 + 2
+            totalThumbnailCreated * 2 + 1
         for (i in 0 until sizeToCreate) {
             val textView = TextView(context)
             if (i % 2 == 0) {
@@ -130,7 +133,7 @@ class TimeLineTrack: FrameLayout {
 
             textView.gravity = Gravity.START
             val layoutParam = FlexboxLayout.LayoutParams(
-                (thumbnailSize + (marginItem / 4)) / 2,
+                (thumbnailSize + (marginItem)) ,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
 
@@ -139,6 +142,8 @@ class TimeLineTrack: FrameLayout {
                 layoutParam.setMargins(marginToCenter - thumbnailSize, 0, 0, 0)
             } else if ((i + 1) == sizeToCreate) {
                 layoutParam.setMargins(0, 0, marginToCenter, 0)
+            } else {
+                layoutParam.setMargins((marginItem) / 2, 0, 0, 0)
             }
 
             this@TimeLineTrack.itemTimeLineBinding.layoutDuration.addView(
@@ -160,9 +165,6 @@ class TimeLineTrack: FrameLayout {
         this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.setOnTouchListener { _, event ->
             when (event?.action) {
                 MotionEvent.ACTION_MOVE -> {
-                    if (tempScroll != event.x) {
-                        Timber.e("Scroll to ${event.x}")
-                    }
                     tempScroll = event.x
                 }
             }
@@ -175,7 +177,7 @@ class TimeLineTrack: FrameLayout {
      */
     private fun handelUpdateProgress() {
         this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.setOnScrollChangeListener { _, scrollX, _, _, _ ->
-            val durationCalc = (scrollX / thumbnailSize.toDouble()) * 1000L
+            val durationCalc = (scrollX / (thumbnailSize.toDouble() - (marginItem / 4))) * 1000L
             val durationSeek = durationCalc.toLong()
             if (currentDurationInVideo != durationSeek && !isScrollToStart) {
                 currentDurationInVideo = durationSeek
@@ -262,7 +264,7 @@ class TimeLineTrack: FrameLayout {
         var totalThumb = 0
         this@TimeLineTrack.listMedia.forEach {
             var thumb = (it.mediaDuration / 1000.0).toInt()
-            if (it.mediaDuration - (thumb * 1000.0) > 0) {
+            if (it.mediaDuration - (thumb * 1000.0) > adjToPlugThumb) {
                 thumb += 1
             }
             totalThumb += thumb
@@ -401,7 +403,7 @@ class TimeLineTrack: FrameLayout {
         }
 
         var thumb = (duration / 1000.0).toInt()
-        if (duration - (thumb *  1000.0) > 0) {
+        if (duration - (thumb *  1000.0) > adjToPlugThumb) {
             thumb += 1
         }
 
@@ -462,7 +464,7 @@ class TimeLineTrack: FrameLayout {
      * Scroll list track when play
      */
     fun updateScrollOfMainView() {
-        val duration = ((thumbnailSize + (marginItem / 4)) * 100.0 / 1000)
+        val duration = ((thumbnailSize + (marginItem / 4)) * 12.3 / 1000)
         this@TimeLineTrack.currentDurationInView += duration
         this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
             (currentDurationInView).toInt(),

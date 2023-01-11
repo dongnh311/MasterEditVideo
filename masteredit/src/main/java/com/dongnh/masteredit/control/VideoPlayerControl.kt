@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
+import kotlin.math.abs
 
 /**
  * Project : MasterEditVideo
@@ -64,9 +65,14 @@ class VideoPlayerControl(context: Context) {
                     exoPlayerDuration = 0
                 }
 
+                val duration = if (indexOfMedia == 0) 0 else findDurationForIndexMedia(indexOfMedia)
+
                 // Check type of media
-                val adjDuration = exoPlayerDuration - currentDurationPlayer
-                Timber.e("Exoplay duration : ${exoPlayerDuration}, adj $adjDuration")
+                var adjDuration = exoPlayerDuration + duration - currentDurationPlayer
+                if (adjDuration < 0) {
+                    adjDuration = exoPlayerDuration
+                }
+
                 emit(adjDuration)
                 currentDurationPlayer += adjDuration
                 delay(200)
@@ -189,7 +195,7 @@ class VideoPlayerControl(context: Context) {
     private fun findDurationForIndexMedia(indexOfMedia: Int): Long {
         var durationNeed = 0L
         mediaObjects.forEachIndexed { index, mediaObject ->
-            if (index <= indexOfMedia) {
+            if (index < indexOfMedia) {
                 durationNeed += mediaObject.endAt - mediaObject.beginAt
             } else {
                 return@forEachIndexed

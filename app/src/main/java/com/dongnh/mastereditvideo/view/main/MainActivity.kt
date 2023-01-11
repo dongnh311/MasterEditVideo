@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
         this@MainActivity.runnableDurationTimeLine = Runnable {
             this@MainActivity.mainBinding.viewTimeLine.updateScrollOfMainView()
             this@MainActivity.runnableDurationTimeLine?.let {
-                if (this@MainActivity.isPlaying) {handleTask.postDelayed(it, 100)} else handleTask.removeCallbacks(it)
+                if (this@MainActivity.isPlaying) {handleTask.postDelayed(it, 10)} else handleTask.removeCallbacks(it)
             }
         }
     }

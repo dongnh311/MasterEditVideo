@@ -21,10 +21,12 @@ class DurationControl(private val viewDuration: TextView) {
      * Set duration for video play
      */
     fun setDuration(durationFormat: Long) {
-        this@DurationControl.adjDuration = durationFormat
-        this@DurationControl.currentDuration += durationFormat
-        CoroutineScope(Dispatchers.Main).launch {
-            this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        if (durationFormat >= 0) {
+            this@DurationControl.adjDuration = durationFormat
+            this@DurationControl.currentDuration += durationFormat
+            CoroutineScope(Dispatchers.Main).launch {
+                this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+            }
         }
     }
 
@@ -32,9 +34,11 @@ class DurationControl(private val viewDuration: TextView) {
      * Set duration for seek on scroll
      */
     fun setDurationSeek(durationFormat: Long) {
-        this@DurationControl.currentDuration = durationFormat
-        CoroutineScope(Dispatchers.Main).launch {
-            this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+        if (durationFormat >= 0) {
+            this@DurationControl.currentDuration = durationFormat
+            CoroutineScope(Dispatchers.Main).launch {
+                this@DurationControl.viewDuration.text = currentDuration.stringForTime()
+            }
         }
     }
 

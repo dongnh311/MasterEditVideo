@@ -70,11 +70,6 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
 
             override fun needConfigInputSource(surface: Surface) {
                 this@GLPlayerView.surface = surface
-                this@GLPlayerView.exoPlayer?.setVideoFrameMetadataListener { presentationTimeUs, releaseTimeNs, format, mediaFormat ->
-                    Timber.e(
-                        "Data : $presentationTimeUs, releaseTimeNs : $releaseTimeNs, format : $format, mediaFormat : $mediaFormat"
-                    )
-                }
             }
         }
 

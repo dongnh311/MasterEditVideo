@@ -14,6 +14,9 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.video.VideoSize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.microedition.khronos.egl.EGLConfig
 import kotlin.math.abs
@@ -109,7 +112,11 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
         // Init input source to preview
         onGLFilterActionListener?.needConfigInputSource(surface!!)
-        exoPlayer?.setVideoSurface(surface)
+
+        // Need set it on main thread
+        CoroutineScope(Dispatchers.Main).launch {
+            exoPlayer?.setVideoSurface(surface)
+        }
 
         Matrix.setLookAtM(
             vMatrix, 0,

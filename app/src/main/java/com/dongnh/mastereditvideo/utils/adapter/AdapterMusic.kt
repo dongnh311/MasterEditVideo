@@ -48,6 +48,9 @@ class AdapterMusic : RecyclerView.Adapter<AdapterMusic.ItemViewHolder>() {
                 holder.binding.viewPlay.setImageResource(R.drawable.ic_play_music)
                 holder.binding.progressMusic.progress = 0
             }
+
+            // Button download
+            holder.binding.viewDownload.isEnabled = !musicModel.isDownloaded
         } else {
             // Make old method is call
             onBindViewHolder(holder, position)
@@ -83,6 +86,9 @@ class AdapterMusic : RecyclerView.Adapter<AdapterMusic.ItemViewHolder>() {
                     )
                 )
             }
+
+            // Enable button download
+            binding.viewDownload.isEnabled = !musicModel.isDownloaded
 
             // Name of music
             binding.viewName.text = musicModel.nameMusic

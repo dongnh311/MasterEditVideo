@@ -25,4 +25,5 @@ class MusicModel {
     var progress: Int = 0
     var isChoose: Boolean = false
     var isPlay = false
+    var isDownloaded = false
 }

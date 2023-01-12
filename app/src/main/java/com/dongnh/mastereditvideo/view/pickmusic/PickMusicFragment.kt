@@ -1,10 +1,8 @@
 package com.dongnh.mastereditvideo.view.pickmusic
 
 import android.app.Dialog
-import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -59,8 +57,11 @@ class PickMusicFragment: BottomSheetDialogFragment() {
     // Duration of music
     private var duration = 0
 
-    // Position of music
-    private var positionOfMusic = -1
+    // Position of music selected
+    private var positionOfMusicSelect = -1
+
+    // Position of music player
+    private var positionOfMusicPlayer = -1
 
     // Handle task
     private var handle = Handler(Looper.getMainLooper())
@@ -145,7 +146,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                 if (musicModel.isPlay) {
                     this@PickMusicFragment.mediaPlayer.setVolume(50f, 50f)
                     this@PickMusicFragment.musicIsPlaying = musicModel
-                    this@PickMusicFragment.positionOfMusic = position
+                    this@PickMusicFragment.positionOfMusicPlayer = position
                     if (this@PickMusicFragment.mediaPlayer.isPlaying) {
                         this@PickMusicFragment.mediaPlayer.stop()
                         this@PickMusicFragment.mediaPlayer.reset()
@@ -163,27 +164,31 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                         e.printStackTrace()
                     }
                 } else {
-                    this@PickMusicFragment.positionOfMusic = -1
+                    this@PickMusicFragment.positionOfMusicPlayer = -1
                     this@PickMusicFragment.mediaPlayer.pause()
                     this@PickMusicFragment.musicIsPlaying = null
                 }
             }
 
             override fun onMusicDownload(musicModel: MusicModel, position: Int) {
-                // TODO download file
-                val pathOfMusic = createMusicPath(this@PickMusicFragment.requireContext()) + "/" + musicModel.nameMusic + NAME_EXIF_MUSIC
-                Timber.e("onMusicDownload path in local : $pathOfMusic")
-                musicModel.pathInLocal = pathOfMusic
-                if (File(pathOfMusic).exists()) {
-                    Timber.e("Have file, no need download")
+                if (musicModel.pathInLocal.isNullOrEmpty()) {
+                    val pathOfMusic = createMusicPath(this@PickMusicFragment.requireContext()) + "/" + musicModel.nameMusic + NAME_EXIF_MUSIC
+                    Timber.e("onMusicDownload path in local : $pathOfMusic")
+                    musicModel.pathInLocal = pathOfMusic
+                    if (File(pathOfMusic).exists()) {
+                        Timber.e("Have file, no need download")
+                    } else {
+                        downloadFileMusic(musicModel, position)
+                    }
                 } else {
-                    downloadFileMusic(musicModel)
+                    musicModel.isDownloaded = true
                 }
             }
 
             override fun onMusicClick(musicModel: MusicModel, position: Int) {
                 Timber.e("Music click $musicModel")
-                this@PickMusicFragment.dataBinding.btnClickDone.isEnabled = musicModel.isChoose
+                this@PickMusicFragment.dataBinding.btnClickDone.isEnabled = musicModel.isDownloaded
+                this@PickMusicFragment.positionOfMusicSelect = position
                 if (musicModel.isChoose) {
                     this@PickMusicFragment.musicObject = musicModel
                 } else {
@@ -195,14 +200,10 @@ class PickMusicFragment: BottomSheetDialogFragment() {
 
         // Button done
         dataBinding.btnClickDone.setOnClickListener {
-            this@PickMusicFragment.musicObject?.let { musicModel ->
-                if (musicModel.pathInLocal.isNullOrEmpty()) {
-                    downloadFileMusic(musicModel)
-                } else {
-                    onMusicSelectListener?.onMusicChoose(
-                        musicModel
-                    )
-                }
+            this@PickMusicFragment.musicObject?.let { music ->
+                onMusicSelectListener?.onMusicChoose(
+                    music
+                )
             }
         }
     }
@@ -221,7 +222,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
             if (this@PickMusicFragment.musicIsPlaying?.progress != progress.toInt()) {
                 Timber.e("Progress music player : $progress, total duration : ${this@PickMusicFragment.duration}, current play :$currentDuration ")
                 this@PickMusicFragment.musicIsPlaying?.progress = progress.toInt()
-                this@PickMusicFragment.adapterMusic.notifyItemChanged(this@PickMusicFragment.positionOfMusic, progress.toInt())
+                this@PickMusicFragment.adapterMusic.notifyItemChanged(this@PickMusicFragment.positionOfMusicPlayer, progress.toInt())
             }
 
             // Call this thread again after 15 milliseconds => ~ 1000/60fps
@@ -229,7 +230,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                 handle.postDelayed(this, 15)
             } else {
                 this@PickMusicFragment.musicIsPlaying?.isPlay = false
-                this@PickMusicFragment.adapterMusic.notifyItemChanged(this@PickMusicFragment.positionOfMusic, progress.toInt())
+                this@PickMusicFragment.adapterMusic.notifyItemChanged(this@PickMusicFragment.positionOfMusicPlayer, progress.toInt())
             }
         }
     }
@@ -253,7 +254,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
     /**
      * Download file
      */
-    private fun downloadFileMusic(musicModel: MusicModel) {
+    private fun downloadFileMusic(musicModel: MusicModel, position: Int) {
         val downloadService = loadDownloadService()
         CoroutineScope(Dispatchers.IO).launch {
             val response = withContext(Dispatchers.IO) {
@@ -263,10 +264,16 @@ class PickMusicFragment: BottomSheetDialogFragment() {
             response.body()?.let {
                 val result = writeResponseBodyToDisk(it, musicModel)
                 if (result) {
-                    onMusicSelectListener?.onMusicChoose(musicModel)
-                    this@PickMusicFragment.dismiss()
+                    if (position == this@PickMusicFragment.positionOfMusicSelect) {
+                        dataBinding.btnClickDone.isEnabled = true
+                    }
+
+                    // Update to adapter
+                    musicModel.isDownloaded = true
+                    this@PickMusicFragment.adapterMusic.notifyItemChanged(position, Any())
                 } else {
                     Timber.e("Download file is fail")
+                    dataBinding.btnClickDone.isEnabled = false
                 }
             }
         }

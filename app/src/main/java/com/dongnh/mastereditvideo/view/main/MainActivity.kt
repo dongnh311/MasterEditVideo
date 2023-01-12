@@ -2,12 +2,12 @@ package com.dongnh.mastereditvideo.view.main
 
 import android.Manifest
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
@@ -53,6 +53,9 @@ class MainActivity : AppCompatActivity() {
 
     // Save list object
     private val listMedia = mutableListOf<MediaModel>()
+
+    // Save list music
+    private val listMusic = mutableListOf<MusicModel>()
 
     // Save index click on media
     private var indexMediaSelect = -1
@@ -162,7 +165,11 @@ class MainActivity : AppCompatActivity() {
             val pickMusicFragment = PickMusicFragment()
             PickMusicFragment.onMusicSelectListener = object : OnMusicSelectListener {
                 override fun onMusicChoose(musicModel: MusicModel) {
-                    Timber.e("We have music")
+                    Timber.e("We have music and it to view")
+                    this@MainActivity.listMusic.add(musicModel)
+
+                    // Add to track
+                    this@MainActivity.mainBinding.viewTimeLine.addMusicToTrackView(this@MainActivity.listMusic)
                 }
             }
             pickMusicFragment.show(supportFragmentManager, "PickMusicFragment")

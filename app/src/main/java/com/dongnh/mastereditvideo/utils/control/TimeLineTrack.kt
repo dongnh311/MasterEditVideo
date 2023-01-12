@@ -22,8 +22,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.dongnh.masteredit.model.MediaModel
+import com.dongnh.masteredit.model.MusicModel
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
+import com.dongnh.mastereditvideo.databinding.ItemTrackBinding
 import com.dongnh.mastereditvideo.databinding.ItemTrackViewBinding
 import com.dongnh.mastereditvideo.databinding.LayoutTimeLineBinding
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
@@ -39,7 +41,7 @@ import timber.log.Timber
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class TimeLineTrack: FrameLayout {
+class TimeLineTrack : FrameLayout {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -96,7 +98,10 @@ class TimeLineTrack: FrameLayout {
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics)
 
     // List media
-    private var listMedia: MutableList<MediaModel> = mutableListOf()
+    private val listMedia: MutableList<MediaModel> = mutableListOf()
+
+    // List Music
+    private val listMusics = mutableListOf<MusicModel>()
 
     // Lister
     var onItemMediaChoose: OnItemMediaChoose? = null
@@ -135,7 +140,7 @@ class TimeLineTrack: FrameLayout {
 
             textView.gravity = Gravity.START
             val layoutParam = FlexboxLayout.LayoutParams(
-                (thumbnailSize + (marginItem)) ,
+                (thumbnailSize + (marginItem)),
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
 
@@ -153,8 +158,12 @@ class TimeLineTrack: FrameLayout {
             )
         }
 
-        maxWidthOfDuration = (totalThumbnailCreated * thumbnailSize) + (marginToCenter * 2) - thumbnailSize + (marginItem)
-        val layoutOfDuration = ConstraintLayout.LayoutParams(maxWidthOfDuration, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+        maxWidthOfDuration =
+            (totalThumbnailCreated * thumbnailSize) + (marginToCenter * 2) - thumbnailSize + (marginItem)
+        val layoutOfDuration = ConstraintLayout.LayoutParams(
+            maxWidthOfDuration,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
         layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
 
         this@TimeLineTrack.itemTimeLineBinding.layoutDuration.layoutParams = layoutOfDuration
@@ -196,7 +205,12 @@ class TimeLineTrack: FrameLayout {
     private fun initTimeLineForType() {
         // Add item to view
         for (i in 0 until 5) {
-            val layoutMedia: ItemTrackViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_track_view, null, false)
+            val layoutMedia: ItemTrackViewBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_track_view,
+                null,
+                false
+            )
 
             // Set ID
             when (i) {
@@ -215,6 +229,11 @@ class TimeLineTrack: FrameLayout {
                 4 -> {
                     layoutMedia.root.id = R.id.track_music
                 }
+                else -> {
+                    layoutMedia.root.id = R.id.track_music
+                    // Only music is vertical
+                    layoutMedia.mainAddTrack.orientation = LinearLayout.VERTICAL
+                }
             }
 
             val marginForCurrent = if (i == 0) {
@@ -231,7 +250,10 @@ class TimeLineTrack: FrameLayout {
             )
         }
 
-        val layoutOfDuration = ConstraintLayout.LayoutParams(maxWidthOfDuration, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+        val layoutOfDuration = ConstraintLayout.LayoutParams(
+            maxWidthOfDuration,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
         layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
 
         this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
@@ -245,6 +267,7 @@ class TimeLineTrack: FrameLayout {
      */
     fun clearAllMediaAdded() {
         this@TimeLineTrack.listMedia.clear()
+        this@TimeLineTrack.listMusics.clear()
         this@TimeLineTrack.totalThumbnailCreated = 0
 
         // Re draw timeline
@@ -259,7 +282,7 @@ class TimeLineTrack: FrameLayout {
     /**
      * Add media to view
      */
-    fun addMediaAndCreateItemView(listMedia : MutableList<MediaModel>) {
+    fun addMediaAndCreateItemView(listMedia: MutableList<MediaModel>) {
         this@TimeLineTrack.listMedia.clear()
         this@TimeLineTrack.listMedia.addAll(listMedia)
         this@TimeLineTrack.totalDuration = 0
@@ -280,6 +303,13 @@ class TimeLineTrack: FrameLayout {
 
         // Draw track
         drawTrackToView()
+
+        // draw music
+        if (listMusics.isNotEmpty()) {
+            val list = mutableListOf<MusicModel>()
+            list.addAll(listMusics)
+            addMusicToTrackView(list)
+        }
     }
 
     /**
@@ -295,15 +325,21 @@ class TimeLineTrack: FrameLayout {
         // Re draw track
         initTimeLineForType()
 
-        val layoutOfTrack: LinearLayout = this@TimeLineTrack.itemTimeLineBinding.layoutEdit[0] as LinearLayout
+        val layoutOfTrack: LinearLayout =
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit[0] as LinearLayout
         this@TimeLineTrack.listMedia.forEachIndexed { index, mediaObject ->
             // Image thumb
             val timeToGet = calcThumbCanCreateByItem(mediaObject)
 
             // Create main layout
-            val linearLayoutAddThumb = LinearLayout(this@TimeLineTrack.context)
-            linearLayoutAddThumb.orientation = LinearLayout.HORIZONTAL
-            linearLayoutAddThumb.gravity = Gravity.CENTER
+            val linearLayoutAddThumb: ItemTrackBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_track,
+                null,
+                false
+            )
+            linearLayoutAddThumb.mainAddView.orientation = LinearLayout.HORIZONTAL
+            linearLayoutAddThumb.mainAddView.gravity = Gravity.CENTER
 
             // Create item thumb
             for (indexThumb in 1..timeToGet) {
@@ -353,7 +389,7 @@ class TimeLineTrack: FrameLayout {
                 // Load thumb
                 loadThumbnailToImageView(imageView, indexThumb, mediaObject)
 
-                linearLayoutAddThumb.addView(imageView)
+                linearLayoutAddThumb.mainAddView.addView(imageView)
             }
 
             val layoutParams = LinearLayout.LayoutParams(
@@ -363,21 +399,150 @@ class TimeLineTrack: FrameLayout {
 
             // Margin first item
             if (index == 0) {
-                layoutParams.setMargins(marginToCenter - thumbnailSize + marginItem , 0, 0, 0)
+                layoutParams.setMargins(marginToCenter - thumbnailSize + marginItem, 0, 0, 0)
             } else {
-                layoutParams.setMargins( 0 , 0, 0, 0)
+                layoutParams.setMargins(0, 0, 0, 0)
             }
 
-            linearLayoutAddThumb.layoutParams = layoutParams
-            linearLayoutAddThumb.requestLayout()
+            linearLayoutAddThumb.mainAddView.layoutParams = layoutParams
+            linearLayoutAddThumb.mainAddView.requestLayout()
 
             // Set tag for item
-            linearLayoutAddThumb.tag = index
+            linearLayoutAddThumb.mainAddView.tag = 1
+            linearLayoutAddThumb.viewIndex.tag = index
+            linearLayoutAddThumb.viewObject.tag = mediaObject
             setUpEventLickChooseMedia(linearLayoutAddThumb)
-            linearLayoutAddThumb.setBackgroundResource(R.drawable.bg_media_normal)
+            linearLayoutAddThumb.mainAddView.setBackgroundResource(R.drawable.bg_media_normal)
 
-            layoutOfTrack.addView(linearLayoutAddThumb)
+            layoutOfTrack.addView(linearLayoutAddThumb.mainAddView)
             layoutOfTrack.requestLayout()
+        }
+    }
+
+    /**
+     * Add music
+     */
+    fun addMusicToTrackView(listMusic: MutableList<MusicModel>) {
+        this@TimeLineTrack.listMusics.clear()
+        this@TimeLineTrack.listMusics.addAll(listMusic)
+
+        // Add more line
+        for (i in 0 until listMusic.size - 1) {
+            val layoutMedia: ItemTrackViewBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_track_view,
+                null,
+                false
+            )
+            val marginForCurrent = marginItem - marginItem / 4
+
+            val layoutOfChild = LinearLayout.LayoutParams(maxWidthOfDuration, thumbnailSize)
+            layoutOfChild.setMargins(0, marginForCurrent, 0, 0)
+
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.addView(
+                layoutMedia.root, layoutOfChild
+            )
+
+        }
+
+        // Need reset value
+        scrollToStart()
+        this@TimeLineTrack.isScrollToStart = false
+
+        try {
+
+            // Add music
+            val adjIndex = 4
+            listMusic.forEachIndexed { index, musicModel ->
+                val layoutOfTrack: LinearLayout =
+                    this@TimeLineTrack.itemTimeLineBinding.layoutEdit[adjIndex + index] as LinearLayout
+                layoutOfTrack.orientation = LinearLayout.VERTICAL
+                layoutOfTrack.gravity = Gravity.START or Gravity.CENTER
+
+                // Create main layout
+                val linearLayoutViewMusic: ItemTrackBinding = DataBindingUtil.inflate(
+                    LayoutInflater.from(context),
+                    R.layout.item_track,
+                    null,
+                    false
+                )
+
+                linearLayoutViewMusic.mainAddView.orientation = LinearLayout.HORIZONTAL
+                linearLayoutViewMusic.mainAddView.gravity = Gravity.START or Gravity.CENTER
+
+                val draw = ContextCompat.getDrawable(context, R.drawable.visualize_sound_time_line)
+                val width = draw?.intrinsicWidth
+                Timber.e("Image music width : $width")
+
+                // Set it is not choose
+                linearLayoutViewMusic.mainAddView.tag = 1
+
+                // Add thumb
+                var totalCreate = 0
+                if (width != null) {
+                    for (time in 0 until 100000) {
+                        totalCreate += width
+                        if (totalCreate < maxWidthOfDuration) {
+                            val imageView = ImageView(context)
+                            val imageLayout =
+                                LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                )
+                            imageView.layoutParams = imageLayout
+                            imageView.scaleType = ImageView.ScaleType.FIT_CENTER
+                            imageView.background = draw
+                            linearLayoutViewMusic.mainAddView.background = draw
+
+                            var marginStart = 0
+                            if (time == 0) marginStart = marginToCenter - thumbnailSize + marginItem
+                            imageLayout.setMargins(marginStart, 0, 0, 0)
+
+                            linearLayoutViewMusic.mainAddView.addView(imageView)
+                        } else {
+                            break
+                        }
+                    }
+                }
+
+                linearLayoutViewMusic.mainAddView.requestLayout()
+
+                linearLayoutViewMusic.viewObject.tag = musicModel
+                linearLayoutViewMusic.viewIndex.tag = index
+
+                // Set margin for item
+                val layout = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+
+                val marginForCurrent = if (index == 0) {
+                    0
+                } else {
+                    marginItem - marginItem / 4
+                }
+
+                layout.setMargins(0, marginForCurrent, marginToCenter, 0)
+                linearLayoutViewMusic.mainAddView.layoutParams = layout
+
+                setUpEventMusicChoose(linearLayoutViewMusic)
+
+                // Add to parent view
+                layoutOfTrack.addView(linearLayoutViewMusic.root)
+            }
+
+            // Make layout edit is scale
+            val layoutOfDuration = ConstraintLayout.LayoutParams(
+                maxWidthOfDuration,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
+
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+        } catch (ex: java.lang.Exception) {
+            Timber.e(ex)
         }
     }
 
@@ -406,7 +571,7 @@ class TimeLineTrack: FrameLayout {
         }
 
         var thumb = (duration / 1000.0).toInt()
-        if ((duration - (thumb *  1000.0)) / 1000.0 > adjToPlugThumb) {
+        if ((duration - (thumb * 1000.0)) / 1000.0 > adjToPlugThumb) {
             thumb += 1
         }
 
@@ -479,8 +644,9 @@ class TimeLineTrack: FrameLayout {
      * Add event click on item
      */
     private fun setUpEventLickChooseMedia(
-        linearLayout: LinearLayout
+        itemTrackBinding: ItemTrackBinding
     ) {
+        val linearLayout = itemTrackBinding.mainAddView
         // Allow child click to main
         for (index in 0 until linearLayout.childCount) {
             linearLayout.getChildAt(index).setOnClickListener {
@@ -488,13 +654,13 @@ class TimeLineTrack: FrameLayout {
                     linearLayout.getChildAt(0).tag = 1
                     linearLayout.setBackgroundResource(R.drawable.bg_media_click)
                     onItemMediaChoose?.onItemMediaChoose(
-                        linearLayout.tag as Int
+                        itemTrackBinding.viewIndex.tag as Int
                     )
                 } else {
                     linearLayout.getChildAt(0).tag = 0
                     linearLayout.setBackgroundResource(R.drawable.bg_media_normal)
                     onItemMediaChoose?.onItemMediaCancel(
-                        linearLayout.tag as Int
+                        itemTrackBinding.viewIndex.tag as Int
                     )
                 }
 
@@ -507,10 +673,26 @@ class TimeLineTrack: FrameLayout {
                         child.setBackgroundResource(R.drawable.bg_media_normal)
                     }
                 }
-
-                // Reset color of parent
-                //resetParentItemBg(this@TrackTimeLineControl.dataBinding.layoutEdit.getChildAt(0) as ConstraintLayout)
             }
+        }
+    }
+
+    /**
+     * Change color if need
+     */
+    private fun setUpEventMusicChoose(childViewMusic: ItemTrackBinding) {
+        if (childViewMusic.mainAddView.tag == null || childViewMusic.mainAddView.tag == 0) {
+            childViewMusic.mainAddView.tag = 1
+            childViewMusic.mainAddView.setBackgroundResource(R.drawable.bg_media_click)
+            onItemMediaChoose?.onMusicChoose(
+                childViewMusic.viewIndex.tag as Int
+            )
+        } else {
+            childViewMusic.mainAddView.tag = 0
+            childViewMusic.mainAddView.setBackgroundResource(android.R.color.transparent)
+            onItemMediaChoose?.onItemMediaCancel(
+                childViewMusic.viewIndex.tag as Int
+            )
         }
     }
 

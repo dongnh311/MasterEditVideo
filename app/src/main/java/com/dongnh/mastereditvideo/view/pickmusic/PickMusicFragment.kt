@@ -224,7 +224,18 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                 dataBinding.dialogDownload.visibility = View.GONE
 
                 // Setup data to view
-                result.result?.data?.let { adapterMusic.dataList.addAll(it) }
+                result.result?.data?.let {
+                    it.forEach { item ->
+
+                        // Mapping download status
+                        val pathOfMusic =
+                            createMusicPath(this@PickMusicFragment.requireContext()) + "/" + item.nameMusic + NAME_EXIF_MUSIC
+                        if (File(pathOfMusic).exists()) {
+                            item.isDownloaded = true
+                        }
+                    }
+                    adapterMusic.dataList.addAll(it)
+                }
                 adapterMusic.notifyItemRangeInserted(0, adapterMusic.dataList.size)
             }
         }

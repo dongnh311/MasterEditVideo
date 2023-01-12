@@ -109,4 +109,18 @@ class PreViewLayoutControl(context: Context) {
         glPlayerView.onPause()
     }
 
+    /**
+     * On resume view
+     */
+    fun onResume() {
+        glPlayerView.onResume()
+    }
+
+    /**
+     * Release all
+     */
+    fun release() {
+        glPlayerView.releaseAll()
+    }
+
 }

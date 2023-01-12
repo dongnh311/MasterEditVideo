@@ -195,7 +195,7 @@ open class GLFilterObject() {
     }
 
     /**
-     * Get Handle by nmae
+     * Get Handle by name
      */
     fun getHandle(name: String): Int {
         val value = handleMap[name]

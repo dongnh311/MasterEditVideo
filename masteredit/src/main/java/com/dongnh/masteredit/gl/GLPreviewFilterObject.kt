@@ -8,7 +8,7 @@ import android.opengl.GLES20
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class GLPreviewFilterObject(texTarget: Int) : GLFilterObject() {
+open class GLPreviewFilterObject(texTarget: Int) : GLFilterObject() {
 
     val GL_TEXTURE_EXTERNAL_OES = 0x8D65
 

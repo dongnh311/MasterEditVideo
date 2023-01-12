@@ -11,6 +11,7 @@ import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
 import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
@@ -175,8 +176,10 @@ class VideoPlayerControl(context: Context) {
      * Release
      */
     fun releaseMedia() {
+        isPlaying = false
         mediaObjects.clear()
         exoManager.exoPlayer.release()
+        playbackProgressObservable.cancellable()
     }
 
     /**

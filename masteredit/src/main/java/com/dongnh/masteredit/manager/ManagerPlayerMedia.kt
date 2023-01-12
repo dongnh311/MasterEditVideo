@@ -3,9 +3,6 @@ package com.dongnh.masteredit.manager
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
-import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
-import com.dongnh.masteredit.base.BasePlayerControl
-import com.dongnh.masteredit.control.ImagePlayerControl
 import com.dongnh.masteredit.control.PreViewLayoutControl
 import com.dongnh.masteredit.control.VideoPlayerControl
 import com.dongnh.masteredit.model.MediaObject
@@ -17,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -74,7 +70,10 @@ class ManagerPlayerMedia(private val context: Context,
         // Reset duration
         this@ManagerPlayerMedia.durationOfVideoProject = 0
 
-        videoPlayerControl = VideoPlayerControl(this@ManagerPlayerMedia.context)
+        // Init if need
+        if (videoPlayerControl == null) {
+            videoPlayerControl = VideoPlayerControl(this@ManagerPlayerMedia.context)
+        }
 
         videoPlayerControl?.playEndListener = object : MediaPlayEndListener {
             override fun onPreparePlay(position: Long, duration: Long) {
@@ -137,7 +136,6 @@ class ManagerPlayerMedia(private val context: Context,
      * Release all media and player created
      */
     fun releaseAllPlayer() {
-        clearAllMediaPlayerCreated()
         clearAllViewAdded()
         this@ManagerPlayerMedia.listMediaAdded.clear()
     }
@@ -147,6 +145,7 @@ class ManagerPlayerMedia(private val context: Context,
      */
     private fun clearAllMediaPlayerCreated() {
         videoPlayerControl?.releaseMedia()
+        preViewLayoutControl.release()
     }
 
     /**
@@ -210,5 +209,31 @@ class ManagerPlayerMedia(private val context: Context,
         } catch (e: Exception) {
             Timber.e(e)
         }
+    }
+
+    /**
+     * Resume view and media
+     */
+    fun onResume(isPlaying : Boolean) {
+        preViewLayoutControl.onResume()
+        if (isPlaying) {
+            videoPlayerControl?.playerMedia()
+        }
+    }
+
+    /**
+     * Stop if need
+     */
+    fun onPause() {
+        preViewLayoutControl.onPause()
+        videoPlayerControl?.pauseMedia()
+    }
+
+    /**
+     * Clear all media player, preview
+     */
+    fun onDestroy() {
+        preViewLayoutControl.release()
+        videoPlayerControl?.releaseMedia()
     }
 }

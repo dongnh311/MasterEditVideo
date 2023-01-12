@@ -89,8 +89,6 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             this@GLPlayerView.exoPlayer = null
         }
         this@GLPlayerView.exoPlayer = player
-        //this@GLPlayerView.surface?.let { player.setVideoSurface(it) }
-
         this@GLPlayerView.renderer.configPlayer(player)
         return this
     }
@@ -156,9 +154,20 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
         requestLayout()
     }
 
+    /**
+     * Make render continue draw
+     */
+    override fun onResume() {
+        super.onResume()
+        renderer.allowDraw()
+    }
+
+    /**
+     * Make render stop draw
+     */
     override fun onPause() {
         super.onPause()
-        renderer.release()
+        renderer.stopDraw()
     }
 
     /**

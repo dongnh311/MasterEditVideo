@@ -305,8 +305,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        managerPlayerControl.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        managerPlayerControl.onPause()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        managerPlayerControl.onDestroy()
         MyDataSingleton.resetValue()
     }
 

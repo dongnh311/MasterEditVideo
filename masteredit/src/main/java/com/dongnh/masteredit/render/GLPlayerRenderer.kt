@@ -56,6 +56,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     private var previewFilter: GLPreviewFilterObject? = null
     private var glFilter: GLFilterObject? = null
 
+    // Check if add new filter
     private var isNewFilter = false
 
     // View of preview
@@ -64,6 +65,9 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
     // Callback
     var onGLFilterActionListener : OnGLFilterActionListener? = null
+
+    // Allow draw
+    private var isNeedDraw = true
 
     // Add filter
     fun addGLFilter(glFilterObject: GLFilterObject?) {
@@ -263,12 +267,18 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
             )  // - of x is go to right max is 0.5, - of y is go top
         }
 
-        previewFilter?.draw(textureId, mvpMatrix, stMatrix, aspectRatio)
+        if (isNeedDraw) {
+            previewFilter?.draw(textureId, mvpMatrix, stMatrix, aspectRatio)
+        }
 
         if (glFilter != null) {
             fbo?.enable()
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-            filterFramebufferObject?.let { glFilter?.draw(it.getTexName(), fbo) }
+            filterFramebufferObject?.let {
+                if (isNeedDraw) {
+                    glFilter?.draw(it.getTexName(), fbo)
+                }
+            }
         }
     }
 
@@ -278,7 +288,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     fun configPlayer(exoPlayer: ExoPlayer) {
         this@GLPlayerRenderer.exoPlayer = exoPlayer
         surface?.let {
-            //this@GLPlayerRenderer.exoPlayer!!.clearVideoSurface()
+            this@GLPlayerRenderer.exoPlayer!!.clearVideoSurface()
             this@GLPlayerRenderer.exoPlayer!!.setVideoSurface(it)
             onGLFilterActionListener?.requestRender()
         }
@@ -291,15 +301,26 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     }
 
     /**
+     * Allow filter draw
+     */
+    fun allowDraw() {
+        isNeedDraw = true
+    }
+
+    /**
+     * Stop draw if filter
+     */
+    fun stopDraw() {
+        isNeedDraw = false
+    }
+
+    /**
      * Release object
      */
     fun release() {
-        if (glFilter != null) {
-            glFilter?.release()
-        }
-        if (previewTexture != null) {
-            previewTexture?.release()
-        }
+        glFilter?.release()
+        previewTexture?.release()
+        filterFramebufferObject?.release()
     }
 
     /**

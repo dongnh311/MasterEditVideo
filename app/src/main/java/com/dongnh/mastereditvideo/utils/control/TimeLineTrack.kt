@@ -21,9 +21,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.mastereditvideo.R
-import com.dongnh.mastereditvideo.const.MEDIA_TYPE_IMAGE
 import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
 import com.dongnh.mastereditvideo.databinding.ItemTrackViewBinding
 import com.dongnh.mastereditvideo.databinding.LayoutTimeLineBinding
@@ -33,7 +32,6 @@ import com.dongnh.mastereditvideo.utils.view.ShapeableImageViewHeight
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.shape.CornerFamily
 import timber.log.Timber
-import kotlin.math.round
 
 /**
  * Project : MasterEditVideo
@@ -98,7 +96,7 @@ class TimeLineTrack: FrameLayout {
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics)
 
     // List media
-    private var listMedia: MutableList<MediaObject> = mutableListOf()
+    private var listMedia: MutableList<MediaModel> = mutableListOf()
 
     // Lister
     var onItemMediaChoose: OnItemMediaChoose? = null
@@ -261,7 +259,7 @@ class TimeLineTrack: FrameLayout {
     /**
      * Add media to view
      */
-    fun addMediaAndCreateItemView(listMedia : MutableList<MediaObject>) {
+    fun addMediaAndCreateItemView(listMedia : MutableList<MediaModel>) {
         this@TimeLineTrack.listMedia.clear()
         this@TimeLineTrack.listMedia.addAll(listMedia)
         this@TimeLineTrack.totalDuration = 0
@@ -398,7 +396,7 @@ class TimeLineTrack: FrameLayout {
     /**
      * Calc thumb can be create for view media
      */
-    private fun calcThumbCanCreateByItem(mediaMainObject: MediaObject): Int {
+    private fun calcThumbCanCreateByItem(mediaMainObject: MediaModel): Int {
         var duration = mediaMainObject.endAt - mediaMainObject.beginAt
         if (duration == 0L) {
             duration = mediaMainObject.mediaDuration
@@ -421,7 +419,7 @@ class TimeLineTrack: FrameLayout {
     private fun loadThumbnailToImageView(
         imageView: ImageView,
         index: Int,
-        mediaMainObject: MediaObject
+        mediaMainObject: MediaModel
     ) {
 
         var requestOptions = RequestOptions()

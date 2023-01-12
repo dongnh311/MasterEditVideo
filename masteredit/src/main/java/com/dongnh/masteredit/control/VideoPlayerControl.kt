@@ -1,10 +1,7 @@
 package com.dongnh.masteredit.control
 
 import android.content.Context
-import com.dongnh.masteredit.base.BasePlayerControl
-import com.dongnh.masteredit.const.MEDIA_TYPE_IMAGE
-import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
@@ -13,9 +10,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import timber.log.Timber
-import kotlin.math.abs
 
 /**
  * Project : MasterEditVideo
@@ -32,7 +26,7 @@ class VideoPlayerControl(context: Context) {
     private var isPlaying = false
 
     // Save object
-    var mediaObjects = mutableListOf<MediaObject>()
+    var mediaModels = mutableListOf<MediaModel>()
 
     // Total duration of media added
     var totalDurationOfMediaAdded = 0L
@@ -57,7 +51,7 @@ class VideoPlayerControl(context: Context) {
                     return@withContext this@VideoPlayerControl.exoManager.exoPlayer.currentPosition
                 }
 
-                if (indexOfMedia > mediaObjects.size - 1) {
+                if (indexOfMedia > mediaModels.size - 1) {
                     return@flow
                 }
 
@@ -87,9 +81,9 @@ class VideoPlayerControl(context: Context) {
     /**
      * Init media
      */
-    fun initMediaPlayer(mediaObjects: MutableList<MediaObject>) {
-        this@VideoPlayerControl.mediaObjects.clear()
-        this@VideoPlayerControl.mediaObjects.addAll(mediaObjects)
+    fun initMediaPlayer(mediaModels: MutableList<MediaModel>) {
+        this@VideoPlayerControl.mediaModels.clear()
+        this@VideoPlayerControl.mediaModels.addAll(mediaModels)
 
         // Call back to view
         exoManager.mediaPlayEndListener = object : MediaPlayEndListener {
@@ -98,7 +92,7 @@ class VideoPlayerControl(context: Context) {
             }
 
             override fun onEndPlay(position: Long, duration: Long) {
-                if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > this@VideoPlayerControl.mediaObjects.size - 1) {
+                if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > this@VideoPlayerControl.mediaModels.size - 1) {
                     return
                 }
                 playEndListener?.onEndPlay(this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex.toLong(), duration)
@@ -110,7 +104,7 @@ class VideoPlayerControl(context: Context) {
         }
 
         // Init media to play
-        exoManager.createMediaItems(this@VideoPlayerControl.mediaObjects)
+        exoManager.createMediaItems(this@VideoPlayerControl.mediaModels)
         exoManager.exoPlayer.prepare()
 
         // Make it not play
@@ -153,8 +147,8 @@ class VideoPlayerControl(context: Context) {
             this@VideoPlayerControl.currentDurationPlayer = 0
         } else {
             var durationOfClip = 0L
-            for (index in 0 until mediaObjects.size) {
-                val mediaMainObject = mediaObjects[index]
+            for (index in 0 until mediaModels.size) {
+                val mediaMainObject = mediaModels[index]
                 durationOfClip += mediaMainObject.mediaDuration
                 var durationNeed = 0
 
@@ -177,7 +171,7 @@ class VideoPlayerControl(context: Context) {
      */
     fun releaseMedia() {
         isPlaying = false
-        mediaObjects.clear()
+        mediaModels.clear()
         exoManager.exoPlayer.release()
         playbackProgressObservable.cancellable()
     }
@@ -187,7 +181,7 @@ class VideoPlayerControl(context: Context) {
      */
     private fun calcTotalDuration() {
         this@VideoPlayerControl.totalDurationOfMediaAdded = 0L
-        mediaObjects.forEachIndexed { _, mediaObject ->
+        mediaModels.forEachIndexed { _, mediaObject ->
             this@VideoPlayerControl.totalDurationOfMediaAdded += mediaObject.endAt - mediaObject.beginAt
         }
     }
@@ -197,7 +191,7 @@ class VideoPlayerControl(context: Context) {
      */
     private fun findDurationForIndexMedia(indexOfMedia: Int): Long {
         var durationNeed = 0L
-        mediaObjects.forEachIndexed { index, mediaObject ->
+        mediaModels.forEachIndexed { index, mediaObject ->
             if (index < indexOfMedia) {
                 durationNeed += mediaObject.endAt - mediaObject.beginAt
             } else {

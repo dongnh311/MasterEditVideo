@@ -11,10 +11,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
+import com.dongnh.masteredit.model.MusicModel
 import com.dongnh.masteredit.utils.exts.createMediaTransformPath
 import com.dongnh.masteredit.utils.exts.deleteFolderIfExit
-import com.dongnh.masteredit.utils.exts.pathOfMedia
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
@@ -24,7 +24,9 @@ import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
 import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
+import com.dongnh.mastereditvideo.utils.interfaces.OnMusicSelectListener
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
+import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     private var runnableDurationTimeLine: Runnable? = null
 
     // Save list object
-    private val listMedia = mutableListOf<MediaObject>()
+    private val listMedia = mutableListOf<MediaModel>()
 
     // Save index click on media
     private var indexMediaSelect = -1
@@ -153,6 +155,17 @@ class MainActivity : AppCompatActivity() {
 
                 makeViewShowMedia()
             }
+        }
+
+        // Open dialog pick music
+        mainBinding.btnMusic.setOnClickListener {
+            val pickMusicFragment = PickMusicFragment()
+            PickMusicFragment.onMusicSelectListener = object : OnMusicSelectListener {
+                override fun onMusicChoose(musicModel: MusicModel) {
+                    Timber.e("We have music")
+                }
+            }
+            pickMusicFragment.show(supportFragmentManager, "PickMusicFragment")
         }
     }
 
@@ -307,7 +320,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        managerPlayerControl.onResume()
+        managerPlayerControl.onResume(isPlaying)
     }
 
     override fun onPause() {

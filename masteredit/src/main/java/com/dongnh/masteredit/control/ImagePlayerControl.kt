@@ -2,7 +2,7 @@ package com.dongnh.masteredit.control
 
 import android.content.Context
 import com.dongnh.masteredit.base.BasePlayerControl
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.utils.exomanager.ExoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -41,7 +41,7 @@ class ImagePlayerControl(private val context: Context) : BasePlayerControl() {
         }
     }.flowOn(Dispatchers.Main)
 
-    override fun initMediaPlayer(indexOfMedia: Int, mediaObjects: MutableList<MediaObject>) {
+    override fun initMediaPlayer(indexOfMedia: Int, mediaModels: MutableList<MediaModel>) {
 
     }
 

@@ -9,7 +9,7 @@ import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.MEDIA_IMAGE
 import com.dongnh.mastereditvideo.const.NAME_SEND_PICK_MEDIA
 import com.dongnh.mastereditvideo.databinding.ActivityMediaPickBinding
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.adapter.AdapterMedia
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
@@ -89,12 +89,12 @@ class MediaPickActivity : AppCompatActivity() {
             }
 
             adapterMedia.onImageClick = object : OnImageClick {
-                override fun imageClick(imageObject: MediaObject) {
+                override fun imageClick(imageObject: MediaModel) {
                     MyDataSingleton.listMediaPick.add(imageObject)
                     activityMediaPickBinding.btnNext.visibility = View.VISIBLE
                 }
 
-                override fun imageClear(imageObject: MediaObject) {
+                override fun imageClear(imageObject: MediaModel) {
                     MyDataSingleton.listMediaPick.remove(imageObject)
                     // Show or hide button next
                     if (MyDataSingleton.listMediaPick.isEmpty()) {

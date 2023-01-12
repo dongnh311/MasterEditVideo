@@ -21,7 +21,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
 import com.dongnh.mastereditvideo.databinding.ItemMediaBinding
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.mastereditvideo.utils.interfaces.OnImageClick
 import timber.log.Timber
 
@@ -33,7 +33,7 @@ import timber.log.Timber
  */
 class AdapterMedia : BaseAdapter() {
 
-    val arrayImage: ArrayList<MediaObject> = arrayListOf()
+    val arrayImage: ArrayList<MediaModel> = arrayListOf()
 
     var onImageClick: OnImageClick? = null
 
@@ -41,7 +41,7 @@ class AdapterMedia : BaseAdapter() {
         return arrayImage.size
     }
 
-    override fun getItem(position: Int): MediaObject? {
+    override fun getItem(position: Int): MediaModel? {
         return if (position > arrayImage.size) {
             null
         } else {
@@ -88,7 +88,7 @@ class AdapterMedia : BaseAdapter() {
         return view
     }
 
-    class ViewHandle(private val binding: ItemMediaBinding, private val imageObject: MediaObject) {
+    class ViewHandle(private val binding: ItemMediaBinding, private val imageObject: MediaModel) {
         fun bindingData() {
             // image
             if (binding.imageViewToPick.drawable == null || (binding.viewName.tag as String?) != null && binding.viewName.tag != imageObject.mediaPath) {
@@ -232,7 +232,7 @@ class AdapterMedia : BaseAdapter() {
             val durationString = imageCursor.getColumnIndex(DURATION)
             val duration = imageCursor.getLongOrNull(durationString)
             val path = imageCursor.getString(dataColumnIndex)
-            val imageObject = MediaObject()
+            val imageObject = MediaModel()
             imageObject.mediaPath = path
             imageObject.mediaId = id
             imageObject.mediaType = stringType

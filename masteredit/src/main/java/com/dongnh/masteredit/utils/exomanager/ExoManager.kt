@@ -10,7 +10,7 @@ import com.dongnh.masteredit.const.MEDIA_TYPE_TRANSITION
 import com.dongnh.masteredit.const.MEDIA_TYPE_VIDEO
 import com.dongnh.masteredit.enums.FormatVideoOut
 import com.dongnh.masteredit.enums.NAME_EXIF_IMAGE_VIDEO
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.utils.exts.createMediaTransformPath
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.google.android.exoplayer2.*
@@ -45,7 +45,7 @@ class ExoManager(private val context: Context) {
     private val mediaItems: MutableList<MediaItem> = mutableListOf()
 
     // List media raw
-    private val listMedia : MutableList<MediaObject> = mutableListOf()
+    private val listMedia : MutableList<MediaModel> = mutableListOf()
 
     // Call back to parent
     var mediaPlayEndListener : MediaPlayEndListener? = null
@@ -97,7 +97,7 @@ class ExoManager(private val context: Context) {
     /**
      * Create media for play
      */
-    fun createMediaItems(listMediaItem: MutableList<MediaObject>) {
+    fun createMediaItems(listMediaItem: MutableList<MediaModel>) {
         // Init media to play
         CoroutineScope(Dispatchers.Main).launch {
             // Clear all first
@@ -151,9 +151,9 @@ class ExoManager(private val context: Context) {
      * Convert image to video
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun convertImageToVideo(mediaObject: MediaObject) = callbackFlow {
-        val fileInput = File(mediaObject.mediaPath)
-        val info = ExifInterface(mediaObject.mediaPath)
+    private fun convertImageToVideo(mediaModel: MediaModel) = callbackFlow {
+        val fileInput = File(mediaModel.mediaPath)
+        val info = ExifInterface(mediaModel.mediaPath)
 
         val withImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0)
         val heightImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
@@ -185,14 +185,14 @@ class ExoManager(private val context: Context) {
             }
         }
 
-        val duration = (mediaObject.mediaDuration / 1000.0).toInt()
+        val duration = (mediaModel.mediaDuration / 1000.0).toInt()
 
-        val pathOfFile = createMediaTransformPath(context = context) + "/" + mediaObject.mediaName + NAME_EXIF_IMAGE_VIDEO
+        val pathOfFile = createMediaTransformPath(context = context) + "/" + mediaModel.mediaName + NAME_EXIF_IMAGE_VIDEO
         val commandToRun = "-loop 1 -framerate 30 -i ${fileInput.path} -s $withToNewVideo:$heightToNewVideo -t $duration $pathOfFile -y"
 
         Timber.e("Command to run : $commandToRun")
         val ffmpegSessionCompleteCallback = FFmpegSessionCompleteCallback {
-            mediaObject.pathVideoTransform = pathOfFile
+            mediaModel.pathVideoTransform = pathOfFile
             trySend(pathOfFile)
             Timber.e("Transform done")
         }

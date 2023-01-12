@@ -51,6 +51,7 @@
                         android:paddingStart="@dimen/common_padding_8dp"
                         android:paddingEnd="0dp"
                         android:singleLine="true"
+                        android:ellipsize="end"
                         android:textColor="@color/colorWhite"
                         android:textSize="@dimen/common_size_text_14sp"
                         tools:text="My song is name Music" />
@@ -79,6 +80,7 @@
                             android:paddingStart="@dimen/common_padding_8dp"
                             android:paddingEnd="0dp"
                             android:singleLine="true"
+                            android:ellipsize="end"
                             android:textColor="@color/colorWhite"
                             android:textSize="@dimen/common_size_text_10sp"
                             tools:text="Author" />

@@ -6,7 +6,7 @@ package com.dongnh.masteredit.model
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class MediaObject(
+class MediaModel(
     var mediaName: String = "",
     var mediaPath: String = "",
     var mediaType: String = "",

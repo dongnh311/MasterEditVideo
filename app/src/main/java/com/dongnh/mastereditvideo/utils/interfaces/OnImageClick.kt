@@ -1,6 +1,6 @@
 package com.dongnh.mastereditvideo.utils.interfaces
 
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 
 /**
  * Project : MasterEditVideo
@@ -9,6 +9,6 @@ import com.dongnh.masteredit.model.MediaObject
  * Phone : +84397199197.
  */
 interface OnImageClick {
-    fun imageClick(imageObject: MediaObject)
-    fun imageClear(imageObject: MediaObject)
+    fun imageClick(imageObject: MediaModel)
+    fun imageClear(imageObject: MediaModel)
 }

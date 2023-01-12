@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.FrameLayout
 import com.dongnh.masteredit.control.PreViewLayoutControl
 import com.dongnh.masteredit.control.VideoPlayerControl
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
@@ -42,7 +42,7 @@ class ManagerPlayerMedia(private val context: Context,
     private var currentDurationPlayer = 0L
 
     // List media
-    private var listMediaAdded: MutableList<MediaObject> = mutableListOf()
+    private var listMediaAdded: MutableList<MediaModel> = mutableListOf()
 
     // Handle view
     private val preViewLayoutControl = PreViewLayoutControl(context)
@@ -62,10 +62,10 @@ class ManagerPlayerMedia(private val context: Context,
     /**
      * Add media to player
      */
-    fun addMediasToPlayerQueue(listMediaObject: MutableList<MediaObject>) {
+    fun addMediasToPlayerQueue(listMediaModel: MutableList<MediaModel>) {
         releaseAllPlayer()
         this@ManagerPlayerMedia.listMediaAdded.clear()
-        this@ManagerPlayerMedia.listMediaAdded.addAll(listMediaObject)
+        this@ManagerPlayerMedia.listMediaAdded.addAll(listMediaModel)
 
         // Reset duration
         this@ManagerPlayerMedia.durationOfVideoProject = 0
@@ -124,10 +124,10 @@ class ManagerPlayerMedia(private val context: Context,
         }
 
         // Init media first
-        videoPlayerControl?.initMediaPlayer(listMediaObject)
+        videoPlayerControl?.initMediaPlayer(listMediaModel)
 
         // Calc duration of all media
-        listMediaObject.forEachIndexed { _, mediaObject ->
+        listMediaModel.forEachIndexed { _, mediaObject ->
             this@ManagerPlayerMedia.durationOfVideoProject += (mediaObject.endAt - mediaObject.beginAt)
         }
     }

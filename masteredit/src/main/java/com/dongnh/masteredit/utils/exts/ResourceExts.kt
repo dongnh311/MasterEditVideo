@@ -3,6 +3,7 @@ package com.dongnh.masteredit.utils.exts
 import android.content.Context
 import com.dongnh.masteredit.enums.NAME_FOLDER_IMAGE2VIDEO
 import com.dongnh.masteredit.enums.NAME_SUB_FOLDER_IMAGE
+import com.dongnh.masteredit.enums.NAME_SUB_FOLDER_MUSIC
 import timber.log.Timber
 import java.io.File
 
@@ -18,6 +19,17 @@ import java.io.File
  */
 fun createMediaTransformPath(context: Context) : String {
     val file = File(pathOfMedia(context) + "/" + NAME_SUB_FOLDER_IMAGE)
+    if (!file.exists()) {
+        file.mkdir()
+    }
+    return file.path
+}
+
+/**
+ * Create folder for music
+ */
+fun createMusicPath(context: Context) : String {
+    val file = File(pathOfMedia(context) + "/" + NAME_SUB_FOLDER_MUSIC)
     if (!file.exists()) {
         file.mkdir()
     }

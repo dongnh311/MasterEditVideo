@@ -1,7 +1,7 @@
 package com.dongnh.mastereditvideo.singleton
 
 import androidx.lifecycle.MutableLiveData
-import com.dongnh.masteredit.model.MediaObject
+import com.dongnh.masteredit.model.MediaModel
 
 /**
  * Project : MasterEditVideo
@@ -12,7 +12,7 @@ import com.dongnh.masteredit.model.MediaObject
 object MyDataSingleton {
 
     // Save list to main
-    val listMediaPick = mutableListOf<MediaObject>()
+    val listMediaPick = mutableListOf<MediaModel>()
 
     // Make flag for reload
     val isAddNewMedia = MutableLiveData(false)

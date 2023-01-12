@@ -1,13 +1,6 @@
 package com.dongnh.masteredit.base
 
-import com.dongnh.masteredit.model.MediaObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.isActive
-import java.util.concurrent.Flow
+import com.dongnh.masteredit.model.MediaModel
 
 /**
  * Project : MasterEditVideo
@@ -18,7 +11,7 @@ import java.util.concurrent.Flow
 abstract class BasePlayerControl {
 
     // Save object
-    var mediaObjects = mutableListOf<MediaObject>()
+    var mediaModels = mutableListOf<MediaModel>()
 
     // Save current index
     var indexOfMedia = -1
@@ -26,7 +19,7 @@ abstract class BasePlayerControl {
     /**
      * Init media
      */
-    abstract fun initMediaPlayer(indexOfMedia: Int, mediaObjects: MutableList<MediaObject>)
+    abstract fun initMediaPlayer(indexOfMedia: Int, mediaModels: MutableList<MediaModel>)
 
     /**
      * Play media

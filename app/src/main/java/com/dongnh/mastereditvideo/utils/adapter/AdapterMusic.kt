@@ -157,6 +157,15 @@ class AdapterMusic : RecyclerView.Adapter<AdapterMusic.ItemViewHolder>() {
 
             // Event choose
             binding.mainViewMusic.setOnClickListener {
+                // Clear all select
+                dataList.forEachIndexed { index, musicModel ->
+                    if (index != position) {
+                        musicModel.isChoose = false
+                        this@AdapterMusic.notifyItemChanged(index)
+                    }
+                }
+                musicModel.isChoose = !musicModel.isChoose
+                this@AdapterMusic.notifyItemChanged(position)
                 onMusicActionClick?.onMusicClick(musicModel, position)
             }
 

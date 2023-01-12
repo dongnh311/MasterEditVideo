@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dongnh.masteredit.enums.NAME_EXIF_MUSIC
@@ -19,8 +20,11 @@ import com.dongnh.masteredit.utils.exts.createMusicPath
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.FragmentPickMusicBinding
 import com.dongnh.mastereditvideo.utils.adapter.AdapterMusic
+import com.dongnh.mastereditvideo.utils.error.coroutineError
 import com.dongnh.mastereditvideo.utils.interfaces.OnMusicActionClick
 import com.dongnh.mastereditvideo.utils.interfaces.OnMusicSelectListener
+import com.dongnh.mastereditvideo.utils.retrofit.MusicService
+import com.dongnh.mastereditvideo.utils.retrofit.createRetrofitService
 import com.dongnh.mastereditvideo.utils.retrofit.loadDownloadService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -118,8 +122,6 @@ class PickMusicFragment: BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        this@PickMusicFragment.dataBinding.lifecycleOwner = this@PickMusicFragment
-
         this@PickMusicFragment.isCancelable = true
 
         configView()
@@ -177,6 +179,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                     Timber.e("onMusicDownload path in local : $pathOfMusic")
                     musicModel.pathInLocal = pathOfMusic
                     if (File(pathOfMusic).exists()) {
+                        musicModel.isDownloaded = true
                         Timber.e("Have file, no need download")
                     } else {
                         downloadFileMusic(musicModel, position)
@@ -195,9 +198,36 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                 } else {
                     this@PickMusicFragment.musicObject = null
                 }
+
+                this@PickMusicFragment.dataBinding.btnClickDone.isEnabled =
+                    musicModel.isDownloaded && musicModel.isChoose
+                this@PickMusicFragment.adapterMusic.notifyItemChanged(position)
             }
         }
         this@PickMusicFragment.dataBinding.viewListMusic.adapter = adapterMusic
+
+        // Load list music
+        val musicService =
+            createRetrofitService<MusicService>("https://raw.githubusercontent.com/dongnh311/mockup-api/")
+        // Show dialog
+        dataBinding.dialogDownload.visibility = View.VISIBLE
+        dataBinding.viewProgress.text = getString(R.string.common_loading)
+
+        // Start load
+        CoroutineScope(Dispatchers.Default + coroutineError).launch {
+            val result = withContext(Dispatchers.IO) {
+                return@withContext musicService.getListMusic()
+            }
+
+            lifecycleScope.launch {
+                // Hide video loading
+                dataBinding.dialogDownload.visibility = View.GONE
+
+                // Setup data to view
+                result.result?.data?.let { adapterMusic.dataList.addAll(it) }
+                adapterMusic.notifyItemRangeInserted(0, adapterMusic.dataList.size)
+            }
+        }
 
         // Button done
         dataBinding.btnClickDone.setOnClickListener {
@@ -205,6 +235,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                 onMusicSelectListener?.onMusicChoose(
                     music
                 )
+                this@PickMusicFragment.dismiss()
             }
         }
     }
@@ -261,7 +292,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
 
         // Download
         val downloadService = loadDownloadService()
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineError).launch {
             val response = withContext(Dispatchers.IO) {
                 return@withContext downloadService.downloadFileWithDynamicUrlSync(musicModel.urlFile)
             }
@@ -275,7 +306,9 @@ class PickMusicFragment: BottomSheetDialogFragment() {
 
                     // Update to adapter
                     musicModel.isDownloaded = true
-                    this@PickMusicFragment.adapterMusic.notifyItemChanged(position, Any())
+                    CoroutineScope(Dispatchers.Main).launch {
+                        this@PickMusicFragment.adapterMusic.notifyItemChanged(position, Any())
+                    }
                 } else {
                     Timber.e("Download file is fail")
                     dataBinding.btnClickDone.isEnabled = false
@@ -304,7 +337,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
         // Max byte
         val maxByteOfFile = body.contentLength()
         val fileByteReader = ByteArrayOutputStream()
-        var currentByteWrite = 0
+        var currentByteWrite: Int
 
         try {
             val outputStream = FileOutputStream(item.pathInLocal)

@@ -15,5 +15,5 @@ import retrofit2.http.Url
 interface DownloadService {
     @Streaming
     @GET
-    fun downloadFileWithDynamicUrlSync(@Url fileUrl: String): Response<ResponseBody>
+    suspend fun downloadFileWithDynamicUrlSync(@Url fileUrl: String): Response<ResponseBody>
 }

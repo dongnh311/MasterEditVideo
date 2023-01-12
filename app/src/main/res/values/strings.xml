@@ -6,4 +6,11 @@
     <string name="media_pick_video">Videos</string>
 
     <string name="common_empty_data">Empty List</string>
+
+    <!-- Select music -->
+    <string name="select_music_header">Select Music</string>
+    <string name="select_music_fail_download">Can\'t download this Song. Please try again later.</string>
+    <string name="select_music_btn_done">Done</string>
+    <string name="select_music_btn_reset">Reset</string>
+
 </resources>

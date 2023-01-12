@@ -1,5 +1,6 @@
 package com.dongnh.mastereditvideo.view.pickmusic
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -255,6 +256,10 @@ class PickMusicFragment: BottomSheetDialogFragment() {
      * Download file
      */
     private fun downloadFileMusic(musicModel: MusicModel, position: Int) {
+        // Show dialog download
+        dataBinding.dialogDownload.visibility = View.VISIBLE
+
+        // Download
         val downloadService = loadDownloadService()
         CoroutineScope(Dispatchers.IO).launch {
             val response = withContext(Dispatchers.IO) {
@@ -275,6 +280,10 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                     Timber.e("Download file is fail")
                     dataBinding.btnClickDone.isEnabled = false
                 }
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    dataBinding.dialogDownload.visibility = View.GONE
+                }
             }
         }
     }
@@ -282,6 +291,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
     /**
      * Save file music to local
      */
+    @SuppressLint("SetTextI18n")
     private fun writeResponseBodyToDisk(
         body: ResponseBody,
         item: MusicModel
@@ -290,13 +300,29 @@ class PickMusicFragment: BottomSheetDialogFragment() {
         if (outputFile.exists()) {
             outputFile.delete()
         }
+
+        // Max byte
+        val maxByteOfFile = body.contentLength()
+        val fileByteReader = ByteArrayOutputStream()
+        var currentByteWrite = 0
+
         try {
             val outputStream = FileOutputStream(item.pathInLocal)
             try {
-                // Write byte to file
-                body.use { byte ->
-                    outputStream.use { output ->
-                        output.write(byte.bytes())
+                // Write byte to reader
+                body.byteStream().use { byte ->
+                    byte.copyTo(fileByteReader)
+                    currentByteWrite = fileByteReader.size()
+                    val percent = currentByteWrite / maxByteOfFile * 100.0
+                    CoroutineScope(Dispatchers.Main).launch {
+                        dataBinding.viewProgress.text = "Percent $percent %"
+                    }
+                }
+
+                // Reader save to file
+                fileByteReader.use { byteOutPut ->
+                    outputStream.use { outputFile ->
+                        byteOutPut.writeTo(outputFile)
                     }
                 }
 

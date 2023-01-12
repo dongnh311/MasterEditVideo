@@ -13,4 +13,6 @@
     <string name="select_music_btn_done">Done</string>
     <string name="select_music_btn_reset">Reset</string>
 
+    <string name="common_loading">Loading…</string>
+
 </resources>

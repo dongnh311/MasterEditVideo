@@ -1,11 +1,12 @@
 package com.dongnh.masteredit.manager
 
 import android.content.Context
-import android.view.View
 import android.widget.FrameLayout
+import com.dongnh.masteredit.control.MusicPlayerControl
 import com.dongnh.masteredit.control.PreViewLayoutControl
 import com.dongnh.masteredit.control.VideoPlayerControl
 import com.dongnh.masteredit.model.MediaModel
+import com.dongnh.masteredit.model.MusicModel
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
+import java.lang.ref.WeakReference
 
 /**
  * Project : MasterEditVideo
@@ -28,9 +29,6 @@ import java.util.*
 class ManagerPlayerMedia(private val context: Context,
                          private val frameLayout: FrameLayout
 ) {
-
-    // stack all view player
-    private val stackViewPlayer: Stack<View> = Stack()
 
     // Duration in total played
     private var durationPlayed = 0L
@@ -44,11 +42,17 @@ class ManagerPlayerMedia(private val context: Context,
     // List media
     private var listMediaAdded: MutableList<MediaModel> = mutableListOf()
 
+    // List Music
+    private var lisMusicAdded: MutableList<MusicModel> = mutableListOf()
+
     // Handle view
     private val preViewLayoutControl = PreViewLayoutControl(context)
 
     // View of media
     private var videoPlayerControl: VideoPlayerControl? = null
+
+    // List music
+    private val listMusicPlayer: MutableList<MusicPlayerControl> = mutableListOf()
 
     // Lister event
     var videoEventLister: VideoEventLister? = null
@@ -64,6 +68,7 @@ class ManagerPlayerMedia(private val context: Context,
      */
     fun addMediasToPlayerQueue(listMediaModel: MutableList<MediaModel>) {
         releaseAllPlayer()
+        clearAllMusicAdded()
         this@ManagerPlayerMedia.listMediaAdded.clear()
         this@ManagerPlayerMedia.listMediaAdded.addAll(listMediaModel)
 
@@ -130,29 +135,71 @@ class ManagerPlayerMedia(private val context: Context,
         listMediaModel.forEachIndexed { _, mediaObject ->
             this@ManagerPlayerMedia.durationOfVideoProject += (mediaObject.endAt - mediaObject.beginAt)
         }
+
+        // Add music
+        if (this@ManagerPlayerMedia.lisMusicAdded.isNotEmpty()) {
+            val copyList = mutableListOf<MusicModel>()
+            copyList.addAll(this@ManagerPlayerMedia.lisMusicAdded)
+            addMusicToQueue(copyList)
+        }
+    }
+
+    /**
+     * Add music to player music control
+     */
+    fun addMusicToQueue(listMusicModel: MutableList<MusicModel>) {
+        lisMusicAdded.clear()
+        lisMusicAdded.addAll(listMusicModel)
+
+        if (this@ManagerPlayerMedia.listMusicPlayer.isEmpty()) {
+            listMusicModel.forEachIndexed { index, music ->
+                addMusicToList(index, music)
+            }
+        } else {
+            listMusicModel.forEachIndexed { index, musicModel ->
+                var isAdded = false
+                this@ManagerPlayerMedia.listMusicPlayer.forEach { musicPlayer ->
+                    if (musicPlayer.checkMusicHaveAdded(index, musicModel)) {
+                        isAdded = true
+                        return@forEach
+                    }
+                }
+                if (!isAdded) {
+                    addMusicToList(index, musicModel)
+                }
+            }
+        }
+    }
+
+    /**
+     * Create music play and add to list
+     */
+    private fun addMusicToList(index: Int, musicModel: MusicModel) {
+        val musicPlayerControl = MusicPlayerControl(WeakReference(context))
+        musicPlayerControl.indexOfMusic = index
+        musicPlayerControl.initSourcePlay(musicModel)
+        this@ManagerPlayerMedia.listMusicPlayer.add(musicPlayerControl)
     }
 
     /**
      * Release all media and player created
      */
     fun releaseAllPlayer() {
-        clearAllViewAdded()
+        clearAllMusicAdded()
         this@ManagerPlayerMedia.listMediaAdded.clear()
-    }
-
-    /**
-     * Clear all media player added
-     */
-    private fun clearAllMediaPlayerCreated() {
         videoPlayerControl?.releaseMedia()
         preViewLayoutControl.release()
     }
 
     /**
-     * Clear view added to layout
+     * Clear music added to manager
      */
-    private fun clearAllViewAdded() {
-        this@ManagerPlayerMedia.stackViewPlayer.clear()
+    private fun clearAllMusicAdded() {
+        this@ManagerPlayerMedia.listMusicPlayer.forEach { musicPlayerControl ->
+            musicPlayerControl.releaseMusicPlayer()
+        }
+
+        this@ManagerPlayerMedia.listMusicPlayer.clear()
     }
 
     /**
@@ -166,12 +213,18 @@ class ManagerPlayerMedia(private val context: Context,
             }
             this@ManagerPlayerMedia.durationPlayed = 0L
             this@ManagerPlayerMedia.videoPlayerControl?.seekTo(0L)
+            this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                it.seekMusicToDuration(0L)
+            }
         } else {
             if (videoPlayerControl == null) {
                 return
             }
             this@ManagerPlayerMedia.durationPlayed = duration
             this@ManagerPlayerMedia.videoPlayerControl?.seekTo(duration)
+            this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                it.seekMusicToDuration(duration)
+            }
         }
     }
 
@@ -187,11 +240,27 @@ class ManagerPlayerMedia(private val context: Context,
             // If play from start
             if (this@ManagerPlayerMedia.durationPlayed == 0L) {
                 this@ManagerPlayerMedia.videoPlayerControl?.seekTo(0L)
-                this@ManagerPlayerMedia.videoPlayerControl?.playerMedia()
+
+                // Seek music
+                this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                    it.seekMusicToDuration(0L)
+                }
             } else {
                 this@ManagerPlayerMedia.videoPlayerControl?.seekTo(this@ManagerPlayerMedia.durationPlayed)
-                this@ManagerPlayerMedia.videoPlayerControl?.playerMedia()
+                // Seek music
+                this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                    it.seekMusicToDuration(this@ManagerPlayerMedia.durationPlayed)
+                }
             }
+
+            // Play media
+            this@ManagerPlayerMedia.videoPlayerControl?.playerMedia()
+
+            // Play music
+            this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                it.playMusic()
+            }
+
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -206,6 +275,11 @@ class ManagerPlayerMedia(private val context: Context,
                 return
             }
             videoPlayerControl?.pauseMedia()
+
+            // Pause music
+            this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                it.pauseMusic()
+            }
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -218,6 +292,10 @@ class ManagerPlayerMedia(private val context: Context,
         preViewLayoutControl.onResume()
         if (isPlaying) {
             videoPlayerControl?.playerMedia()
+
+            this@ManagerPlayerMedia.listMusicPlayer.forEach {
+                it.playMusic()
+            }
         }
     }
 
@@ -227,13 +305,16 @@ class ManagerPlayerMedia(private val context: Context,
     fun onPause() {
         preViewLayoutControl.onPause()
         videoPlayerControl?.pauseMedia()
+        // Pause music
+        this@ManagerPlayerMedia.listMusicPlayer.forEach {
+            it.pauseMusic()
+        }
     }
 
     /**
      * Clear all media player, preview
      */
     fun onDestroy() {
-        preViewLayoutControl.release()
-        videoPlayerControl?.releaseMedia()
+        releaseAllPlayer()
     }
 }

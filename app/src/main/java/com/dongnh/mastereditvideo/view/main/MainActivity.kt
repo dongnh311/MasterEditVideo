@@ -170,6 +170,9 @@ class MainActivity : AppCompatActivity() {
 
                     // Add to track
                     this@MainActivity.mainBinding.viewTimeLine.addMusicToTrackView(this@MainActivity.listMusic)
+
+                    // Add to manager play
+                    this@MainActivity.managerPlayerControl.addMusicToQueue(this@MainActivity.listMusic)
                 }
             }
             pickMusicFragment.show(supportFragmentManager, "PickMusicFragment")

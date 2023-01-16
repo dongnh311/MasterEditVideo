@@ -232,6 +232,7 @@ class PickMusicFragment: BottomSheetDialogFragment() {
                             createMusicPath(this@PickMusicFragment.requireContext()) + "/" + item.nameMusic + NAME_EXIF_MUSIC
                         if (File(pathOfMusic).exists()) {
                             item.isDownloaded = true
+                            item.pathInLocal = pathOfMusic
                         }
                     }
                     adapterMusic.dataList.addAll(it)

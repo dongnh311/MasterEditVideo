@@ -681,18 +681,20 @@ class TimeLineTrack : FrameLayout {
      * Change color if need
      */
     private fun setUpEventMusicChoose(childViewMusic: ItemTrackBinding) {
-        if (childViewMusic.mainAddView.tag == null || childViewMusic.mainAddView.tag == 0) {
-            childViewMusic.mainAddView.tag = 1
-            childViewMusic.mainAddView.setBackgroundResource(R.drawable.bg_media_click)
-            onItemMediaChoose?.onMusicChoose(
-                childViewMusic.viewIndex.tag as Int
-            )
-        } else {
-            childViewMusic.mainAddView.tag = 0
-            childViewMusic.mainAddView.setBackgroundResource(android.R.color.transparent)
-            onItemMediaChoose?.onItemMediaCancel(
-                childViewMusic.viewIndex.tag as Int
-            )
+        childViewMusic.mainAddView.setOnClickListener {
+            if (childViewMusic.mainAddView.tag == null || childViewMusic.mainAddView.tag == 0) {
+                childViewMusic.mainAddView.tag = 1
+                childViewMusic.mainAddView.setBackgroundResource(R.drawable.bg_media_click)
+                onItemMediaChoose?.onMusicChoose(
+                    childViewMusic.viewIndex.tag as Int
+                )
+            } else {
+                childViewMusic.mainAddView.tag = 0
+                childViewMusic.mainAddView.setBackgroundResource(android.R.color.transparent)
+                onItemMediaChoose?.onItemMediaCancel(
+                    childViewMusic.viewIndex.tag as Int
+                )
+            }
         }
     }
 

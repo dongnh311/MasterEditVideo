@@ -4,6 +4,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLES20
 import android.opengl.Matrix
 import android.view.Surface
+import com.dongnh.masteredit.base.AbstractTransition
 import com.dongnh.masteredit.const.VIEW_SIZE_16_9
 import com.dongnh.masteredit.const.VIEW_SIZE_1_1
 import com.dongnh.masteredit.const.VIEW_SIZE_9_16
@@ -11,9 +12,6 @@ import com.dongnh.masteredit.gl.*
 import com.dongnh.masteredit.utils.glutils.EglUtil
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,8 +64,11 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     private var width: Float = 0.0F
     private var height: Float = 0.0F
 
+    // Draw transition
+    var transitionDraw: AbstractTransition? = null
+
     // Callback
-    var onGLFilterActionListener : OnGLFilterActionListener? = null
+    var onGLFilterActionListener: OnGLFilterActionListener? = null
 
     // Allow draw
     private var isNeedDraw = true
@@ -148,6 +149,11 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         Matrix.setIdentityM(mMatrix, 0)
         matrix = android.graphics.Matrix()
         matrix.postTranslate(this@GLPlayerRenderer.width / 2f, this@GLPlayerRenderer.height / 2f)
+
+        if (transitionDraw != null) {
+            transitionDraw?.initTextureOutput(width, height)
+            transitionDraw?.initDrawSize(top = height, left = 0, bottom = 0, right = width)
+        }
     }
 
     /**
@@ -287,6 +293,11 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
                 }
             }
         }
+
+        // Transition draw
+        if (transitionDraw != null) {
+            transitionDraw?.exec()
+        }
     }
 
     /**
@@ -328,6 +339,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         glFilter?.release()
         previewTexture?.release()
         filterFramebufferObject?.release()
+        transitionDraw?.release()
     }
 
     /**

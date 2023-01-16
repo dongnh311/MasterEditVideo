@@ -473,20 +473,22 @@ class TimeLineTrack : FrameLayout {
                 val draw = ContextCompat.getDrawable(context, R.drawable.visualize_sound_time_line)
                 val width = draw?.intrinsicWidth
                 Timber.e("Image music width : $width")
+                var withOfImageDraw = (width ?: 0)
+                withOfImageDraw /= 2
 
                 // Set it is not choose
                 linearLayoutViewMusic.mainAddView.tag = 1
 
                 // Add thumb
                 var totalCreate = 0
-                if (width != null) {
-                    for (time in 0 until 100000) {
-                        totalCreate += width
+                if (withOfImageDraw > 0) {
+                    for (time in 0 until 100) {
+                        totalCreate += withOfImageDraw
                         if (totalCreate < maxWidthOfDuration) {
                             val imageView = ImageView(context)
                             val imageLayout =
                                 LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    withOfImageDraw,
                                     LinearLayout.LayoutParams.WRAP_CONTENT
                                 )
                             imageView.layoutParams = imageLayout

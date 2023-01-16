@@ -2,7 +2,6 @@ package com.dongnh.masteredit.gl
 
 import android.opengl.GLES20
 import android.util.Pair
-import java.util.ArrayList
 
 /**
  * Project : MasterEditVideo
@@ -14,7 +13,6 @@ class GLFilterGroupObject(private val filters: Collection<GLFilterObject?>) : GL
 
     val list: ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>> =
         ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>>()
-
 
     override fun setup() {
         super.setup()

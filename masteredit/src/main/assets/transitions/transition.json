@@ -1,0 +1,170 @@
+[
+  {
+    "id": -1,
+    "name": "None",
+    "file": "",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/transparent.jpg"
+  },
+  {
+    "id": 0,
+    "name": "Window\nSlice",
+    "file": "ff_windowslice.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/windowslice.png"
+  },
+  {
+    "id": 1,
+    "name": "Simple\nZoom",
+    "file": "ff_simplezoom.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/simplezoom.png"
+  },
+  {
+    "id": 2,
+    "name": "Cross\nZoom",
+    "file": "ff_crosszoom.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/crosszoom.png"
+  },
+  {
+    "id": 3,
+    "name": "Luminance\nMelt",
+    "file": "ff_luminance_melt.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/luminance.png"
+  },
+  {
+    "id": 4,
+    "name": "Cross\nHatch",
+    "file": "ff_crosshatch.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/crosshatch.png"
+  },
+  {
+    "id": 5,
+    "name": "Wipe\nRight",
+    "file": "wipeRight.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/wiperight.png"
+  },
+  {
+    "id": 6,
+    "name": "Wipe\nLeft",
+    "file": "wipeLeft.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/wipeLeft.png"
+  },
+  {
+    "id": 7,
+    "name": "Wipe\nDown",
+    "file": "wipeDown.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/wipedown.png"
+  },
+  {
+    "id": 8,
+    "name": "Wipe\nUp",
+    "file": "wipeUp.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/wipeup.png"
+  },
+  {
+    "id": 9,
+    "name": "Dreamy\nZoom",
+    "file": "DreamyZoom.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/dreamyzoom.png"
+  },
+  {
+    "id": 10,
+    "name": "Fade",
+    "file": "fade.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/fade.png"
+  },
+  {
+    "id": 11,
+    "name": "Directional \n Wipe",
+    "file": "ff_directionalwipe.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/directionalwipe.png"
+  },
+  {
+    "id": 12,
+    "name": "Wind",
+    "file": "ff_wind.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/wind.png"
+  },
+  {
+    "id": 13,
+    "name": "Inverted \nPage Curl",
+    "file": "InvertedPageCurl.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/invertedpagecurl.png"
+  },
+  {
+    "id": 14,
+    "name": "Swap",
+    "file": "ff_swap.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/swap.png"
+  },
+  {
+    "id": 15,
+    "name": "Cube",
+    "file": "cube.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/cube.png"
+  },
+  {
+    "id": 16,
+    "name": "Circle \nOpen",
+    "file": "ff_circleopen.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/circleopen.png"
+  },
+  {
+    "id": 17,
+    "name": "PinWheel",
+    "file": "pinwheel.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/pinwheel.png"
+  },
+  {
+    "id": 18,
+    "name": "Angular",
+    "file": "ff_angular.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/angular.png"
+  },
+  {
+    "id": 19,
+    "name": "Hexagonalize",
+    "file": "ff_hexagonalize.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/hexagonalize.png"
+  },
+  {
+    "id": 20,
+    "name": "Pixelize",
+    "file": "ff_pixelize.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/pixelize.png"
+  },
+  {
+    "id": 21,
+    "name": "Perlin",
+    "file": "ff_perlin.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/perlin.png"
+  },
+  {
+    "id": 22,
+    "name": "Bounce",
+    "file": "ff_bounce.glsl",
+    "isSelected": false,
+    "thumbnail": "transitions/thumb/bounce.png"
+  }
+]

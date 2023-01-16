@@ -55,7 +55,7 @@ open class GLFilterObject() {
     var vertexShaderSource: String? = null
     var fragmentShaderSource: String? = null
 
-    private var programCurrent = 0
+    var programCurrent = 0
 
     private var vertexShader = 0
     private var fragmentShader = 0

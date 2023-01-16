@@ -296,6 +296,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
         // Transition draw
         if (transitionDraw != null) {
+            transitionDraw?.initTextureId(textureId)
             transitionDraw?.exec()
         }
     }

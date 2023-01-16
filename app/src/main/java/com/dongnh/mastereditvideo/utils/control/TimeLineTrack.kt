@@ -586,7 +586,6 @@ class TimeLineTrack : FrameLayout {
         index: Int,
         mediaMainObject: MediaModel
     ) {
-
         var requestOptions = RequestOptions()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .skipMemoryCache(false)
@@ -603,7 +602,6 @@ class TimeLineTrack : FrameLayout {
             .asBitmap()
             .load(mediaMainObject.mediaPath)
             .apply(requestOptions)
-            .thumbnail(0.01f)
             .listener(object : RequestListener<Bitmap> {
                 override fun onLoadFailed(
                     e: GlideException?,

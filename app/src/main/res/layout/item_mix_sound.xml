@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/view_track"
+            android:layout_width="@dimen/image_height_50dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_height="@dimen/image_height_57dp">
+
+            <ImageButton
+                android:id="@+id/view_track_video"
+                android:layout_width="@dimen/image_height_35dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_media"
+                android:background="@android:color/transparent"
+                android:layout_marginTop="@dimen/common_margin_8dp"
+                android:layout_marginEnd="@dimen/common_margin_8dp"
+                android:layout_marginStart="@dimen/common_margin_8dp"
+                android:layout_height="@dimen/image_height_35dp" />
+
+            <TextView
+                android:id="@+id/view_number"
+                android:layout_width="wrap_content"
+                android:gravity="end"
+                android:layout_gravity="end"
+                tools:text="1"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/common_size_text_8sp"
+                android:layout_marginTop="-12dp"
+                android:layout_marginEnd="@dimen/common_margin_8dp"
+                android:layout_marginBottom="@dimen/common_margin_4dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/view_is_video"
+                android:layout_width="@dimen/image_height_35dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_video"
+                android:background="@android:color/transparent"
+                android:layout_margin="@dimen/common_margin_8dp"
+                android:visibility="gone"
+                android:layout_height="@dimen/image_height_35dp" />
+
+        </LinearLayout>
+
+        <com.dongnh.mastereditvideo.utils.view.VerticalSeekBar
+            android:id="@+id/seer_volume"
+            android:max="100"
+            android:progress="100"
+            android:clickable="true"
+            android:focusable="true"
+            android:thumb="@drawable/ic_seekbar_thumb"
+            android:layout_width="@dimen/image_height_50dp"
+            android:layout_height="@dimen/image_height_200dp" />
+
+        <TextView
+            android:id="@+id/view_volume"
+            android:layout_width="@dimen/image_height_50dp"
+            android:background="@drawable/bg_text_view_header"
+            android:layout_marginTop="@dimen/common_margin_8dp"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            tools:text="100"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</layout>

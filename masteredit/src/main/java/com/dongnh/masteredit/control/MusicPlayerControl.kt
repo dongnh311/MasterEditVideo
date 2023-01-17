@@ -67,7 +67,7 @@ class MusicPlayerControl(private val context: WeakReference<Context>) : MediaPla
         @Suppress("DEPRECATION")
         setAudioStreamType(AudioManager.STREAM_MUSIC)
 
-        setVolume(50f, 50f)
+        setVolume(musicModel.volume, musicModel.volume)
 
         prepare()
 

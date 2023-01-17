@@ -19,9 +19,12 @@ import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
 import com.dongnh.mastereditvideo.databinding.ActivityMainBinding
+import com.dongnh.mastereditvideo.model.MixSoundModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.control.DurationControl
+import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
+import com.dongnh.mastereditvideo.utils.interfaces.OnConfirmClickMixSound
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
 import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
 import com.dongnh.mastereditvideo.utils.interfaces.OnMusicSelectListener
@@ -59,6 +62,11 @@ class MainActivity : AppCompatActivity() {
 
     // Save index click on media
     private var indexMediaSelect = -1
+
+    // Dialog mix volume
+    private val dialogMixVolume by lazy {
+        DialogMixVolume(this@MainActivity)
+    }
 
     // Request permission for storage
     private val requestPermissionLauncherStorage =
@@ -176,6 +184,42 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             pickMusicFragment.show(supportFragmentManager, "PickMusicFragment")
+        }
+
+        // Open tool
+        mainBinding.btnTool.setOnClickListener {
+
+        }
+
+        // Open volume mix
+        mainBinding.btnVolume.setOnClickListener {
+
+            // Send data to prepare showing
+            dialogMixVolume.showDialogMixVolume(mutableListOf(), mutableListOf())
+            dialogMixVolume.onConfirmClickMixSound = object : OnConfirmClickMixSound {
+                override fun onConfirmClick(
+                    listMedia: MutableList<MixSoundModel>
+                ) {
+                    // Mapping new volume
+                    listMedia.forEach { itemMix ->
+                        if (itemMix.type == MEDIA_TYPE_VIDEO) {
+                            this@MainActivity.listMedia.forEach { media ->
+                                if (itemMix.itemId == media.mediaId) {
+                                    media.volume = itemMix.volume
+                                }
+                            }
+                        } else if (itemMix.type == MEDIA_TYPE_MUSIC) {
+                            this@MainActivity.listMusic.forEachIndexed { index, music ->
+                                if (itemMix.itemId == music.id && index == itemMix.indexMusic) {
+                                    music.volume = itemMix.volume
+                                }
+                            }
+                        }
+                    }
+
+                    // TODO update to player
+                }
+            }
         }
     }
 

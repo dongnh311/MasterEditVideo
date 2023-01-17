@@ -13,6 +13,14 @@
     <string name="select_music_btn_done">Done</string>
     <string name="select_music_btn_reset">Reset</string>
 
+
+    <!-- Dialog Mix Sound  -->
+    <string name="dialog_mix_sound_header">Audio Mixing</string>
+    <string name="dialog_mix_sound_btn_confirm">Confirm</string>
+
+    <!-- Common -->
+    <string name="common_btn_ok">OK</string>
+    <string name="common_btn_cancel">Cancel</string>
     <string name="common_loading">Loading…</string>
 
 </resources>

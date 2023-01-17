@@ -7,7 +7,7 @@ package com.dongnh.masteredit.model
  * Phone : +84397199197.
  */
 class MusicModel {
-    var id: Long? = -1
+    var id: Int = -1
     var nameMusic: String = ""
     var urlFile: String = ""
     var urlThumb: String = ""
@@ -21,6 +21,8 @@ class MusicModel {
     var endAt = 0L
     var nameSinger: String = ""
     var singerId: Long? = -1
+
+    var volume: Float = 50f
 
     var progress: Int = 0
     var isChoose: Boolean = false

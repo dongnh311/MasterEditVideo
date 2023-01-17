@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.MasterEditVideo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -32,5 +32,15 @@
     <style name="imageCircleLargeTheme">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">4%</item>
+    </style>
+
+    <!-- style of dialog -->
+    <style name="customDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@drawable/common_bg_dialog</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="windowMinWidthMajor">0dp</item>
+        <item name="windowMinWidthMinor">0dp</item>
+        <item name="android:textSize">@dimen/common_size_text_14sp</item>
     </style>
 </resources>

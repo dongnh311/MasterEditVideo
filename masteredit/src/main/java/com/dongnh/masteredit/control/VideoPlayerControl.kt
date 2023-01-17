@@ -95,7 +95,16 @@ class VideoPlayerControl(context: Context) {
                 if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex > this@VideoPlayerControl.mediaModels.size - 1) {
                     return
                 }
-                playEndListener?.onEndPlay(this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex.toLong(), duration)
+                playEndListener?.onEndPlay(
+                    this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex.toLong(),
+                    duration
+                )
+
+                // Set volume for exo when play next
+                CoroutineScope(Dispatchers.Main).launch {
+                    exoManager.exoPlayer.volume =
+                        mediaModels[this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex + 1].volume / 100.0F
+                }
             }
 
             override fun onVideoSizeChange(videoSize: VideoSize) {
@@ -145,6 +154,7 @@ class VideoPlayerControl(context: Context) {
         if (currentPosition == 0L) {
             exoManager.exoPlayer.seekTo(0, 0L)
             this@VideoPlayerControl.currentDurationPlayer = 0
+            exoManager.exoPlayer.volume = mediaModels[0].volume / 100.0F
         } else {
             var durationOfClip = 0L
             for (index in 0 until mediaModels.size) {
@@ -157,6 +167,7 @@ class VideoPlayerControl(context: Context) {
                         currentPosition + mediaMainObject.beginAt
                     // Seek to next
                     exoManager.exoPlayer.seekTo(index, currentDurationPlayer)
+                    exoManager.exoPlayer.volume = mediaModels[index].volume / 100.0F
                     break
                 }
             }
@@ -198,5 +209,19 @@ class VideoPlayerControl(context: Context) {
         }
 
         return durationNeed
+    }
+
+    /**
+     * Update volume for media
+     */
+    fun updateVolumeForMedia(listMedia: MutableList<MediaModel>) {
+        listMedia.forEach { media ->
+            mediaModels.forEach { mediaModel ->
+                if (media.mediaId == mediaModel.mediaId) {
+                    mediaModel.volume = media.volume
+                }
+            }
+        }
+
     }
 }

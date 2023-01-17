@@ -312,6 +312,42 @@ class ManagerPlayerMedia(private val context: Context,
     }
 
     /**
+     * Update volume for player
+     */
+    fun updateVolumeForMedia(
+        listMusicModel: MutableList<MusicModel>,
+        listMediaModel: MutableList<MediaModel>
+    ) {
+        // Update to music
+        listMusicModel.forEachIndexed { index, musicModel ->
+            this@ManagerPlayerMedia.listMusicPlayer.forEach { musicPlayerControl ->
+                if (musicPlayerControl.musicModel?.id == musicModel.id && index == musicPlayerControl.indexOfMusic) {
+                    musicPlayerControl.musicModel?.volume = musicModel.volume
+                    musicPlayerControl.setVolume(musicModel.volume, musicModel.volume)
+                }
+            }
+
+            this@ManagerPlayerMedia.lisMusicAdded.forEachIndexed { indexCurrent, musicModelCurrent ->
+                if (musicModelCurrent.id == musicModel.id && index == indexCurrent) {
+                    musicModelCurrent.volume = musicModel.volume
+                }
+            }
+        }
+
+        // Update to video
+        listMediaModel.forEach { media ->
+            this@ManagerPlayerMedia.listMediaAdded.forEach { mediaModel ->
+                if (media.mediaId == mediaModel.mediaId) {
+                    mediaModel.volume = media.volume
+                }
+            }
+        }
+
+        // Update volume for video player
+        this@ManagerPlayerMedia.videoPlayerControl?.updateVolumeForMedia(listMediaModel)
+    }
+
+    /**
      * Clear all media player, preview
      */
     fun onDestroy() {

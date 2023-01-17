@@ -217,7 +217,11 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    // TODO update to player
+                    // Update to manager
+                    this@MainActivity.managerPlayerControl.updateVolumeForMedia(
+                        listMusic,
+                        this@MainActivity.listMedia
+                    )
                 }
             }
         }

@@ -1,0 +1,50 @@
+[
+  {
+    "id": -1,
+    "name": "None",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/transparent.jpg"
+  },
+  {
+    "id": 50000,
+    "name": "Two\nScreen",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/two.png"
+  },
+  {
+    "id": 50001,
+    "name": "Three\nScreen",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/three.png"
+  },
+  {
+    "id": 50002,
+    "name": "Four\nScreen",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/four.png"
+  },
+  {
+    "id": 50003,
+    "name": "Six\nScreen",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/six.png"
+  },
+  {
+    "id": 50004,
+    "name": "Nice\nScreen",
+    "isSelected": false,
+    "thumbnail": "graph/thumb/nice.png"
+  }
+  //  {
+  //    "id": 50005,
+  //    "name": "Black While \nScreen",
+  //    "isSelected": false,
+  //    "thumbnail": "graphy/thumb/gray.jpg"
+  //  },
+  //  {
+  //    "id": 50006,
+  //    "name": "Green\nScreen",
+  //    "isSelected": false,
+  //    "thumbnail": "graphy/thumb/blue.jpg"
+  //  }
+]

@@ -75,6 +75,7 @@ class AdapterMixSound : RecyclerView.Adapter<AdapterMixSound.ItemViewHolder>() {
 
             // View progress
             binding.seerVolume.progress = (itemMixSoundModel.volume * 100).toInt()
+            binding.viewVolume.text = (itemMixSoundModel.volume * 100).toInt().toString()
 
             // Seek change
             binding.seerVolume.setOnSeekBarChangeListener(object :

@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.FragmentSpecialBinding
+import com.dongnh.mastereditvideo.utils.adapter.AdapterSpecial
+import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 
 /**
  * Project : MasterEditVideo
@@ -17,6 +19,13 @@ import com.dongnh.mastereditvideo.databinding.FragmentSpecialBinding
  */
 class SpecialFragment : Fragment() {
     lateinit var dataBinding: FragmentSpecialBinding
+
+    // Adapter for view
+    var adapterSpecial = AdapterSpecial()
+
+    companion object {
+        var onSpecialItemListener: OnSpecialItemListener? = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

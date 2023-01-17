@@ -59,7 +59,7 @@
             android:focusable="true"
             android:thumb="@drawable/ic_seekbar_thumb"
             android:layout_width="@dimen/image_height_50dp"
-            android:layout_height="@dimen/image_height_200dp" />
+            android:layout_height="@dimen/image_height_150dp" />
 
         <TextView
             android:id="@+id/view_volume"

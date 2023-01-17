@@ -25,9 +25,9 @@ class LinearDialogCenter : LinearLayout {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         var width = context.resources.displayMetrics.widthPixels
-        width = (0.8 * width).roundToInt()
+        val widthNew = (0.8 * width).roundToInt()
         var height = context.resources.displayMetrics.heightPixels
-        height = (0.8 * height).roundToInt()
-        setMeasuredDimension(width, height)
+        val heightNew = (0.8 * height).roundToInt()
+        setMeasuredDimension(widthNew, heightNew)
     }
 }

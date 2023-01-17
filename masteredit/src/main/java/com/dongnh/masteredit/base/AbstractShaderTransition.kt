@@ -20,7 +20,7 @@ abstract class AbstractShaderTransition {
     companion object {
         const val SHADER_FOLDER = "effect/resource/shaders/"
 
-        const val TRANSITION_FOLDER = "transitions/resource/"
+        const val TRANSITION_FOLDER = "transition/resource/"
     }
 
     private var shaderId = -1

@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
+import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.masteredit.utils.exts.createMediaTransformPath
 import com.dongnh.masteredit.utils.exts.deleteFolderIfExit
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
@@ -25,10 +26,7 @@ import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
 import com.dongnh.mastereditvideo.utils.dialog.DialogTool
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
-import com.dongnh.mastereditvideo.utils.interfaces.OnConfirmClickMixSound
-import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
-import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
-import com.dongnh.mastereditvideo.utils.interfaces.OnMusicSelectListener
+import com.dongnh.mastereditvideo.utils.interfaces.*
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
 import kotlinx.coroutines.launch
@@ -194,14 +192,26 @@ class MainActivity : AppCompatActivity() {
 
         // Open tool
         mainBinding.btnTool.setOnClickListener {
-            dialogTool.showDialogTool()
+            dialogTool.showDialogTool(object : OnSpecialItemListener {
+                override fun onItemSpecialTouchDown(itemSpecial: SpecialModel, position: Int) {
+                    Timber.e("Main onItemSpecialTouchDown")
+                }
+
+                override fun onItemSpecialTouchUp(itemSpecial: SpecialModel, position: Int) {
+                    Timber.e("Main onItemSpecialTouchUp")
+                }
+
+                override fun onItemSpecialClick(itemSpecial: SpecialModel, position: Int) {
+                    Timber.e("Main onItemSpecialClick")
+                }
+            })
         }
 
         // Open volume mix
         mainBinding.btnVolume.setOnClickListener {
 
             // Send data to prepare showing
-            dialogMixVolume.showDialogMixVolume(mutableListOf(), mutableListOf())
+            dialogMixVolume.showDialogMixVolume(listMedia, listMusic)
             dialogMixVolume.onConfirmClickMixSound = object : OnConfirmClickMixSound {
                 override fun onConfirmClick(
                     listMedia: MutableList<MixSoundModel>

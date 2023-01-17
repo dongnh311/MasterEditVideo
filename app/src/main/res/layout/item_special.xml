@@ -3,8 +3,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:background="@color/colorWhite"
-        android:layout_height="match_parent">
+        android:gravity="center"
+        android:background="@color/colorTextRecord"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -41,7 +42,7 @@
                 android:visibility="visible"
                 android:gravity="center"
                 android:textSize="@dimen/common_size_text_12sp"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/black" />
         </LinearLayout>
 
     </LinearLayout>

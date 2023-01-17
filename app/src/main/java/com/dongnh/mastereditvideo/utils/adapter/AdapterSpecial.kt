@@ -1,6 +1,7 @@
 package com.dongnh.mastereditvideo.utils.adapter
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -54,7 +55,7 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
             if (binding.filterThumbnail.tag == null || item.thumbnail != binding.filterThumbnail.tag) {
                 Glide.with(binding.filterThumbnail.context).clear(binding.filterThumbnail)
                 Glide.with(binding.filterThumbnail.context)
-                    .load(item.thumbnail)
+                    .load(Uri.parse("file:///android_asset/" + item.thumbnail))
                     .thumbnail(0.01f)
                     .into(binding.filterThumbnail)
             }

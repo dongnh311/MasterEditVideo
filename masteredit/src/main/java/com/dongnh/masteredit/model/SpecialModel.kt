@@ -19,6 +19,7 @@ class SpecialModel {
 
     // For filter lut
     var lut: String = ""
+    var intensity: Float = 0.0F
 
     // Duration on view
     var duration: Long = -1

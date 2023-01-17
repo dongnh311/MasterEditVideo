@@ -1,6 +1,7 @@
 package com.dongnh.mastereditvideo.utils.dialog
 
 import android.app.AlertDialog
+import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.Window
 import androidx.core.content.ContextCompat
@@ -11,6 +12,7 @@ import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.DialogToolBinding
 import com.dongnh.mastereditvideo.model.TabModel
 import com.dongnh.mastereditvideo.utils.adapter.AdapterTabTool
+import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 /**
@@ -25,7 +27,7 @@ class DialogTool(private val context: FragmentActivity) {
 
     var dataBinding: DialogToolBinding
 
-    var adapterTab = AdapterTabTool(context)
+    lateinit var adapterTab: AdapterTabTool
 
     var currentPageSelect = -1
 
@@ -40,19 +42,21 @@ class DialogTool(private val context: FragmentActivity) {
         this@DialogTool.alertDialog = builder.create()
         this@DialogTool.alertDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this@DialogTool.alertDialog?.setCancelable(true)
-        val tabModel = TabModel()
-        adapterTab.updateNewItems(tabModel.createTabModels())
     }
 
     /**
      * Show dialog tool
      */
-    fun showDialogTool() {
+    fun showDialogTool(onSpecialItemListener: OnSpecialItemListener) {
         // View tab
+        adapterTab = AdapterTabTool(this@DialogTool.context, onSpecialItemListener)
+        val tabModel = TabModel()
+        adapterTab.updateNewItems(tabModel.createTabModels())
+
         // Config adapter
         this@DialogTool.dataBinding.pagerViewFragment.adapter = adapterTab
         // Max limit view init
-        dataBinding.pagerViewFragment.offscreenPageLimit = 4
+        dataBinding.pagerViewFragment.offscreenPageLimit = 5
 
         // Config icon and text for tab
         TabLayoutMediator(
@@ -88,7 +92,6 @@ class DialogTool(private val context: FragmentActivity) {
                         ContextCompat.getDrawable(this@DialogTool.context, R.drawable.ic_special)
                 }
             }
-
         }.attach()
 
         // Don't allow swipe to next fragment
@@ -106,5 +109,23 @@ class DialogTool(private val context: FragmentActivity) {
 
         // Show dialog
         this@DialogTool.alertDialog?.show()
+        setUpWidthOfDialogWhenShowing()
+    }
+
+    /**
+     * Set min width for dialog if need
+     */
+    fun setUpWidthOfDialogWhenShowing() {
+        // Set width for dialog
+        val displayRectangle = Rect()
+        val window: Window = this@DialogTool.context.window
+        window.decorView.getWindowVisibleDisplayFrame(displayRectangle)
+        val widthNew = context.resources.displayMetrics.widthPixels * 0.8
+        this@DialogTool.alertDialog?.window?.attributes?.height?.let {
+            this@DialogTool.alertDialog?.window?.setLayout(
+                widthNew.toInt(),
+                it
+            )
+        }
     }
 }

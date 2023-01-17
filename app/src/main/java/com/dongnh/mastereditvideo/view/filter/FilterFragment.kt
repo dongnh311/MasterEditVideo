@@ -6,8 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.dongnh.masteredit.const.SPECIAL_TYPE_FILTER
+import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.FragmentFilterBinding
+import com.dongnh.mastereditvideo.utils.adapter.AdapterSpecial
+import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import timber.log.Timber
+import java.nio.charset.Charset
 
 /**
  * Project : MasterEditVideo
@@ -16,8 +24,15 @@ import com.dongnh.mastereditvideo.databinding.FragmentFilterBinding
  * Phone : +84397199197.
  */
 class FilterFragment : Fragment() {
-
+    // Data binding
     lateinit var dataBinding: FragmentFilterBinding
+
+    // Adapter for view
+    var adapterSpecial = AdapterSpecial()
+
+    companion object {
+        var onSpecialItemListener: OnSpecialItemListener? = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +54,50 @@ class FilterFragment : Fragment() {
     }
 
     private fun handelViewCreated() {
+        this@FilterFragment.dataBinding.recyclerView.adapter = adapterSpecial
 
+        // Create data for filter
+        var filterList: ArrayList<SpecialModel> = arrayListOf()
+
+        val stream =
+            this@FilterFragment.requireContext().assets?.open("filter/filters.json")
+        val size = stream?.available()
+        if (size != null) {
+            val buffer = ByteArray(size)
+            stream.read(buffer)
+            stream.close()
+
+            filterList =
+                Gson().fromJson(
+                    String(buffer, Charset.forName("UTF-8")),
+                    object : TypeToken<ArrayList<SpecialModel>>() {}.type
+                )
+        }
+
+        // Set type
+        filterList.forEach {
+            it.type = SPECIAL_TYPE_FILTER
+        }
+
+        adapterSpecial.dataList.clear()
+        adapterSpecial.dataList.addAll(filterList)
+        adapterSpecial.notifyItemRangeInserted(0, filterList.size)
+
+        adapterSpecial.onSpecialItemListener = object : OnSpecialItemListener {
+            override fun onItemSpecialTouchDown(itemSpecial: SpecialModel, position: Int) {
+                Timber.e("onItemSpecialTouchDown")
+                onSpecialItemListener?.onItemSpecialTouchDown(itemSpecial, position)
+            }
+
+            override fun onItemSpecialTouchUp(itemSpecial: SpecialModel, position: Int) {
+                Timber.e("onItemSpecialTouchUp")
+                onSpecialItemListener?.onItemSpecialTouchUp(itemSpecial, position)
+            }
+
+            override fun onItemSpecialClick(itemSpecial: SpecialModel, position: Int) {
+                Timber.e("onItemSpecialClick")
+                onSpecialItemListener?.onItemSpecialClick(itemSpecial, position)
+            }
+        }
     }
 }

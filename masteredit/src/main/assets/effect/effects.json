@@ -1,0 +1,62 @@
+[
+  {
+    "id": 0,
+    "name": "Transparent",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/transparent.jpg"
+  },
+  {
+    "id": 1,
+    "name": "Brightness",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/brightness.png"
+  },
+  {
+    "id": 2,
+    "name": "Contrast",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/contrast.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Cross Hatch",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/crosshatch.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Gama",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/gama.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Hight\nShadow",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/hightlightshadown.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Hue",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/hue.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Invert",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/invert.jpg"
+  },
+  {
+    "id": 8,
+    "name": "Gray\nScale",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/gray.jpg"
+  },
+  {
+    "id": 9,
+    "name": "RGB",
+    "isSelected": false,
+    "thumbnail": "effect/thumb/rbg.jpeg"
+  }
+]

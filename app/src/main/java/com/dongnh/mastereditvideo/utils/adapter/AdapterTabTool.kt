@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dongnh.mastereditvideo.model.TabModel
+import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 import com.dongnh.mastereditvideo.view.effect.EffectFragment
 import com.dongnh.mastereditvideo.view.filter.FilterFragment
 import com.dongnh.mastereditvideo.view.graph.GraphFragment
@@ -16,7 +17,10 @@ import com.dongnh.mastereditvideo.view.transition.TransitionFragment
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class AdapterTabTool(fragmentManager: FragmentActivity) : FragmentStateAdapter(fragmentManager) {
+class AdapterTabTool(
+    fragmentManager: FragmentActivity,
+    private val onSpecialItemListener: OnSpecialItemListener
+) : FragmentStateAdapter(fragmentManager) {
 
     var dataList: MutableList<TabModel> = mutableListOf()
 
@@ -30,18 +34,23 @@ class AdapterTabTool(fragmentManager: FragmentActivity) : FragmentStateAdapter(f
     override fun createFragment(position: Int): Fragment {
         when (position) {
             0 -> {
+                FilterFragment.onSpecialItemListener = onSpecialItemListener
                 return FilterFragment()
             }
             1 -> {
+                EffectFragment.onSpecialItemListener = onSpecialItemListener
                 return EffectFragment()
             }
             2 -> {
+                GraphFragment.onSpecialItemListener = onSpecialItemListener
                 return GraphFragment()
             }
             3 -> {
+                TransitionFragment.onSpecialItemListener = onSpecialItemListener
                 return TransitionFragment()
             }
             4 -> {
+                SpecialFragment.onSpecialItemListener = onSpecialItemListener
                 return SpecialFragment()
             }
             else -> {

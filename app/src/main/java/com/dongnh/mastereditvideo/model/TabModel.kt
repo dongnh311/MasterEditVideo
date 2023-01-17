@@ -23,7 +23,7 @@ class TabModel {
         listTab.add(tabEffect)
 
         val tabGraph = TabModel()
-        tabEffect.nameTab = "Graph"
+        tabGraph.nameTab = "Graph"
         listTab.add(tabGraph)
 
         val tabTransition = TabModel()

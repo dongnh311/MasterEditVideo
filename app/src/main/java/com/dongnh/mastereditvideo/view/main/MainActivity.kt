@@ -23,6 +23,7 @@ import com.dongnh.mastereditvideo.model.MixSoundModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
+import com.dongnh.mastereditvideo.utils.dialog.DialogTool
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.interfaces.OnConfirmClickMixSound
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
@@ -66,6 +67,11 @@ class MainActivity : AppCompatActivity() {
     // Dialog mix volume
     private val dialogMixVolume by lazy {
         DialogMixVolume(this@MainActivity)
+    }
+
+    // Dialog tool
+    private val dialogTool by lazy {
+        DialogTool(this@MainActivity)
     }
 
     // Request permission for storage
@@ -188,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
         // Open tool
         mainBinding.btnTool.setOnClickListener {
-
+            dialogTool.showDialogTool()
         }
 
         // Open volume mix

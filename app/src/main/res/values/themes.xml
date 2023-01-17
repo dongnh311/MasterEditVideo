@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.MasterEditVideo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -42,5 +42,18 @@
         <item name="windowMinWidthMajor">0dp</item>
         <item name="windowMinWidthMinor">0dp</item>
         <item name="android:textSize">@dimen/common_size_text_14sp</item>
+    </style>
+
+    <!-- style of tab layout -->
+    <style name="tabLayoutTextStyleHome">
+        <item name="android:textSize">@dimen/common_size_text_10sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textFontWeight" tools:targetApi="p">400</item>
+        <item name="android:fontWeight" tools:targetApi="o">400</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="fontWeight">400</item>
+        <item name="maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 </resources>

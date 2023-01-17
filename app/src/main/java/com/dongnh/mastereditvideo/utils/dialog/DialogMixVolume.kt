@@ -103,5 +103,8 @@ class DialogMixVolume(private val context: Context) {
         dataBinding.btnConfirm.setOnClickListener {
             onConfirmClickMixSound?.onConfirmClick(adapterMixSound.dataList)
         }
+
+        // Show dialog
+        this@DialogMixVolume.alertDialog?.show()
     }
 }

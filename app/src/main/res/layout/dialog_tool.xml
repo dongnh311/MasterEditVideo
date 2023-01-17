@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.dongnh.mastereditvideo.utils.view.LinearDialogCenter
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/common_bg_dialog">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_select"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_tab_under_line_top"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tabGravity="fill"
+                    app:tabIconTint="@color/tab_layout_color_selector"
+                    app:tabIndicatorColor="@color/colorBlack"
+                    app:tabIndicatorHeight="@dimen/common_width_stroke_0dp"
+                    app:tabMode="fixed"
+                    app:tabRippleColor="@null"
+                    app:tabSelectedTextColor="@color/colorBlack"
+                    app:tabTextAppearance="@style/tabLayoutTextStyleHome"
+                    app:tabTextColor="@color/colorTextTab" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/pager_view_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@color/colorWhite"
+                    android:isScrollContainer="false"
+                    android:visibility="visible"
+                    app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+                    app:layout_constraintBottom_toTopOf="@+id/tab_select"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </com.dongnh.mastereditvideo.utils.view.LinearDialogCenter>
+
+    </RelativeLayout>
+
+</layout>

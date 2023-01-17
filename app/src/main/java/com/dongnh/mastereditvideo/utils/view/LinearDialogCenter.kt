@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class LinearLayoutDialog : LinearLayout {
+class LinearDialogCenter : LinearLayout {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -28,6 +28,6 @@ class LinearLayoutDialog : LinearLayout {
         width = (0.8 * width).roundToInt()
         var height = context.resources.displayMetrics.heightPixels
         height = (0.8 * height).roundToInt()
-        setMeasuredDimension(width, measuredHeight)
+        setMeasuredDimension(width, height)
     }
 }

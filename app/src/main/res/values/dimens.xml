@@ -165,4 +165,14 @@
     <dimen name="view_height_2dp">2dp</dimen>
     <dimen name="view_height_3dp">3dp</dimen>
     <dimen name="view_height_5dp">5dp</dimen>
+
+    <!-- Stroke common -->
+    <dimen name="common_width_stroke_0dp">0dp</dimen>
+    <dimen name="common_width_stroke_0.5dp">0.5dp</dimen>
+    <dimen name="common_width_stroke_1dp">1dp</dimen>
+    <dimen name="common_width_stroke_2dp">2dp</dimen>
+    <dimen name="common_width_stroke_3dp">3dp</dimen>
+    <dimen name="common_width_stroke_4dp">4dp</dimen>
+    <dimen name="common_width_stroke_5dp">5dp</dimen>
+    <dimen name="common_width_stroke_10dp">10dp</dimen>
 </resources>

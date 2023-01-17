@@ -8,6 +8,7 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/parent_view"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/image_height_120dp"
             android:padding="@dimen/common_padding_8dp"

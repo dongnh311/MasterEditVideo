@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
+import com.dongnh.mastereditvideo.const.CLICK_ACTION_THRESHOLD
 import com.dongnh.mastereditvideo.databinding.ItemSpecialBinding
 import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 
@@ -56,7 +57,6 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
                 Glide.with(binding.filterThumbnail.context).clear(binding.filterThumbnail)
                 Glide.with(binding.filterThumbnail.context)
                     .load(Uri.parse("file:///android_asset/" + item.thumbnail))
-                    .thumbnail(0.01f)
                     .into(binding.filterThumbnail)
             }
 
@@ -64,20 +64,24 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
             binding.filterName.text = item.name
 
             // Touch
-            binding.root.setOnTouchListener { _, event ->
+            binding.parentView.setOnTouchListener { _, event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         onSpecialItemListener?.onItemSpecialTouchDown(item, position)
                     }
                     MotionEvent.ACTION_UP -> {
-                        onSpecialItemListener?.onItemSpecialTouchUp(item, position)
+                        if (event.eventTime - event.downTime < CLICK_ACTION_THRESHOLD) {
+                            onSpecialItemListener?.onItemSpecialClick(item, position)
+                        } else {
+                            onSpecialItemListener?.onItemSpecialTouchUp(item, position)
+                        }
                     }
                 }
                 return@setOnTouchListener true
             }
 
             // Click
-            binding.root.setOnClickListener {
+            binding.parentView.setOnClickListener {
                 onSpecialItemListener?.onItemSpecialClick(item, position)
             }
         }

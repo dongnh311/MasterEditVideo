@@ -1,36 +1,36 @@
 [
   {
-    "id": -1,
+    "id": 400000,
     "name": "None",
     "isSelected": false,
     "thumbnail": "graph/thumb/transparent.jpg"
   },
   {
-    "id": 50000,
+    "id": 400001,
     "name": "Two\nScreen",
     "isSelected": false,
     "thumbnail": "graph/thumb/two.png"
   },
   {
-    "id": 50001,
+    "id": 400002,
     "name": "Three\nScreen",
     "isSelected": false,
     "thumbnail": "graph/thumb/three.png"
   },
   {
-    "id": 50002,
+    "id": 400003,
     "name": "Four\nScreen",
     "isSelected": false,
     "thumbnail": "graph/thumb/four.png"
   },
   {
-    "id": 50003,
+    "id": 400004,
     "name": "Six\nScreen",
     "isSelected": false,
     "thumbnail": "graph/thumb/six.png"
   },
   {
-    "id": 50004,
+    "id": 400005,
     "name": "Nice\nScreen",
     "isSelected": false,
     "thumbnail": "graph/thumb/nice.png"

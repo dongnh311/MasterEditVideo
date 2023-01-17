@@ -9,10 +9,10 @@ import android.util.Pair
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class GLFilterGroupObject(private val filters: Collection<GLFilterObject?>) : GLFilterObject() {
+class GLFilterGroupObject(val filters: MutableList<GLFilterObject?>) : GLFilterObject() {
 
     val list: ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>> =
-        ArrayList<Pair<GLFilterObject?, GLFramebufferObject?>>()
+        ArrayList()
 
     override fun setup() {
         super.setup()

@@ -3,19 +3,15 @@ package com.dongnh.masteredit.control
 import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import com.dongnh.masteredit.const.VIEW_SIZE_16_9
 import com.dongnh.masteredit.filter.GLBrightnessFilterObject
 import com.dongnh.masteredit.filter.GLContrastFilterObject
 import com.dongnh.masteredit.filter.GLGammaFilterObject
-import com.dongnh.masteredit.gl.GLFilterObject
 import com.dongnh.masteredit.gl.GLFilterGroupObject
-import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
+import com.dongnh.masteredit.gl.GLFilterObject
 import com.dongnh.masteredit.view.GLPlayerView
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import java.lang.Math.abs
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.video.VideoSize
 
 /**
  * Project : MasterEditVideo
@@ -24,7 +20,7 @@ import java.lang.Math.abs
  * Phone : +84397199197.
  */
 class PreViewLayoutControl(context: Context) {
-    var glPlayerView: GLPlayerView = GLPlayerView(context, null)
+    private var glPlayerView: GLPlayerView = GLPlayerView(context, null)
 
     // Default filter
     private var filterBrightness = GLBrightnessFilterObject()
@@ -122,5 +118,24 @@ class PreViewLayoutControl(context: Context) {
     fun release() {
         glPlayerView.releaseAll()
     }
+
+    /**
+     * Config video size
+     */
+    fun configSizeVideoForPreview(videoSize: VideoSize) {
+        glPlayerView.configSizeOfVideoToView(videoSize)
+    }
+
+    /**
+     * Config video input for preview
+     */
+    fun configExoPlayerToPreview(exoPlayer: ExoPlayer) {
+        glPlayerView.setExoPlayer(exoPlayer)
+    }
+
+    /**
+     * Get preview
+     */
+    fun preview() = glPlayerView
 
 }

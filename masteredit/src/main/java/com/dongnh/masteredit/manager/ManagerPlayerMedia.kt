@@ -4,9 +4,11 @@ import android.content.Context
 import android.widget.FrameLayout
 import com.dongnh.masteredit.control.MusicPlayerControl
 import com.dongnh.masteredit.control.PreViewLayoutControl
+import com.dongnh.masteredit.control.SpecialPlayControl
 import com.dongnh.masteredit.control.VideoPlayerControl
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
+import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.masteredit.utils.interfaces.MediaPlayEndListener
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.masteredit.utils.interfaces.ViewChangeSizeListener
@@ -57,10 +59,15 @@ class ManagerPlayerMedia(private val context: Context,
     // Lister event
     var videoEventLister: VideoEventLister? = null
 
+    // Handle filter, effect
+    private val specialPlayControl by lazy {
+        SpecialPlayControl(this@ManagerPlayerMedia.context)
+    }
+
     init {
         preViewLayoutControl.initViewSizeToView()
         // Add view to player
-        frameLayout.addView(preViewLayoutControl.glPlayerView)
+        frameLayout.addView(preViewLayoutControl.preview())
     }
 
     /**
@@ -105,6 +112,10 @@ class ManagerPlayerMedia(private val context: Context,
             }?.onEach { adjDurationPlayed ->
                 videoEventLister?.onPlayWithProgress(adjDurationPlayed)
                 this@ManagerPlayerMedia.currentDurationPlayer += adjDurationPlayed
+
+                // Make filter run on play
+                this@ManagerPlayerMedia.specialPlayControl.playingVideo(this@ManagerPlayerMedia.currentDurationPlayer)
+
                 if ((adjDurationPlayed + currentDurationPlayer) == this@ManagerPlayerMedia.durationOfVideoProject) {
                     Timber.e("Play end of all")
                     CoroutineScope(Dispatchers.Main).launch {
@@ -117,13 +128,13 @@ class ManagerPlayerMedia(private val context: Context,
         // Change size if need
         videoPlayerControl?.viewChangeSizeListener = object : ViewChangeSizeListener {
             override fun onVideoSizeChange(videoSize: VideoSize) {
-                preViewLayoutControl.glPlayerView.configSizeOfVideoToView(videoSize)
+                preViewLayoutControl.configSizeVideoForPreview(videoSize)
             }
         }
 
         // Set input source for view
         videoPlayerControl?.exoManager?.exoPlayer?.let {
-            preViewLayoutControl.glPlayerView.setExoPlayer(
+            preViewLayoutControl.configExoPlayerToPreview(
                 it
             )
         }
@@ -345,6 +356,20 @@ class ManagerPlayerMedia(private val context: Context,
 
         // Update volume for video player
         this@ManagerPlayerMedia.videoPlayerControl?.updateVolumeForMedia(listMediaModel)
+    }
+
+    /**
+     * Add special to preview
+     */
+    fun addSpecialToPreview(specialModel: SpecialModel) {
+        this@ManagerPlayerMedia.specialPlayControl.addSpecialToHandlePreview(specialModel)
+    }
+
+    /**
+     * Remove special
+     */
+    fun removeSpecialFromPreview(specialModel: SpecialModel) {
+        this@ManagerPlayerMedia.specialPlayControl.removeSpecial(specialModel)
     }
 
     /**

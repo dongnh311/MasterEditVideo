@@ -157,13 +157,14 @@ class VideoPlayerControl(context: Context) {
             exoManager.exoPlayer.volume = mediaModels[0].volume / 100.0F
         } else {
             var durationOfClip = 0L
+            var currentDurationPlayer = 0L
             for (index in 0 until mediaModels.size) {
                 val mediaMainObject = mediaModels[index]
                 durationOfClip += mediaMainObject.endAt - mediaMainObject.beginAt
 
                 if (durationOfClip > currentPosition) {
                     durationOfClip -= (mediaMainObject.endAt - mediaMainObject.beginAt)
-                    val currentDurationPlayer =
+                    currentDurationPlayer =
                         currentPosition + mediaMainObject.beginAt
                     // Seek to next
                     exoManager.exoPlayer.seekTo(index, currentDurationPlayer)
@@ -171,7 +172,7 @@ class VideoPlayerControl(context: Context) {
                     break
                 }
             }
-            this@VideoPlayerControl.currentDurationPlayer = durationOfClip + durationOfClip
+            this@VideoPlayerControl.currentDurationPlayer = currentPosition
         }
     }
 

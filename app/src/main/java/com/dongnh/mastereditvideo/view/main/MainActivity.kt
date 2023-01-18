@@ -73,9 +73,6 @@ class MainActivity : AppCompatActivity() {
         DialogTool(this@MainActivity)
     }
 
-    // Duration of effect
-    private var durationSpecial = 0L
-
     // Request permission for storage
     private val requestPermissionLauncherStorage =
         registerForActivityResult(
@@ -215,15 +212,17 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onItemSpecialTouchUp(itemSpecial: SpecialModel, position: Int) {
                     if (isNotItemNone(itemSpecial)) {
-                        // Make end time
-                        itemSpecial.endAt = this@MainActivity.managerPlayerControl.durationPlayed
 
                         // Pause
                         if (this@MainActivity.isPlaying) {
                             this@MainActivity.setupButtonPause()
                         }
 
+                        // Make end time
+                        itemSpecial.endAt = this@MainActivity.managerPlayerControl.durationPlayed
+
                         this@MainActivity.dialogTool.alertDialog?.dismiss()
+                        Timber.e("New filter duration , start : ${itemSpecial.beginAt}, end :  ${itemSpecial.endAt}")
                         this@MainActivity.mainBinding.viewTimeLine.drawItemFilter(itemSpecial)
                     }
                 }
@@ -277,31 +276,32 @@ class MainActivity : AppCompatActivity() {
      * Seer time duration view
      */
     private fun configEventSeerDuration() {
-        mainBinding.viewTimeLine.onDurationTrackScrollListener = object : OnDurationTrackScrollListener {
-            override fun onDurationSeekChange(duration: Long) {
-                if (!this@MainActivity.isPlaying) {
-                    var durationSeek = duration
-                    if (duration > this@MainActivity.managerPlayerControl.durationOfVideoProject) {
-                        durationSeek =
-                            this@MainActivity.managerPlayerControl.durationOfVideoProject
-                    }
-                    this@MainActivity.durationControl.setDurationSeek(durationSeek)
-                    this@MainActivity.managerPlayerControl.seekVideoDuration(durationSeek)
-                }
-            }
-
-            override fun onScrollXOfView(duration: Long) {
-                if (!this@MainActivity.isPlaying) {
-                    this@MainActivity.mainBinding.viewTimeLine.currentDurationInView =
-                        duration.toDouble()
-
-                    if (duration == 0L) {
-                        this@MainActivity.mainBinding.viewTimeLine.isScrollToStart =
-                            false
+        mainBinding.viewTimeLine.onDurationTrackScrollListener =
+            object : OnDurationTrackScrollListener {
+                override fun onDurationSeekChange(duration: Long) {
+                    if (!this@MainActivity.isPlaying) {
+                        var durationSeek = duration
+                        if (duration > this@MainActivity.managerPlayerControl.durationOfVideoProject) {
+                            durationSeek =
+                                this@MainActivity.managerPlayerControl.durationOfVideoProject
+                        }
+                        this@MainActivity.durationControl.setDurationSeek(durationSeek)
+                        this@MainActivity.managerPlayerControl.seekVideoDuration(durationSeek)
                     }
                 }
+
+                override fun onScrollXOfView(duration: Long) {
+                    if (!this@MainActivity.isPlaying) {
+                        this@MainActivity.mainBinding.viewTimeLine.currentDurationInView =
+                            duration.toDouble()
+
+                        if (duration == 0L) {
+                            this@MainActivity.mainBinding.viewTimeLine.isScrollToStart =
+                                false
+                        }
+                    }
+                }
             }
-        }
 
         // Media choose
         mainBinding.viewTimeLine.onItemMediaChoose = object : OnItemMediaChoose {
@@ -417,7 +417,9 @@ class MainActivity : AppCompatActivity() {
         this@MainActivity.runnableDurationTimeLine = Runnable {
             this@MainActivity.mainBinding.viewTimeLine.updateScrollOfMainView()
             this@MainActivity.runnableDurationTimeLine?.let {
-                if (this@MainActivity.isPlaying) {handleTask.postDelayed(it, 10)} else handleTask.removeCallbacks(it)
+                if (this@MainActivity.isPlaying) {
+                    handleTask.postDelayed(it, 10)
+                } else handleTask.removeCallbacks(it)
             }
         }
     }

@@ -33,8 +33,10 @@ import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
 import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
 import com.dongnh.mastereditvideo.utils.view.ShapeableImageViewHeight
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 /**
  * Project : MasterEditVideo
@@ -254,16 +256,8 @@ class TimeLineTrack : FrameLayout {
             )
         }
 
-        val layoutOfDuration = ConstraintLayout.LayoutParams(
-            maxWidthOfDuration,
-            ConstraintLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
-
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
-
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+        // Request view
+        invalidateWidthOfEditView()
     }
 
     /**
@@ -461,10 +455,10 @@ class TimeLineTrack : FrameLayout {
             // Add music
             val adjIndex = 4
             listMusic.forEachIndexed { index, musicModel ->
-                val layoutOfTrack: LinearLayout =
+                val layoutOfMusic: LinearLayout =
                     this@TimeLineTrack.itemTimeLineBinding.layoutEdit[adjIndex + index] as LinearLayout
-                layoutOfTrack.orientation = LinearLayout.VERTICAL
-                layoutOfTrack.gravity = Gravity.START or Gravity.CENTER
+                layoutOfMusic.orientation = LinearLayout.VERTICAL
+                layoutOfMusic.gravity = Gravity.START or Gravity.CENTER
 
                 // Create main layout
                 val linearLayoutViewMusic: ItemTrackBinding = DataBindingUtil.inflate(
@@ -537,19 +531,11 @@ class TimeLineTrack : FrameLayout {
                 setUpEventMusicChoose(linearLayoutViewMusic)
 
                 // Add to parent view
-                layoutOfTrack.addView(linearLayoutViewMusic.root)
+                layoutOfMusic.addView(linearLayoutViewMusic.root)
             }
 
             // Make layout edit is scale
-            val layoutOfDuration = ConstraintLayout.LayoutParams(
-                maxWidthOfDuration,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
-
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+            invalidateWidthOfEditView()
         } catch (ex: java.lang.Exception) {
             Timber.e(ex)
         }
@@ -567,7 +553,7 @@ class TimeLineTrack : FrameLayout {
             val layoutOfFilter: LinearLayout =
                 this@TimeLineTrack.itemTimeLineBinding.layoutEdit[1] as LinearLayout
             layoutOfFilter.removeAllViews()
-            layoutOfFilter.requestLayout()
+            layoutOfFilter.invalidate()
 
             layoutOfFilter.orientation = LinearLayout.HORIZONTAL
             layoutOfFilter.gravity = Gravity.START or Gravity.CENTER
@@ -589,57 +575,91 @@ class TimeLineTrack : FrameLayout {
                     duration = 1
                 }
                 val widthOfItem = (duration / 1000.0) * thumbnailSize
-                val viewColor = ImageView(context)
+
+                val viewColor = ShapeableImageView(context)
+
+                // Corner image
+                viewColor.shapeAppearanceModel = viewColor.shapeAppearanceModel
+                    .toBuilder()
+                    .setTopLeftCorner(CornerFamily.ROUNDED, connerImageView)
+                    .setBottomLeftCorner(CornerFamily.ROUNDED, connerImageView)
+                    .setBottomRightCorner(CornerFamily.ROUNDED, connerImageView)
+                    .setTopRightCorner(CornerFamily.ROUNDED, connerImageView)
+                    .build()
+
+                viewColor.clipToOutline = true
+                viewColor.outlineProvider = ViewOutlineProvider.BACKGROUND
+
                 val viewLayout =
                     LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        widthOfItem.roundToInt(),
                         LinearLayout.LayoutParams.MATCH_PARENT
                     )
 
-                viewColor.background =
-                    ContextCompat.getDrawable(context, android.R.color.holo_blue_light)
+                viewColor.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        android.R.color.holo_blue_light
+                    )
+                )
                 viewColor.layoutParams = viewLayout
-
-                // Make it not click
-                linearLayoutViewFilter.mainAddView.tag = 1
 
                 // Add view color to preview
                 linearLayoutViewFilter.mainAddView.addView(viewColor)
                 linearLayoutViewFilter.mainAddView.invalidate()
-                linearLayoutViewFilter.mainAddView.requestLayout()
+
+                // Make it not click
+                linearLayoutViewFilter.mainAddView.tag = 1
 
                 linearLayoutViewFilter.viewIndex.tag = index
                 linearLayoutViewFilter.viewObject.tag = specialModel
 
                 // Set margin for item
                 val layout = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.MATCH_PARENT
                 )
 
-                layout.setMargins(0, currentDurationInView.toInt(), 0, 0)
+                var adjMargin = (specialModel.beginAt / 1000.0) * thumbnailSize
+                var marginLeft = (adjMargin - (thumbnailSize) + marginItem).toInt()
+                if (index == 0) {
+                    marginLeft += marginToCenter
+                } else {
+                    adjMargin =
+                        ((specialModel.beginAt - listFilter[index - 1].endAt) / 1000.0) * thumbnailSize
+                    marginLeft = (adjMargin - (marginItem * index)).toInt()
+                }
+
+                layout.setMargins(marginLeft, marginItem / 4, 0, marginItem / 4)
+
                 linearLayoutViewFilter.mainAddView.layoutParams = layout
-                linearLayoutViewFilter.mainAddView.background =
-                    ContextCompat.getDrawable(context, android.R.color.black)
+                linearLayoutViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
 
                 setUpEventFilterChoose(linearLayoutViewFilter)
                 layoutOfFilter.addView(linearLayoutViewFilter.root)
                 layoutOfFilter.invalidate()
             }
 
-            // Make layout edit is scale
-            val layoutOfDuration = ConstraintLayout.LayoutParams(
-                maxWidthOfDuration,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
-
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+            invalidateWidthOfEditView()
         } catch (e: java.lang.Exception) {
             Timber.e(e)
         }
+    }
+
+    /**
+     * Make edit view is validate
+     */
+    private fun invalidateWidthOfEditView() {
+        // Make layout edit is scale
+        val layoutOfDuration = ConstraintLayout.LayoutParams(
+            maxWidthOfDuration,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
+        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
+
+        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
     }
 
     /**

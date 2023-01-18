@@ -40,7 +40,7 @@
             android:name=".view.pickmedia.MediaPickActivity"
             android:screenOrientation="landscape"
             android:exported="false"
-            tools:ignore="LockedOrientationActivity"></activity>
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>

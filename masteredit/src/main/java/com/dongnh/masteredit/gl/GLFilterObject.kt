@@ -12,8 +12,6 @@ import timber.log.Timber
  */
 open class GLFilterObject() {
 
-    val DEFAULT_UNIFORM_SAMPLER = "inputImageTexture"
-
     companion object {
         val DEFAULT_VERTEX_SHADER = """
         attribute highp vec3 position;
@@ -35,23 +33,25 @@ open class GLFilterObject() {
         }
         
         """.trimIndent()
+
+        private val VERTICES_DATA = floatArrayOf( // X, Y, Z, U, V
+            -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, 0.0f, 1.0f, 0.0f
+        )
+
+        const val FLOAT_SIZE_BYTES = 4
+        const val VERTICES_DATA_POS_SIZE = 3
+        const val VERTICES_DATA_UV_SIZE = 2
+        const val VERTICES_DATA_STRIDE_BYTES =
+            (VERTICES_DATA_POS_SIZE + VERTICES_DATA_UV_SIZE) * FLOAT_SIZE_BYTES
+        const val VERTICES_DATA_POS_OFFSET = 0 * FLOAT_SIZE_BYTES
+        const val VERTICES_DATA_UV_OFFSET =
+            VERTICES_DATA_POS_OFFSET + VERTICES_DATA_POS_SIZE * FLOAT_SIZE_BYTES
+
+        const val DEFAULT_UNIFORM_SAMPLER = "inputImageTexture"
     }
-
-    private val VERTICES_DATA = floatArrayOf( // X, Y, Z, U, V
-        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 0.0f, 1.0f, 0.0f
-    )
-
-    private val FLOAT_SIZE_BYTES = 4
-    protected val VERTICES_DATA_POS_SIZE = 3
-    protected val VERTICES_DATA_UV_SIZE = 2
-    protected val VERTICES_DATA_STRIDE_BYTES =
-        (VERTICES_DATA_POS_SIZE + VERTICES_DATA_UV_SIZE) * FLOAT_SIZE_BYTES
-    protected val VERTICES_DATA_POS_OFFSET = 0 * FLOAT_SIZE_BYTES
-    protected val VERTICES_DATA_UV_OFFSET =
-        VERTICES_DATA_POS_OFFSET + VERTICES_DATA_POS_SIZE * FLOAT_SIZE_BYTES
 
     var vertexShaderSource: String? = null
     var fragmentShaderSource: String? = null

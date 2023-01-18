@@ -27,7 +27,8 @@
         <activity
             android:name=".view.main.MainActivity"
             android:exported="true"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,8 +39,8 @@
         <activity
             android:name=".view.pickmedia.MediaPickActivity"
             android:screenOrientation="landscape"
-            android:exported="false">
-        </activity>
+            android:exported="false"
+            tools:ignore="LockedOrientationActivity"></activity>
     </application>
 
 </manifest>

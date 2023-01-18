@@ -224,6 +224,10 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity.dialogTool.alertDialog?.dismiss()
                         Timber.e("New filter duration , start : ${itemSpecial.beginAt}, end :  ${itemSpecial.endAt}")
                         this@MainActivity.mainBinding.viewTimeLine.drawItemFilter(itemSpecial)
+
+                        // Clone item
+                        val cloneSpecial = SpecialModel().cloneItem(itemSpecial)
+                        this@MainActivity.managerPlayerControl.addSpecialToPreview(cloneSpecial)
                     }
                 }
 

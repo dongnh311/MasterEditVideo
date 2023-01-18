@@ -102,8 +102,10 @@ class VideoPlayerControl(context: Context) {
 
                 // Set volume for exo when play next
                 CoroutineScope(Dispatchers.Main).launch {
-                    exoManager.exoPlayer.volume =
-                        mediaModels[this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex + 1].volume / 100.0F
+                    if (this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex < this@VideoPlayerControl.mediaModels.size - 1) {
+                        exoManager.exoPlayer.volume =
+                            mediaModels[this@VideoPlayerControl.exoManager.exoPlayer.currentMediaItemIndex + 1].volume / 100.0F
+                    }
                 }
             }
 

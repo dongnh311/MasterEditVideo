@@ -65,6 +65,7 @@ class ManagerPlayerMedia(private val context: Context,
         preViewLayoutControl.initViewSizeToView()
         // Add view to player
         frameLayout.addView(preViewLayoutControl.preview())
+        specialPlayControl.configToPreview(preViewLayoutControl.preview())
     }
 
     /**
@@ -144,6 +145,10 @@ class ManagerPlayerMedia(private val context: Context,
             this@ManagerPlayerMedia.durationOfVideoProject += (mediaObject.endAt - mediaObject.beginAt)
         }
 
+        // Set max progress for special handle
+        this@ManagerPlayerMedia.specialPlayControl.durationOfProject =
+            this@ManagerPlayerMedia.durationOfVideoProject
+
         // Add music
         if (this@ManagerPlayerMedia.lisMusicAdded.isNotEmpty()) {
             val copyList = mutableListOf<MusicModel>()
@@ -214,26 +219,15 @@ class ManagerPlayerMedia(private val context: Context,
      * Seek video to duration
      */
     fun seekVideoDuration(duration: Long) {
-        // If start of video
-        if (duration == 0L) {
-            if (videoPlayerControl == null) {
-                return
-            }
-            this@ManagerPlayerMedia.durationPlayed = 0L
-            this@ManagerPlayerMedia.videoPlayerControl?.seekTo(0L)
-            this@ManagerPlayerMedia.listMusicPlayer.forEach {
-                it.seekMusicToDuration(0L)
-            }
-        } else {
-            if (videoPlayerControl == null) {
-                return
-            }
-            this@ManagerPlayerMedia.durationPlayed = duration
-            this@ManagerPlayerMedia.videoPlayerControl?.seekTo(duration)
-            this@ManagerPlayerMedia.listMusicPlayer.forEach {
-                it.seekMusicToDuration(duration)
-            }
+        if (videoPlayerControl == null) {
+            return
         }
+        this@ManagerPlayerMedia.durationPlayed = duration
+        this@ManagerPlayerMedia.videoPlayerControl?.seekTo(duration)
+        this@ManagerPlayerMedia.listMusicPlayer.forEach {
+            it.seekMusicToDuration(duration)
+        }
+        this@ManagerPlayerMedia.specialPlayControl.playingVideo(duration)
     }
 
     /**

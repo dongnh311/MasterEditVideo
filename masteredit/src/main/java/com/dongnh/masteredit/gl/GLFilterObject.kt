@@ -2,6 +2,7 @@ package com.dongnh.masteredit.gl
 
 import android.opengl.GLES20
 import com.dongnh.masteredit.utils.glutils.EglUtil
+import timber.log.Timber
 
 /**
  * Project : MasterEditVideo
@@ -206,7 +207,12 @@ open class GLFilterObject() {
         if (location == -1) {
             location = GLES20.glGetUniformLocation(programCurrent, name)
         }
-        check(location != -1) { "Could not get attrib or uniform location for $name" }
+        try {
+            check(location != -1) { "Could not get attrib or uniform location for $name" }
+        } catch (e: java.lang.Exception) {
+            Timber.e(e)
+            return -1
+        }
         handleMap[name] = Integer.valueOf(location)
         return location
     }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import com.dongnh.masteredit.gl.GLFilterObject
+import com.dongnh.masteredit.model.SpecialModel
 import java.nio.ByteBuffer
 
 /**
@@ -65,6 +66,7 @@ class GLBaseFilterObject(private val context: Context, private var pathImage: St
     private var bitmap: Bitmap? = null
     private val textures = IntArray(1)
     private var filterTextureId = -1
+    var specialModel: SpecialModel? = null
 
     init {
         this@GLBaseFilterObject.vertexShaderSource = VERTEX_SHADER_LUT
@@ -123,12 +125,6 @@ class GLBaseFilterObject(private val context: Context, private var pathImage: St
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE3)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, filterTextureId)
-    }
-
-    // For image
-    override fun setup() {
-        deleteTextureId()
-        initTextureView()
     }
 
     /**

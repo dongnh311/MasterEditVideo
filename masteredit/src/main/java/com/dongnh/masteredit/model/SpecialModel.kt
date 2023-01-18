@@ -25,4 +25,21 @@ class SpecialModel {
     var duration: Long = -1
 
     var isChoose = false
+
+    var isAdded = false
+
+    fun cloneItem(inputItem: SpecialModel): SpecialModel {
+        val itemClone = SpecialModel()
+        itemClone.id = inputItem.id
+        itemClone.name = inputItem.name
+        itemClone.type = inputItem.type
+        itemClone.thumbnail = inputItem.thumbnail
+        itemClone.beginAt = inputItem.beginAt
+        itemClone.endAt = inputItem.endAt
+        itemClone.lut = inputItem.lut
+        itemClone.intensity = inputItem.intensity
+        itemClone.duration = inputItem.duration
+        itemClone.isChoose = inputItem.isChoose
+        return itemClone
+    }
 }

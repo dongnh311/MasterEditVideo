@@ -9,6 +9,10 @@ import com.dongnh.masteredit.filter.GLGammaFilterObject
 import com.dongnh.masteredit.gl.GLFilterGroupObject
 import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.masteredit.view.GLPlayerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Project : MasterEditVideo
@@ -32,6 +36,9 @@ class SpecialPlayControl(private val context: Context) {
     // Make adj filters
     private val groupFilterAdjusts: MutableList<SpecialModel> = mutableListOf()
 
+    // List GL created
+    private val listFilterAdded: MutableList<GLBaseFilterObject> = mutableListOf()
+
     // Init all default filter
     private val filterBrightness = GLBrightnessFilterObject()
     private val filterContrast = GLContrastFilterObject()
@@ -49,6 +56,14 @@ class SpecialPlayControl(private val context: Context) {
                 filterGrammar
             )
         )
+    }
+
+    /**
+     * Config preview
+     */
+    fun configToPreview(glPlayerView: GLPlayerView) {
+        this@SpecialPlayControl.glPlayerView = glPlayerView
+        glPlayerView.addFilterRender(groupFilterDefault)
     }
 
     /**
@@ -77,6 +92,19 @@ class SpecialPlayControl(private val context: Context) {
                 groupFilterAdjusts.removeAt(indexToRemove)
             }
         }
+
+        var indexToRemove = -1
+        listFilterAdded.forEachIndexed { index, glFilter ->
+            if (glFilter.specialModel?.id == specialModel.id && glFilter.specialModel?.beginAt == specialModel.beginAt && glFilter.specialModel?.endAt == specialModel.endAt) {
+                indexToRemove = index
+                return@forEachIndexed
+            }
+        }
+
+        // Remove if find
+        if (indexToRemove >= 0) {
+            listFilterAdded.removeAt(indexToRemove)
+        }
     }
 
     /**
@@ -90,10 +118,11 @@ class SpecialPlayControl(private val context: Context) {
             return
         }
 
+        // Add item to draw
         groupFilterAdjusts.forEach {
             when (it.type) {
                 SPECIAL_TYPE_FILTER -> {
-                    if (it.beginAt >= durationPlaying && it.endAt < durationPlaying) {
+                    if (it.beginAt <= durationPlaying && it.endAt > durationPlaying) {
                         // Add filter
                         handleFilter(true, it)
 
@@ -115,7 +144,6 @@ class SpecialPlayControl(private val context: Context) {
 
                 }
             }
-
         }
     }
 
@@ -124,13 +152,54 @@ class SpecialPlayControl(private val context: Context) {
      */
     private fun handleFilter(isAdd: Boolean, specialModel: SpecialModel) {
         if (isAdd) {
-            val glBaseFilterObject =
-                GLBaseFilterObject(this@SpecialPlayControl.context, specialModel.lut)
-            glBaseFilterObject.intensity = specialModel.intensity
-            groupFilterDefault.filters.add(glBaseFilterObject)
-            glPlayerView?.addFilterRender(groupFilterDefault)
+            if (!specialModel.isAdded) {
+                specialModel.isAdded = true
+
+                var glBaseFilterObject: GLBaseFilterObject? = null
+                listFilterAdded.forEach { glFilter ->
+                    if (glFilter.specialModel?.id == specialModel.id && glFilter.specialModel?.beginAt == specialModel.beginAt && glFilter.specialModel?.endAt == specialModel.endAt) {
+                        glBaseFilterObject = glFilter
+                        return@forEach
+                    }
+                }
+
+                if (glBaseFilterObject == null) {
+                    // Add new special
+                    glBaseFilterObject =
+                        GLBaseFilterObject(this@SpecialPlayControl.context, specialModel.lut)
+                    glBaseFilterObject?.intensity = specialModel.intensity
+                    glBaseFilterObject?.specialModel = specialModel
+
+                    listFilterAdded.add(glBaseFilterObject!!)
+                }
+
+                // Update view
+                groupFilterDefault.filters.add(glBaseFilterObject)
+                notifyPreviewCreateFilter()
+            }
         } else {
-            groupFilterDefault.filters.removeIf { it is GLBaseFilterObject }
+            if (specialModel.isAdded) {
+                listFilterAdded.forEachIndexed { _, glFilter ->
+                    if (glFilter.specialModel?.id == specialModel.id && glFilter.specialModel?.beginAt == specialModel.beginAt && glFilter.specialModel?.endAt == specialModel.endAt) {
+                        groupFilterDefault.filters.remove(glFilter)
+                        notifyPreviewCreateFilter()
+                        Timber.e("Remove ok")
+                        return@forEachIndexed
+                    }
+                }
+
+                specialModel.isAdded = false
+            }
+        }
+    }
+
+    /**
+     * Add filter to preview
+     */
+    private fun notifyPreviewCreateFilter() {
+        CoroutineScope(Dispatchers.Default).launch {
+            glPlayerView?.addFilterRender(groupFilterDefault)
+            glPlayerView?.requestRender()
         }
     }
 }

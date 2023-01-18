@@ -61,4 +61,6 @@
     <color name="colorBorderHome">#EFF1F4</color>
 
     <color name="colorTextTab">#7F8897</color>
+
+    <color name="colorFilterTrack">#3033b5e5</color>
 </resources>

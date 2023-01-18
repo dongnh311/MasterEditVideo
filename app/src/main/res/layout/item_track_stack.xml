@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/main_add_view"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -19,6 +19,6 @@
             android:layout_width="@dimen/common_app_width_stroke_0dp"
             android:layout_height="@dimen/button_height_45dp" />
 
-    </LinearLayout>
+    </FrameLayout>
 
 </layout>

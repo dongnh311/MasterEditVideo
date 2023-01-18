@@ -27,6 +27,7 @@ import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
 import com.dongnh.mastereditvideo.databinding.ItemTrackBinding
+import com.dongnh.mastereditvideo.databinding.ItemTrackStackBinding
 import com.dongnh.mastereditvideo.databinding.ItemTrackViewBinding
 import com.dongnh.mastereditvideo.databinding.LayoutTimeLineBinding
 import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
@@ -558,6 +559,25 @@ class TimeLineTrack : FrameLayout {
             layoutOfFilter.orientation = LinearLayout.HORIZONTAL
             layoutOfFilter.gravity = Gravity.START or Gravity.CENTER
 
+            // Create main layout
+            val frameLayoutViewFilter: ItemTrackStackBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_track_stack,
+                null,
+                false
+            )
+
+            // New layout param
+            val layoutParamsOfFilter = LinearLayout.LayoutParams(
+                maxWidthOfDuration,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+
+            frameLayoutViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
+            layoutParamsOfFilter.setMargins(marginToCenter - thumbnailSize + marginItem, 0, 0, 0)
+            layoutOfFilter.addView(frameLayoutViewFilter.root, layoutParamsOfFilter)
+            layoutOfFilter.invalidate()
+
             listFilter.forEachIndexed { index, specialModel ->
                 // Create main layout
                 val linearLayoutViewFilter: ItemTrackBinding = DataBindingUtil.inflate(
@@ -566,9 +586,6 @@ class TimeLineTrack : FrameLayout {
                     null,
                     false
                 )
-
-                linearLayoutViewFilter.mainAddView.orientation = LinearLayout.HORIZONTAL
-                linearLayoutViewFilter.mainAddView.gravity = Gravity.START or Gravity.CENTER
 
                 var duration = specialModel.endAt - specialModel.beginAt
                 if (duration <= 0) {
@@ -591,7 +608,7 @@ class TimeLineTrack : FrameLayout {
                 viewColor.outlineProvider = ViewOutlineProvider.BACKGROUND
 
                 val viewLayout =
-                    LinearLayout.LayoutParams(
+                    LayoutParams(
                         widthOfItem.roundToInt(),
                         LinearLayout.LayoutParams.MATCH_PARENT
                     )
@@ -599,7 +616,7 @@ class TimeLineTrack : FrameLayout {
                 viewColor.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        android.R.color.holo_blue_light
+                        R.color.colorFilterTrack
                     )
                 )
                 viewColor.layoutParams = viewLayout
@@ -620,24 +637,21 @@ class TimeLineTrack : FrameLayout {
                     LinearLayout.LayoutParams.MATCH_PARENT
                 )
 
-                var adjMargin = (specialModel.beginAt / 1000.0) * thumbnailSize
-                var marginLeft = (adjMargin - (thumbnailSize) + marginItem).toInt()
-                if (index == 0) {
-                    marginLeft += marginToCenter
-                } else {
-                    adjMargin =
-                        ((specialModel.beginAt - listFilter[index - 1].endAt) / 1000.0) * thumbnailSize
-                    marginLeft = (adjMargin - (marginItem * index)).toInt()
+                var adjMargin = (specialModel.beginAt / 1000.0) * thumbnailSize - marginItem
+                if (adjMargin < 0) {
+                    adjMargin = 0.0
                 }
 
-                layout.setMargins(marginLeft, marginItem / 4, 0, marginItem / 4)
+                layout.setMargins(adjMargin.roundToInt(), marginItem / 4, 0, marginItem / 4)
 
                 linearLayoutViewFilter.mainAddView.layoutParams = layout
                 linearLayoutViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
 
                 setUpEventFilterChoose(linearLayoutViewFilter)
-                layoutOfFilter.addView(linearLayoutViewFilter.root)
-                layoutOfFilter.invalidate()
+
+                // Parent add
+                frameLayoutViewFilter.mainAddView.addView(linearLayoutViewFilter.root)
+                frameLayoutViewFilter.mainAddView.invalidate()
             }
 
             invalidateWidthOfEditView()

@@ -26,6 +26,7 @@ import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
 import com.dongnh.mastereditvideo.utils.dialog.DialogTool
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
+import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
 import com.dongnh.mastereditvideo.utils.interfaces.*
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
@@ -71,6 +72,9 @@ class MainActivity : AppCompatActivity() {
     private val dialogTool by lazy {
         DialogTool(this@MainActivity)
     }
+
+    // Duration of effect
+    private var durationSpecial = 0L
 
     // Request permission for storage
     private val requestPermissionLauncherStorage =
@@ -192,17 +196,43 @@ class MainActivity : AppCompatActivity() {
 
         // Open tool
         mainBinding.btnTool.setOnClickListener {
+            // Pause if it is playing
+            this@MainActivity.setupButtonPause()
+
+            // Show dialog
             dialogTool.showDialogTool(object : OnSpecialItemListener {
                 override fun onItemSpecialTouchDown(itemSpecial: SpecialModel, position: Int) {
-                    Timber.e("Main onItemSpecialTouchDown")
+                    if (isNotItemNone(itemSpecial)) {
+                        // Make start time
+                        itemSpecial.beginAt = this@MainActivity.managerPlayerControl.durationPlayed
+
+                        // Play
+                        if (!this@MainActivity.isPlaying) {
+                            this@MainActivity.setupButtonPlay()
+                        }
+                    }
                 }
 
                 override fun onItemSpecialTouchUp(itemSpecial: SpecialModel, position: Int) {
-                    Timber.e("Main onItemSpecialTouchUp")
+                    if (isNotItemNone(itemSpecial)) {
+                        // Make end time
+                        itemSpecial.endAt = this@MainActivity.managerPlayerControl.durationPlayed
+
+                        // Pause
+                        if (this@MainActivity.isPlaying) {
+                            this@MainActivity.setupButtonPause()
+                        }
+
+                        this@MainActivity.dialogTool.alertDialog?.dismiss()
+                        this@MainActivity.mainBinding.viewTimeLine.drawItemFilter(itemSpecial)
+                    }
                 }
 
                 override fun onItemSpecialClick(itemSpecial: SpecialModel, position: Int) {
-                    Timber.e("Main onItemSpecialClick")
+                    if (!isNotItemNone(itemSpecial)) {
+                        Timber.e("onItemSpecialTouchDown item transparent click")
+                        this@MainActivity.dialogTool.alertDialog?.dismiss()
+                    }
                 }
             })
         }

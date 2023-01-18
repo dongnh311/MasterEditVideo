@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
-import com.dongnh.mastereditvideo.const.CLICK_ACTION_THRESHOLD
 import com.dongnh.mastereditvideo.databinding.ItemSpecialBinding
+import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
 import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 
 /**
@@ -64,25 +64,23 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
             binding.filterName.text = item.name
 
             // Touch
-            binding.parentView.setOnTouchListener { _, event ->
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        onSpecialItemListener?.onItemSpecialTouchDown(item, position)
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        if (event.eventTime - event.downTime < CLICK_ACTION_THRESHOLD) {
-                            onSpecialItemListener?.onItemSpecialClick(item, position)
-                        } else {
+            if (isNotItemNone(item)) {
+                binding.parentView.setOnTouchListener { _, event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            onSpecialItemListener?.onItemSpecialTouchDown(item, position)
+                        }
+                        MotionEvent.ACTION_UP -> {
                             onSpecialItemListener?.onItemSpecialTouchUp(item, position)
                         }
                     }
+                    return@setOnTouchListener true
                 }
-                return@setOnTouchListener true
-            }
-
-            // Click
-            binding.parentView.setOnClickListener {
-                onSpecialItemListener?.onItemSpecialClick(item, position)
+            } else {
+                // Click
+                binding.parentView.setOnClickListener {
+                    onSpecialItemListener?.onItemSpecialClick(item, position)
+                }
             }
         }
     }

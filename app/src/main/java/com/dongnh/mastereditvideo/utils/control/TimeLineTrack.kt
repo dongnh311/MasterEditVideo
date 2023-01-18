@@ -23,6 +23,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
+import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
 import com.dongnh.mastereditvideo.databinding.ItemTrackBinding
@@ -102,6 +103,9 @@ class TimeLineTrack : FrameLayout {
 
     // List Music
     private val listMusics = mutableListOf<MusicModel>()
+
+    // List Filter
+    private val listFilter = mutableListOf<SpecialModel>()
 
     // Lister
     var onItemMediaChoose: OnItemMediaChoose? = null
@@ -268,6 +272,7 @@ class TimeLineTrack : FrameLayout {
     fun clearAllMediaAdded() {
         this@TimeLineTrack.listMedia.clear()
         this@TimeLineTrack.listMusics.clear()
+        this@TimeLineTrack.listFilter.clear()
         this@TimeLineTrack.totalThumbnailCreated = 0
 
         // Re draw timeline
@@ -303,6 +308,8 @@ class TimeLineTrack : FrameLayout {
 
         // Draw track
         drawTrackToView()
+
+        drawItemFilter(null)
 
         // draw music
         if (listMusics.isNotEmpty()) {
@@ -414,7 +421,7 @@ class TimeLineTrack : FrameLayout {
             setUpEventLickChooseMedia(linearLayoutAddThumb)
             linearLayoutAddThumb.mainAddView.setBackgroundResource(R.drawable.bg_media_normal)
 
-            layoutOfTrack.addView(linearLayoutAddThumb.mainAddView)
+            layoutOfTrack.addView(linearLayoutAddThumb.root)
             layoutOfTrack.requestLayout()
         }
     }
@@ -545,6 +552,93 @@ class TimeLineTrack : FrameLayout {
             this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
         } catch (ex: java.lang.Exception) {
             Timber.e(ex)
+        }
+    }
+
+    /**
+     * Draw filter to track
+     */
+    fun drawItemFilter(item: SpecialModel?) {
+        item?.let { listFilter.add(it) }
+
+        // Draw
+        try {
+            // Remove all view first
+            val layoutOfFilter: LinearLayout =
+                this@TimeLineTrack.itemTimeLineBinding.layoutEdit[1] as LinearLayout
+            layoutOfFilter.removeAllViews()
+            layoutOfFilter.requestLayout()
+
+            layoutOfFilter.orientation = LinearLayout.HORIZONTAL
+            layoutOfFilter.gravity = Gravity.START or Gravity.CENTER
+
+            listFilter.forEachIndexed { index, specialModel ->
+                // Create main layout
+                val linearLayoutViewFilter: ItemTrackBinding = DataBindingUtil.inflate(
+                    LayoutInflater.from(context),
+                    R.layout.item_track,
+                    null,
+                    false
+                )
+
+                linearLayoutViewFilter.mainAddView.orientation = LinearLayout.HORIZONTAL
+                linearLayoutViewFilter.mainAddView.gravity = Gravity.START or Gravity.CENTER
+
+                var duration = specialModel.endAt - specialModel.beginAt
+                if (duration <= 0) {
+                    duration = 1
+                }
+                val widthOfItem = (duration / 1000.0) * thumbnailSize
+                val viewColor = ImageView(context)
+                val viewLayout =
+                    LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                    )
+
+                viewColor.background =
+                    ContextCompat.getDrawable(context, android.R.color.holo_blue_light)
+                viewColor.layoutParams = viewLayout
+
+                // Make it not click
+                linearLayoutViewFilter.mainAddView.tag = 1
+
+                // Add view color to preview
+                linearLayoutViewFilter.mainAddView.addView(viewColor)
+                linearLayoutViewFilter.mainAddView.invalidate()
+                linearLayoutViewFilter.mainAddView.requestLayout()
+
+                linearLayoutViewFilter.viewIndex.tag = index
+                linearLayoutViewFilter.viewObject.tag = specialModel
+
+                // Set margin for item
+                val layout = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+
+                layout.setMargins(0, currentDurationInView.toInt(), 0, 0)
+                linearLayoutViewFilter.mainAddView.layoutParams = layout
+                linearLayoutViewFilter.mainAddView.background =
+                    ContextCompat.getDrawable(context, android.R.color.black)
+
+                setUpEventFilterChoose(linearLayoutViewFilter)
+                layoutOfFilter.addView(linearLayoutViewFilter.root)
+                layoutOfFilter.invalidate()
+            }
+
+            // Make layout edit is scale
+            val layoutOfDuration = ConstraintLayout.LayoutParams(
+                maxWidthOfDuration,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
+
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+        } catch (e: java.lang.Exception) {
+            Timber.e(e)
         }
     }
 
@@ -693,6 +787,27 @@ class TimeLineTrack : FrameLayout {
                 childViewMusic.mainAddView.setBackgroundResource(android.R.color.transparent)
                 onItemMediaChoose?.onItemMediaCancel(
                     childViewMusic.viewIndex.tag as Int
+                )
+            }
+        }
+    }
+
+    /**
+     * Change color if need
+     */
+    private fun setUpEventFilterChoose(childViewFilter: ItemTrackBinding) {
+        childViewFilter.mainAddView.setOnClickListener {
+            if (childViewFilter.mainAddView.tag == null || childViewFilter.mainAddView.tag == 0) {
+                childViewFilter.mainAddView.tag = 1
+                childViewFilter.mainAddView.setBackgroundResource(R.drawable.bg_media_click)
+                onItemMediaChoose?.onItemSpecialChoose(
+                    childViewFilter.viewIndex.tag as Int
+                )
+            } else {
+                childViewFilter.mainAddView.tag = 0
+                childViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
+                onItemMediaChoose?.onItemSpecialChoose(
+                    childViewFilter.viewIndex.tag as Int
                 )
             }
         }

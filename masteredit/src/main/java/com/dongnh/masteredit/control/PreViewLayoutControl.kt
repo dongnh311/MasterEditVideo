@@ -59,7 +59,7 @@ class PreViewLayoutControl(context: Context) {
 
         // Using group for add all
         val glFilterGroup = GLFilterGroupObject(
-            listOf(
+            mutableListOf(
                 filterBrightness,
                 filterContrast,
                 filterGrammar
@@ -88,7 +88,7 @@ class PreViewLayoutControl(context: Context) {
         listFilterAdded.add(glFilterObject)
 
         val filterGroup = GLFilterGroupObject(
-            listOf(
+            mutableListOf(
                 filterBrightness,
                 filterContrast,
                 filterGrammar,

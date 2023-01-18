@@ -33,13 +33,10 @@ class ManagerPlayerMedia(private val context: Context,
 ) {
 
     // Duration in total played
-    private var durationPlayed = 0L
+    var durationPlayed = 0L
 
     // Max duration of video project
     var durationOfVideoProject = 0L
-
-    // Position duration
-    private var currentDurationPlayer = 0L
 
     // List media
     private var listMediaAdded: MutableList<MediaModel> = mutableListOf()
@@ -111,12 +108,12 @@ class ManagerPlayerMedia(private val context: Context,
                 Timber.e(error)
             }?.onEach { adjDurationPlayed ->
                 videoEventLister?.onPlayWithProgress(adjDurationPlayed)
-                this@ManagerPlayerMedia.currentDurationPlayer += adjDurationPlayed
+                this@ManagerPlayerMedia.durationPlayed += adjDurationPlayed
 
                 // Make filter run on play
-                this@ManagerPlayerMedia.specialPlayControl.playingVideo(this@ManagerPlayerMedia.currentDurationPlayer)
+                this@ManagerPlayerMedia.specialPlayControl.playingVideo(this@ManagerPlayerMedia.durationPlayed)
 
-                if ((adjDurationPlayed + currentDurationPlayer) == this@ManagerPlayerMedia.durationOfVideoProject) {
+                if ((adjDurationPlayed + durationPlayed) == this@ManagerPlayerMedia.durationOfVideoProject) {
                     Timber.e("Play end of all")
                     CoroutineScope(Dispatchers.Main).launch {
                         videoEventLister?.onPlayOverEnd()

@@ -16,7 +16,7 @@ class CircleOpenTransition(private val context: Context) :
     var opening = true
 
     override fun getDrawer() {
-        drawer = context?.let { CircleOpenTransDrawer(it) }
+        drawer = context.let { CircleOpenTransDrawer(it) }
     }
 
     override fun setDrawerParams() {

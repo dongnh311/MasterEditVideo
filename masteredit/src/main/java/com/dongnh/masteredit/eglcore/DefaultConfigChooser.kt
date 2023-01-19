@@ -80,29 +80,29 @@ open class DefaultConfigChooser : GLSurfaceView.EGLConfigChooser {
 
     //////////////////////////////////////////////////////////////////////////
     override fun chooseConfig(egl: EGL10, display: EGLDisplay?): EGLConfig {
-        // 要求されている仕様から使用可能な構成の数を抽出します。
-        val num_config = IntArray(1)
+        // Extract the number of available configurations from the requested spec.
+        val numConfig = IntArray(1)
         require(
             egl.eglChooseConfig(
                 display,
                 configSpec,
                 null,
                 0,
-                num_config
+                numConfig
             )
         ) { "eglChooseConfig failed" }
-        val config_size = num_config[0]
-        require(config_size > 0) { "No configs match configSpec" }
+        val configSize = numConfig[0]
+        require(configSize > 0) { "No configs match configSpec" }
 
-        // 実際の構成を抽出します。
-        val configs = arrayOfNulls<EGLConfig>(config_size)
+        // Extract the actual configuration.
+        val configs = arrayOfNulls<EGLConfig>(configSize)
         require(
             egl.eglChooseConfig(
                 display,
                 configSpec,
                 configs,
-                config_size,
-                num_config
+                configSize,
+                numConfig
             )
         ) { "eglChooseConfig#2 failed" }
         return chooseConfig(egl, display!!, configs)

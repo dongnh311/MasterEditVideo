@@ -279,10 +279,6 @@ class PickMusicFragment: BottomSheetDialogFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     override fun onPause() {
         super.onPause()
         this@PickMusicFragment.mediaPlayer.pause()

@@ -19,7 +19,7 @@ class AngularTransition(private val context: Context) :
     }
 
     override fun getDrawer() {
-        drawer = context?.let { AngularTransDrawer(it) }
+        drawer = context.let { AngularTransDrawer(it) }
     }
 
     override fun setDrawerParams() {

@@ -9,9 +9,9 @@ import com.dongnh.masteredit.base.AbstractDrawerTransition
  * Discord: BM Dong(9521)
  * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
  */
-class PinWheelTransDrawer(private val context: Context) : AbstractDrawerTransition(context) {
+class PinWheelTransDrawer(context: Context) : AbstractDrawerTransition(context) {
 
-    override fun getTransitionShader() {
+    override fun getTransitionShader(context: Context) {
         transitionShader = PinWheelTransShader(context)
     }
 

@@ -239,6 +239,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         // Transition add
                         Timber.e("We have transition : ${itemSpecial.id}")
+                        this@MainActivity.dialogTool.alertDialog?.dismiss()
                     }
                 }
             })

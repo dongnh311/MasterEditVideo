@@ -167,11 +167,13 @@ class SpecialPlayControl(private val context: Context) {
                 }
                 SPECIAL_TYPE_TRANSITION -> {
                     if (it.beginAt <= durationPlaying && it.endAt > durationPlaying) {
-                        // Add filter
+                        val progress =
+                            1.0f - ((2000 - (durationPlaying - it.beginAt).toFloat() * 1.0f) / 2000)
+                        // Add transition
                         handleTransition(
                             true,
                             it,
-                            1.0f - ((durationPlaying - it.beginAt).toFloat() * 1.0f / 2000)
+                            progress
                         )
                     } else {
                         // Remove filter
@@ -260,6 +262,17 @@ class SpecialPlayControl(private val context: Context) {
                 // Update view
                 abstractTransition!!.progress = progress
                 notifyTransitionChange(abstractTransition)
+            } else {
+                // Update progress view
+                var abstractTransition: AbstractTransition? = null
+                listTransitionAdded.forEach { transition ->
+                    if (transition.specialModel?.id == specialModel.id && transition.specialModel?.beginAt == specialModel.beginAt && transition.specialModel?.endAt == specialModel.endAt) {
+                        abstractTransition = transition
+                        abstractTransition!!.progress = progress
+                        notifyTransitionChange(abstractTransition)
+                        return@forEach
+                    }
+                }
             }
         } else {
             if (specialModel.isAdded) {

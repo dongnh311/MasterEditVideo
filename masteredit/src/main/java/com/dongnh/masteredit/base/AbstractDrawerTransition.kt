@@ -15,6 +15,7 @@ import java.nio.FloatBuffer
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
+@Suppress("LeakingThis")
 abstract class AbstractDrawerTransition(private var context: Context) {
 
     companion object {
@@ -31,7 +32,7 @@ abstract class AbstractDrawerTransition(private var context: Context) {
 
     init {
         vertexShader = TransitionMainVertexShader(context)
-        getTransitionShader()
+        getTransitionShader(context)
         transitionShader?.getShaderId()?.let { loadProgram(vertexShader!!.getShaderId(), it) }
         vertexShader?.initLocation(programId)
         transitionShader?.initLocation(programId)
@@ -130,5 +131,5 @@ abstract class AbstractDrawerTransition(private var context: Context) {
         transitionShader = null
     }
 
-    protected abstract fun getTransitionShader()
+    protected abstract fun getTransitionShader(context: Context)
 }

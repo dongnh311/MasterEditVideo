@@ -249,7 +249,7 @@ class ManagerPlayerMedia(private val context: Context,
                     durationOfMedia += mediaModel.endAt - mediaModel.beginAt
                     if (index < this@ManagerPlayerMedia.listMediaAdded.size - 1) {
                         val specialModel = SpecialModel()
-                        specialModel.id = ITEM_TRANSITION_NONE
+                        specialModel.id = 600004 // TODO : For test
                         specialModel.type = SPECIAL_TYPE_TRANSITION
                         specialModel.indexBefore = index
                         specialModel.indexNext = index + 1

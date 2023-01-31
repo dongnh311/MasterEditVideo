@@ -8,10 +8,10 @@ import com.dongnh.masteredit.base.AbstractDrawerTransition
  * Discord: BM Dong(9521)
  * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
  */
-class FadeTransDrawer(private val context: Context) :
+class FadeTransDrawer(context: Context) :
     AbstractDrawerTransition(context) {
 
-    override fun getTransitionShader() {
+    override fun getTransitionShader(context: Context) {
         transitionShader = FadeTransShader(context)
     }
 }

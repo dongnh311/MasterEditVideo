@@ -150,7 +150,9 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         matrix = android.graphics.Matrix()
         matrix.postTranslate(this@GLPlayerRenderer.width / 2f, this@GLPlayerRenderer.height / 2f)
 
+        // Init transition
         if (transitionDraw != null) {
+            transitionDraw?.initTextureId(textureId)
             transitionDraw?.initTextureOutput(width, height)
             transitionDraw?.initDrawSize(top = height, left = 0, bottom = 0, right = width)
         }
@@ -296,7 +298,6 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
 
         // Transition draw
         if (transitionDraw != null) {
-            transitionDraw?.initTextureId(textureId)
             transitionDraw?.exec()
         }
     }

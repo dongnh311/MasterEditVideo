@@ -37,7 +37,7 @@ abstract class AbstractTransition(
     private var outputWidth = 0
     private var outputHeight = 0
 
-    private val offScreenTextureIds = IntArray(1)
+    private val offScreenTextureIds = IntArray(2)
 
     fun initTextureOutput(width: Int, height: Int) {
         this@AbstractTransition.outputWidth = width
@@ -91,25 +91,25 @@ abstract class AbstractTransition(
     }
 
     open fun exec() {
-        if (textureOutput != -1) {
+        if (textureInput != -1) {
             if (drawer == null) {
                 getDrawer()
             }
             drawer?.setProgress(progress)
+            Timber.e("Progress of transition : $progress")
             setDrawerParams()
 
             drawer?.draw(
+                offScreenTextureIds[1],
                 textureInput,
-                textureOutput,
                 renderLeft,
-                renderTop,
+                renderBottom,
                 renderRight,
-                renderBottom
+                renderTop
             )
         } else {
-            Timber.e("Output screen for transition is null")
+            Timber.e("Input screen for transition is null")
         }
-
     }
 
     open fun checkRational(): Boolean {

@@ -7,7 +7,7 @@ import com.dongnh.masteredit.transition.draw.TransitionMainFragmentShader
 /**
  * Created by DongNH on 2/3/21.
  * Discord: BM Dong(9521)
- * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
+ * Email : hoaidongit5@dnkinno.com or hoaidongit5@gmail.com.
  */
 class WipeDownTransShader(context: Context) : TransitionMainFragmentShader() {
     val TRANS_SHADER = "wipeDown.glsl"

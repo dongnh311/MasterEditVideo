@@ -5,9 +5,9 @@ import android.opengl.GLES20
 import com.dongnh.masteredit.transition.draw.TransitionMainFragmentShader
 
 /**
- * Created by DongNH on 2/17/21.
+ * Created by DongNH on 16/01/2023.
  * Discord: BM Dong(9521)
- * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
+ * Email : hoaidongit5@dnkinno.com or hoaidongit5@gmail.com.
  */
 class FadeTransShader(context: Context) : TransitionMainFragmentShader() {
     val TRANS_SHADER = "fade.glsl"

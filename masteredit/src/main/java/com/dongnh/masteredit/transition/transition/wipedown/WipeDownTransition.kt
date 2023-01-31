@@ -7,7 +7,7 @@ import com.dongnh.masteredit.const.TRANS_WIPE_DOWN
 /**
  * Created by DongNH on 2/3/21.
  * Discord: BM Dong(9521)
- * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
+ * Email : hoaidongit5@dnkinno.com or hoaidongit5@gmail.com.
  */
 class WipeDownTransition(private val context: Context) : AbstractTransition(
     WipeDownTransition::class.java.simpleName,

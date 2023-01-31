@@ -5,9 +5,9 @@ import com.dongnh.masteredit.base.AbstractTransition
 import com.dongnh.masteredit.const.TRANS_INVERTED_PAGE_CURL
 
 /**
- * Created by DongNH on 2/17/21.
+ * Created by DongNH on 16/01/2023.
  * Discord: BM Dong(9521)
- * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
+ * Email : hoaidongit5@dnkinno.com or hoaidongit5@gmail.com.
  */
 class InvertedPageCurlTransition(private val context: Context) : AbstractTransition(
     InvertedPageCurlTransition::class.java.simpleName,

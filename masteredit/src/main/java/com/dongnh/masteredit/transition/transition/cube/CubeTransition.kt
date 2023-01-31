@@ -5,9 +5,9 @@ import com.dongnh.masteredit.base.AbstractTransition
 import com.dongnh.masteredit.const.TRANS_CUBE
 
 /**
- * Created by DongNH on 2/17/21.
+ * Created by DongNH on 16/01/2023.
  * Discord: BM Dong(9521)
- * Email : hoaidongit5@brickmate.kr or hoaidongit5@gmail.com.
+ * Email : hoaidongit5@dnkinno.com or hoaidongit5@gmail.com.
  */
 class CubeTransition(private val context: Context) :
     AbstractTransition(CubeTransition::class.java.simpleName, TRANS_CUBE) {

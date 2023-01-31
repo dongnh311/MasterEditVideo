@@ -3,6 +3,7 @@ package com.dongnh.mastereditvideo.utils.control
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.*
@@ -21,6 +22,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.dongnh.masteredit.const.ITEM_TRANSITION_NONE
+import com.dongnh.masteredit.const.SPECIAL_TYPE_TRANSITION
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
 import com.dongnh.masteredit.model.SpecialModel
@@ -45,7 +48,7 @@ import kotlin.math.roundToInt
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-class TimeLineTrack : FrameLayout {
+class TimeLineControl : FrameLayout {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -110,6 +113,9 @@ class TimeLineTrack : FrameLayout {
     // List Filter
     private val listFilter = mutableListOf<SpecialModel>()
 
+    // List Transition
+    private val listTransition = mutableListOf<SpecialModel>()
+
     // Lister
     var onItemMediaChoose: OnItemMediaChoose? = null
 
@@ -130,7 +136,7 @@ class TimeLineTrack : FrameLayout {
      * Init duration view
      */
     private fun initializeViewForDuration() {
-        this@TimeLineTrack.itemTimeLineBinding.layoutDuration.removeAllViews()
+        this@TimeLineControl.itemTimeLineBinding.layoutDuration.removeAllViews()
         val sizeToCreate =
             totalThumbnailCreated * 2 + 1
         for (i in 0 until sizeToCreate) {
@@ -160,7 +166,7 @@ class TimeLineTrack : FrameLayout {
                 layoutParam.setMargins((marginItem) / 2, 0, 0, 0)
             }
 
-            this@TimeLineTrack.itemTimeLineBinding.layoutDuration.addView(
+            this@TimeLineControl.itemTimeLineBinding.layoutDuration.addView(
                 textView, layoutParam
             )
         }
@@ -173,14 +179,14 @@ class TimeLineTrack : FrameLayout {
         )
         layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
 
-        this@TimeLineTrack.itemTimeLineBinding.layoutDuration.layoutParams = layoutOfDuration
-        this@TimeLineTrack.itemTimeLineBinding.layoutDuration.invalidate()
-        this@TimeLineTrack.itemTimeLineBinding.layoutDuration.requestLayout()
+        this@TimeLineControl.itemTimeLineBinding.layoutDuration.layoutParams = layoutOfDuration
+        this@TimeLineControl.itemTimeLineBinding.layoutDuration.invalidate()
+        this@TimeLineControl.itemTimeLineBinding.layoutDuration.requestLayout()
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initializeListener() {
-        this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.setOnTouchListener { _, event ->
+        this@TimeLineControl.itemTimeLineBinding.horizontalScroll.setOnTouchListener { _, event ->
             when (event?.action) {
                 MotionEvent.ACTION_MOVE -> {
                     tempScroll = event.x
@@ -194,7 +200,7 @@ class TimeLineTrack : FrameLayout {
      * Send progress to view
      */
     private fun handelUpdateProgress() {
-        this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.setOnScrollChangeListener { _, scrollX, _, _, _ ->
+        this@TimeLineControl.itemTimeLineBinding.horizontalScroll.setOnScrollChangeListener { _, scrollX, _, _, _ ->
             val durationCalc = (scrollX / (thumbnailSize.toDouble() - (marginItem / 4))) * 1000L
             val durationSeek = durationCalc.toLong()
             if (currentDurationInVideo != durationSeek && !isScrollToStart) {
@@ -211,7 +217,7 @@ class TimeLineTrack : FrameLayout {
      */
     private fun initTimeLineForType() {
         // Add item to view
-        for (i in 0 until 5) {
+        for (i in 0 until 6) {
             val layoutMedia: ItemTrackViewBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(context),
                 R.layout.item_track_view,
@@ -225,16 +231,21 @@ class TimeLineTrack : FrameLayout {
                     layoutMedia.root.id = R.id.track_media
                 }
                 1 -> {
-                    layoutMedia.root.id = R.id.track_effect
+                    layoutMedia.root.id = R.id.track_transition
                 }
                 2 -> {
-                    layoutMedia.root.id = R.id.track_graphy
+                    layoutMedia.root.id = R.id.track_effect
                 }
                 3 -> {
-                    layoutMedia.root.id = R.id.track_filter
+                    layoutMedia.root.id = R.id.track_graphy
                 }
                 4 -> {
+                    layoutMedia.root.id = R.id.track_filter
+                }
+                5 -> {
                     layoutMedia.root.id = R.id.track_music
+                    // Only music is vertical
+                    layoutMedia.mainAddTrack.orientation = LinearLayout.VERTICAL
                 }
                 else -> {
                     layoutMedia.root.id = R.id.track_music
@@ -252,7 +263,7 @@ class TimeLineTrack : FrameLayout {
             val layoutOfChild = LinearLayout.LayoutParams(maxWidthOfDuration, thumbnailSize)
             layoutOfChild.setMargins(0, marginForCurrent, 0, 0)
 
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.addView(
+            this@TimeLineControl.itemTimeLineBinding.layoutEdit.addView(
                 layoutMedia.root, layoutOfChild
             )
         }
@@ -265,16 +276,17 @@ class TimeLineTrack : FrameLayout {
      * Clear all media in view
      */
     fun clearAllMediaAdded() {
-        this@TimeLineTrack.listMedia.clear()
-        this@TimeLineTrack.listMusics.clear()
-        this@TimeLineTrack.listFilter.clear()
-        this@TimeLineTrack.totalThumbnailCreated = 0
+        this@TimeLineControl.listMedia.clear()
+        this@TimeLineControl.listMusics.clear()
+        this@TimeLineControl.listFilter.clear()
+        this@TimeLineControl.listTransition.clear()
+        this@TimeLineControl.totalThumbnailCreated = 0
 
         // Re draw timeline
         initializeViewForDuration()
 
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.removeAllViews()
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.removeAllViews()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.invalidate()
         // Re draw track
         initTimeLineForType()
     }
@@ -283,20 +295,20 @@ class TimeLineTrack : FrameLayout {
      * Add media to view
      */
     fun addMediaAndCreateItemView(listMedia: MutableList<MediaModel>) {
-        this@TimeLineTrack.listMedia.clear()
-        this@TimeLineTrack.listMedia.addAll(listMedia)
-        this@TimeLineTrack.totalDuration = 0
+        this@TimeLineControl.listMedia.clear()
+        this@TimeLineControl.listMedia.addAll(listMedia)
+        this@TimeLineControl.totalDuration = 0
         var totalThumb = 0
-        this@TimeLineTrack.listMedia.forEach {
+        this@TimeLineControl.listMedia.forEach {
             var thumb = (it.mediaDuration / 1000.0).toInt()
             if ((it.mediaDuration - (thumb * 1000.0)) / 1000.0 > adjToPlugThumb) {
                 thumb += 1
             }
             totalThumb += thumb
-            this@TimeLineTrack.totalDuration += (it.endAt - it.beginAt)
+            this@TimeLineControl.totalDuration += (it.endAt - it.beginAt)
         }
 
-        this@TimeLineTrack.totalThumbnailCreated = totalThumb
+        this@TimeLineControl.totalThumbnailCreated = totalThumb
 
         // Re draw timeline
         initializeViewForDuration()
@@ -304,9 +316,30 @@ class TimeLineTrack : FrameLayout {
         // Draw track
         drawTrackToView()
 
+        // Calculator transition
+        this@TimeLineControl.listTransition.clear()
+        if (this@TimeLineControl.listMedia.size > 1) {
+            this@TimeLineControl.listMedia.forEachIndexed { index, media ->
+                if (index < this@TimeLineControl.listMedia.size - 1) {
+                    val specialModel = SpecialModel()
+                    specialModel.id = ITEM_TRANSITION_NONE
+                    specialModel.type = SPECIAL_TYPE_TRANSITION
+                    specialModel.indexBefore = index
+                    specialModel.indexNext = index + 1
+                    specialModel.itemIdBefore = media.mediaId
+                    specialModel.itemIdNext = this@TimeLineControl.listMedia[index + 1].mediaId
+                    this@TimeLineControl.listTransition.add(specialModel)
+                }
+            }
+        }
+
+        // Draw transition
+        drawTransition()
+
+        // Draw filter
         drawItemFilter(null)
 
-        // draw music
+        // Draw music
         if (listMusics.isNotEmpty()) {
             val list = mutableListOf<MusicModel>()
             list.addAll(listMusics)
@@ -320,16 +353,16 @@ class TimeLineTrack : FrameLayout {
     private fun drawTrackToView() {
         // Need reset value
         scrollToStart()
-        this@TimeLineTrack.isScrollToStart = false
+        this@TimeLineControl.isScrollToStart = false
 
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.removeAllViews()
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.removeAllViews()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.invalidate()
         // Re draw track
         initTimeLineForType()
 
         val layoutOfTrack: LinearLayout =
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit[0] as LinearLayout
-        this@TimeLineTrack.listMedia.forEachIndexed { index, mediaObject ->
+            this@TimeLineControl.itemTimeLineBinding.layoutEdit[0] as LinearLayout
+        this@TimeLineControl.listMedia.forEachIndexed { index, mediaObject ->
             // Image thumb
             val timeToGet = calcThumbCanCreateByItem(mediaObject)
 
@@ -422,11 +455,118 @@ class TimeLineTrack : FrameLayout {
     }
 
     /**
+     * Draw transition to view
+     */
+    private fun drawTransition() {
+        val layoutOfTransition: LinearLayout =
+            this@TimeLineControl.itemTimeLineBinding.layoutEdit[1] as LinearLayout
+        layoutOfTransition.orientation = LinearLayout.HORIZONTAL
+        layoutOfTransition.gravity = Gravity.START or Gravity.CENTER
+
+        // Stop if need
+        if (this@TimeLineControl.listTransition.isEmpty()) {
+            return
+        }
+
+        this@TimeLineControl.listTransition.forEachIndexed { index, specialModel ->
+
+            // Create main layout
+            val linearLayoutViewTransition: ItemTrackBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_track,
+                null,
+                false
+            )
+
+            linearLayoutViewTransition.mainAddView.orientation = LinearLayout.HORIZONTAL
+            linearLayoutViewTransition.mainAddView.gravity = Gravity.START
+
+            val imageView = ShapeableImageView(context)
+            val imageLayout =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+
+            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            imageView.visibility = View.VISIBLE
+
+            if (specialModel.id == ITEM_TRANSITION_NONE) {
+                imageView.setImageResource(R.drawable.ic_effect_transition)
+            } else {
+                Glide.with(context)
+                    .load(Uri.parse("file:///android_asset/" + specialModel.thumbnail))
+                    .thumbnail(0.01f)
+                    .into(imageView)
+            }
+
+            imageView.background =
+                ContextCompat.getDrawable(context, android.R.color.transparent)
+
+            imageView.layoutParams = imageLayout
+            imageView.requestLayout()
+
+            imageView.shapeAppearanceModel = imageView.shapeAppearanceModel
+                .toBuilder()
+                .setTopLeftCorner(CornerFamily.ROUNDED, connerImageView)
+                .setBottomLeftCorner(CornerFamily.ROUNDED, connerImageView)
+                .setBottomRightCorner(CornerFamily.ROUNDED, connerImageView)
+                .setTopRightCorner(CornerFamily.ROUNDED, connerImageView)
+                .build()
+
+            imageView.clipToOutline = true
+            imageView.outlineProvider = ViewOutlineProvider.BACKGROUND
+
+            val layoutParamsParent = LinearLayout.LayoutParams(
+                thumbnailSize,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+
+            var totalThumbOfMediaBefore = 0
+            this@TimeLineControl.listMedia.forEachIndexed { indexMedia, mediaModel ->
+                if (indexMedia == specialModel.indexBefore) {
+                    totalThumbOfMediaBefore = calcThumbCanCreateByItem(mediaModel)
+                }
+            }
+
+            var marginLeft =
+                totalThumbOfMediaBefore * thumbnailSize - (thumbnailSize / 2) + (marginItem / 2)
+            // Set margin
+            if (index == 0) {
+                marginLeft += marginToCenter - thumbnailSize + marginItem
+            } else {
+                marginLeft -= (thumbnailSize / 2)
+            }
+            layoutParamsParent.setMargins(marginLeft, 0, 0, 0)
+
+            linearLayoutViewTransition.mainAddView.tag = 1
+            linearLayoutViewTransition.viewIndex.tag = index
+            linearLayoutViewTransition.viewObject.tag = specialModel
+            // Add View
+            linearLayoutViewTransition.mainAddView.addView(imageView)
+
+            // Request layout
+            linearLayoutViewTransition.mainAddView.background =
+                ContextCompat.getDrawable(context, android.R.color.transparent)
+            linearLayoutViewTransition.mainAddView.layoutParams = layoutParamsParent
+            linearLayoutViewTransition.mainAddView.requestLayout()
+
+            // Event click choose
+            setUpEventTransitionChoose(linearLayoutViewTransition)
+
+            layoutOfTransition.addView(linearLayoutViewTransition.root)
+        }
+
+        // Make layout edit is scale
+        invalidateWidthOfEditView()
+    }
+
+    /**
      * Add music
      */
     fun addMusicToTrackView(listMusic: MutableList<MusicModel>) {
-        this@TimeLineTrack.listMusics.clear()
-        this@TimeLineTrack.listMusics.addAll(listMusic)
+        this@TimeLineControl.listMusics.clear()
+        this@TimeLineControl.listMusics.addAll(listMusic)
 
         // Add more line
         for (i in 0 until listMusic.size - 1) {
@@ -441,23 +581,21 @@ class TimeLineTrack : FrameLayout {
             val layoutOfChild = LinearLayout.LayoutParams(maxWidthOfDuration, thumbnailSize)
             layoutOfChild.setMargins(0, marginForCurrent, 0, 0)
 
-            this@TimeLineTrack.itemTimeLineBinding.layoutEdit.addView(
+            this@TimeLineControl.itemTimeLineBinding.layoutEdit.addView(
                 layoutMedia.root, layoutOfChild
             )
-
         }
 
         // Need reset value
         scrollToStart()
-        this@TimeLineTrack.isScrollToStart = false
+        this@TimeLineControl.isScrollToStart = false
 
         try {
-
             // Add music
-            val adjIndex = 4
+            val adjIndex = 5
             listMusic.forEachIndexed { index, musicModel ->
                 val layoutOfMusic: LinearLayout =
-                    this@TimeLineTrack.itemTimeLineBinding.layoutEdit[adjIndex + index] as LinearLayout
+                    this@TimeLineControl.itemTimeLineBinding.layoutEdit[adjIndex + index] as LinearLayout
                 layoutOfMusic.orientation = LinearLayout.VERTICAL
                 layoutOfMusic.gravity = Gravity.START or Gravity.CENTER
 
@@ -552,7 +690,7 @@ class TimeLineTrack : FrameLayout {
         try {
             // Remove all view first
             val layoutOfFilter: LinearLayout =
-                this@TimeLineTrack.itemTimeLineBinding.layoutEdit[1] as LinearLayout
+                this@TimeLineControl.itemTimeLineBinding.layoutEdit[2] as LinearLayout
             layoutOfFilter.removeAllViews()
             layoutOfFilter.invalidate()
 
@@ -670,19 +808,19 @@ class TimeLineTrack : FrameLayout {
             ConstraintLayout.LayoutParams.WRAP_CONTENT
         )
         layoutOfDuration.setMargins(marginToCenter, 0, marginToCenter, 0)
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.layoutParams = layoutOfDuration
 
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.invalidate()
-        this@TimeLineTrack.itemTimeLineBinding.layoutEdit.requestLayout()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.invalidate()
+        this@TimeLineControl.itemTimeLineBinding.layoutEdit.requestLayout()
     }
 
     /**
      * Scroll to start
      */
     fun scrollToStart() {
-        this@TimeLineTrack.isScrollToStart = true
-        this@TimeLineTrack.currentDurationInVideo = 0
-        this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
+        this@TimeLineControl.isScrollToStart = true
+        this@TimeLineControl.currentDurationInVideo = 0
+        this@TimeLineControl.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
             0,
             0
         )
@@ -761,8 +899,8 @@ class TimeLineTrack : FrameLayout {
      */
     fun updateScrollOfMainView() {
         val duration = (thumbnailSize + (marginItem / 4)) / 1000.0 * 10.0
-        this@TimeLineTrack.currentDurationInView += duration
-        this@TimeLineTrack.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
+        this@TimeLineControl.currentDurationInView += duration
+        this@TimeLineControl.itemTimeLineBinding.horizontalScroll.smoothScrollTo(
             (currentDurationInView).toInt(),
             0
         )
@@ -842,6 +980,27 @@ class TimeLineTrack : FrameLayout {
                 childViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
                 onItemMediaChoose?.onItemSpecialChoose(
                     childViewFilter.viewIndex.tag as Int
+                )
+            }
+        }
+    }
+
+    /**
+     * Change color if need
+     */
+    private fun setUpEventTransitionChoose(childViewTransition: ItemTrackBinding) {
+        childViewTransition.mainAddView.setOnClickListener {
+            if (childViewTransition.mainAddView.tag == null || childViewTransition.mainAddView.tag == 0) {
+                childViewTransition.mainAddView.tag = 1
+                childViewTransition.mainAddView.setBackgroundResource(R.drawable.bg_media_click)
+                onItemMediaChoose?.onItemSpecialChoose(
+                    childViewTransition.viewIndex.tag as Int
+                )
+            } else {
+                childViewTransition.mainAddView.tag = 0
+                childViewTransition.mainAddView.setBackgroundResource(android.R.color.transparent)
+                onItemMediaChoose?.onItemSpecialChoose(
+                    childViewTransition.viewIndex.tag as Int
                 )
             }
         }

@@ -341,6 +341,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
         previewTexture?.release()
         filterFramebufferObject?.release()
         transitionDraw?.release()
+        releaseDraw()
     }
 
     /**

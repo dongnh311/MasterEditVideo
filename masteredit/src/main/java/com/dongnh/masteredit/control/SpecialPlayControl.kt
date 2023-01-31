@@ -39,6 +39,9 @@ class SpecialPlayControl(private val context: Context) {
     // List GL created
     private val listFilterAdded: MutableList<GLBaseFilterObject> = mutableListOf()
 
+    // List Transition created
+    private val listTransitionAdded: MutableList<GLBaseFilterObject> = mutableListOf()
+
     // Init all default filter
     private val filterBrightness = GLBrightnessFilterObject()
     private val filterContrast = GLContrastFilterObject()
@@ -81,7 +84,7 @@ class SpecialPlayControl(private val context: Context) {
         if (!result) {
             var indexToRemove = -1
             groupFilterAdjusts.forEachIndexed { index, special ->
-                if (specialModel.id == special.id) {
+                if (specialModel.id == special.id && specialModel.beginAt == special.beginAt && specialModel.endAt == special.endAt) {
                     indexToRemove = index
                     return@forEachIndexed
                 }
@@ -105,6 +108,32 @@ class SpecialPlayControl(private val context: Context) {
         if (indexToRemove >= 0) {
             listFilterAdded.removeAt(indexToRemove)
         }
+    }
+
+    /**
+     * Clear all special added
+     */
+    fun releaseAllGLObjectAdded() {
+        listFilterAdded.forEach {
+            groupFilterDefault.filters.remove(it)
+        }
+        listTransitionAdded.forEach {
+            groupFilterDefault.filters.remove(it)
+        }
+        listFilterAdded.clear()
+        listTransitionAdded.clear()
+        groupFilterAdjusts.clear()
+
+        groupFilterDefault = GLFilterGroupObject(
+            mutableListOf(
+                filterBrightness,
+                filterContrast,
+                filterGrammar
+            )
+        )
+
+        // Make preview remove
+        notifyPreviewCreateFilter()
     }
 
     /**

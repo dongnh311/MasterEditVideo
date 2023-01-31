@@ -2,6 +2,8 @@ package com.dongnh.masteredit.manager
 
 import android.content.Context
 import android.widget.FrameLayout
+import com.dongnh.masteredit.const.ITEM_TRANSITION_NONE
+import com.dongnh.masteredit.const.SPECIAL_TYPE_TRANSITION
 import com.dongnh.masteredit.control.MusicPlayerControl
 import com.dongnh.masteredit.control.PreViewLayoutControl
 import com.dongnh.masteredit.control.SpecialPlayControl
@@ -44,6 +46,9 @@ class ManagerPlayerMedia(private val context: Context,
     // List Music
     private var lisMusicAdded: MutableList<MusicModel> = mutableListOf()
 
+    // List transition
+    private var listTransition: MutableList<SpecialModel> = mutableListOf()
+
     // Handle view
     private val preViewLayoutControl = PreViewLayoutControl(context)
 
@@ -74,6 +79,7 @@ class ManagerPlayerMedia(private val context: Context,
     fun addMediasToPlayerQueue(listMediaModel: MutableList<MediaModel>) {
         releaseAllPlayer()
         clearAllMusicAdded()
+        this@ManagerPlayerMedia.specialPlayControl.releaseAllGLObjectAdded()
         this@ManagerPlayerMedia.listMediaAdded.clear()
         this@ManagerPlayerMedia.listMediaAdded.addAll(listMediaModel)
 
@@ -155,6 +161,9 @@ class ManagerPlayerMedia(private val context: Context,
             copyList.addAll(this@ManagerPlayerMedia.lisMusicAdded)
             addMusicToQueue(copyList)
         }
+
+        // Create transition
+        createOfEditTransition()
     }
 
     /**
@@ -181,6 +190,80 @@ class ManagerPlayerMedia(private val context: Context,
                     addMusicToList(index, musicModel)
                 }
             }
+        }
+    }
+
+    /**
+     * Handle transition create by media
+     */
+    private fun createOfEditTransition() {
+        if (this@ManagerPlayerMedia.listTransition.size != this@ManagerPlayerMedia.listMediaAdded.size - 1) {
+            // Adjust if edit
+            if (this@ManagerPlayerMedia.listTransition.isNotEmpty()) {
+                // Remove item is not correct
+                this@ManagerPlayerMedia.listMediaAdded.forEachIndexed { index, mediaModel ->
+                    var isAdded = false
+                    this@ManagerPlayerMedia.listTransition.forEachIndexed { indexSpec, special ->
+                        if (indexSpec == index) {
+                            // Replace if not mapping
+                            if (special.itemIdBefore != mediaModel.mediaId || special.itemIdNext != this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId) {
+                                val specialModel = SpecialModel()
+                                specialModel.id = ITEM_TRANSITION_NONE
+                                specialModel.type = SPECIAL_TYPE_TRANSITION
+                                specialModel.indexBefore = index
+                                specialModel.indexNext = index + 1
+                                specialModel.itemIdBefore = mediaModel.mediaId
+                                specialModel.itemIdNext =
+                                    this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
+                                specialModel.beginAt = mediaModel.endAt - 1000L
+                                specialModel.endAt = mediaModel.endAt + 1000L
+
+                                this@ManagerPlayerMedia.listTransition[indexSpec] = specialModel
+                            }
+                            isAdded = true
+                        }
+                    }
+                    if (!isAdded) {
+                        if (index < this@ManagerPlayerMedia.listMediaAdded.size - 1) {
+                            val specialModel = SpecialModel()
+                            specialModel.id = ITEM_TRANSITION_NONE
+                            specialModel.type = SPECIAL_TYPE_TRANSITION
+                            specialModel.indexBefore = index
+                            specialModel.indexNext = index + 1
+                            specialModel.itemIdBefore = mediaModel.mediaId
+                            specialModel.itemIdNext =
+                                this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
+                            specialModel.beginAt = mediaModel.endAt - 1000L
+                            specialModel.endAt = mediaModel.endAt + 1000L
+
+                            this@ManagerPlayerMedia.listTransition.add(specialModel)
+                        }
+                    }
+                }
+            } else {
+                // Add new
+                this@ManagerPlayerMedia.listMediaAdded.forEachIndexed { index, mediaModel ->
+                    if (index < this@ManagerPlayerMedia.listMediaAdded.size - 1) {
+                        val specialModel = SpecialModel()
+                        specialModel.id = ITEM_TRANSITION_NONE
+                        specialModel.type = SPECIAL_TYPE_TRANSITION
+                        specialModel.indexBefore = index
+                        specialModel.indexNext = index + 1
+                        specialModel.itemIdBefore = mediaModel.mediaId
+                        specialModel.itemIdNext =
+                            this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
+                        specialModel.beginAt = mediaModel.endAt - 1000L
+                        specialModel.endAt = mediaModel.endAt + 1000L
+
+                        this@ManagerPlayerMedia.listTransition.add(specialModel)
+                    }
+                }
+            }
+        }
+
+        // Update new item to special player
+        this@ManagerPlayerMedia.listTransition.forEach {
+            specialPlayControl.addSpecialToHandlePreview(it)
         }
     }
 

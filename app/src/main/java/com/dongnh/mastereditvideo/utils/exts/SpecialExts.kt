@@ -20,3 +20,10 @@ fun isNotItemNone(specialModel: SpecialModel): Boolean {
             && specialModel.id != ITEM_TRANSITION_NONE
             && specialModel.id != ITEM_SPECIAL_NONE
 }
+
+/**
+ * Check if item is transition
+ */
+fun isTransitionItem(specialModel: SpecialModel): Boolean {
+    return specialModel.id in ITEM_TRANSITION_NONE until ITEM_SPECIAL_NONE
+}

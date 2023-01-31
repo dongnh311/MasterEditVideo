@@ -74,8 +74,8 @@ abstract class GLFrameBufferObjectRenderer : GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         framebufferObject?.getTexName()?.let {
             normalShader?.draw(it, null)
-            listFilter.forEach { glfilter ->
-                glfilter.draw(it, null)
+            listFilter.forEach { glFilter ->
+                glFilter.draw(it, null)
             }
         }
     }

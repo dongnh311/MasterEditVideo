@@ -28,7 +28,7 @@
                     android:layout_width="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginTop="@dimen/common_margin_34dp"
-                    android:weightSum="5"
+                    android:weightSum="6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:gravity="center|start"
@@ -54,6 +54,27 @@
                             android:layout_height="@dimen/image_height_43dp" />
 
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/bottom_transition"
+                        android:padding="@dimen/common_padding_4dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_height="0dp">
+
+                        <ImageButton
+                            android:id="@+id/bottom_btn_transition"
+                            android:layout_width="@dimen/image_height_30dp"
+                            android:src="@drawable/ic_bottom_transition"
+                            android:background="@android:color/transparent"
+                            android:layout_height="@dimen/image_height_43dp" />
+
+                    </LinearLayout>
+
 
                     <LinearLayout
                         android:layout_width="wrap_content"

@@ -4,5 +4,6 @@
     <item name="track_effect" type="id"/>
     <item name="track_graphy" type="id"/>
     <item name="track_filter" type="id"/>
+    <item name="track_transition" type="id" />
     <item name="track_music" type="id"/>
 </resources>

@@ -24,6 +24,12 @@ class SpecialModel {
     // Duration on view
     var duration: Long = -1
 
+    // For transition
+    var indexBefore = -1
+    var indexNext = -1
+    var itemIdBefore = -1
+    var itemIdNext = -1
+
     var isChoose = false
 
     var isAdded = false

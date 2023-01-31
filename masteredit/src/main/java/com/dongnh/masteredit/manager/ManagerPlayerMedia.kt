@@ -200,9 +200,11 @@ class ManagerPlayerMedia(private val context: Context,
         if (this@ManagerPlayerMedia.listTransition.size != this@ManagerPlayerMedia.listMediaAdded.size - 1) {
             // Adjust if edit
             if (this@ManagerPlayerMedia.listTransition.isNotEmpty()) {
+                var durationOfMedia = 0L
                 // Remove item is not correct
                 this@ManagerPlayerMedia.listMediaAdded.forEachIndexed { index, mediaModel ->
                     var isAdded = false
+                    durationOfMedia += mediaModel.endAt - mediaModel.beginAt
                     this@ManagerPlayerMedia.listTransition.forEachIndexed { indexSpec, special ->
                         if (indexSpec == index) {
                             // Replace if not mapping
@@ -215,8 +217,8 @@ class ManagerPlayerMedia(private val context: Context,
                                 specialModel.itemIdBefore = mediaModel.mediaId
                                 specialModel.itemIdNext =
                                     this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
-                                specialModel.beginAt = mediaModel.endAt - 1000L
-                                specialModel.endAt = mediaModel.endAt + 1000L
+                                specialModel.beginAt = durationOfMedia - 1000L
+                                specialModel.endAt = durationOfMedia + 1000L
 
                                 this@ManagerPlayerMedia.listTransition[indexSpec] = specialModel
                             }
@@ -233,8 +235,8 @@ class ManagerPlayerMedia(private val context: Context,
                             specialModel.itemIdBefore = mediaModel.mediaId
                             specialModel.itemIdNext =
                                 this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
-                            specialModel.beginAt = mediaModel.endAt - 1000L
-                            specialModel.endAt = mediaModel.endAt + 1000L
+                            specialModel.beginAt = durationOfMedia - 1000L
+                            specialModel.endAt = durationOfMedia + 1000L
 
                             this@ManagerPlayerMedia.listTransition.add(specialModel)
                         }
@@ -242,7 +244,9 @@ class ManagerPlayerMedia(private val context: Context,
                 }
             } else {
                 // Add new
+                var durationOfMedia = 0L
                 this@ManagerPlayerMedia.listMediaAdded.forEachIndexed { index, mediaModel ->
+                    durationOfMedia += mediaModel.endAt - mediaModel.beginAt
                     if (index < this@ManagerPlayerMedia.listMediaAdded.size - 1) {
                         val specialModel = SpecialModel()
                         specialModel.id = ITEM_TRANSITION_NONE
@@ -252,8 +256,8 @@ class ManagerPlayerMedia(private val context: Context,
                         specialModel.itemIdBefore = mediaModel.mediaId
                         specialModel.itemIdNext =
                             this@ManagerPlayerMedia.listMediaAdded[index + 1].mediaId
-                        specialModel.beginAt = mediaModel.endAt - 1000L
-                        specialModel.endAt = mediaModel.endAt + 1000L
+                        specialModel.beginAt = durationOfMedia - 1000L
+                        specialModel.endAt = durationOfMedia + 1000L
 
                         this@ManagerPlayerMedia.listTransition.add(specialModel)
                     }

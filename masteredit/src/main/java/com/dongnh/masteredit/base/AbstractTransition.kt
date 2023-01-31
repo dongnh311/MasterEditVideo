@@ -1,6 +1,7 @@
 package com.dongnh.masteredit.base
 
 import android.opengl.GLES20
+import com.dongnh.masteredit.model.SpecialModel
 import timber.log.Timber
 
 /**
@@ -16,6 +17,10 @@ abstract class AbstractTransition(
 
     var progress = 0f
     var drawer: AbstractDrawerTransition? = null
+
+    // Save object
+    var specialModel: SpecialModel? = null
+    var index = -1
 
     protected abstract fun getDrawer()
 

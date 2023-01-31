@@ -1,6 +1,7 @@
 package com.dongnh.masteredit.control
 
 import android.content.Context
+import com.dongnh.masteredit.base.AbstractTransition
 import com.dongnh.masteredit.const.*
 import com.dongnh.masteredit.filter.GLBaseFilterObject
 import com.dongnh.masteredit.filter.GLBrightnessFilterObject
@@ -8,6 +9,7 @@ import com.dongnh.masteredit.filter.GLContrastFilterObject
 import com.dongnh.masteredit.filter.GLGammaFilterObject
 import com.dongnh.masteredit.gl.GLFilterGroupObject
 import com.dongnh.masteredit.model.SpecialModel
+import com.dongnh.masteredit.utils.exts.getTransitionById
 import com.dongnh.masteredit.view.GLPlayerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +42,7 @@ class SpecialPlayControl(private val context: Context) {
     private val listFilterAdded: MutableList<GLBaseFilterObject> = mutableListOf()
 
     // List Transition created
-    private val listTransitionAdded: MutableList<GLBaseFilterObject> = mutableListOf()
+    private val listTransitionAdded: MutableList<AbstractTransition> = mutableListOf()
 
     // Init all default filter
     private val filterBrightness = GLBrightnessFilterObject()
@@ -117,9 +119,7 @@ class SpecialPlayControl(private val context: Context) {
         listFilterAdded.forEach {
             groupFilterDefault.filters.remove(it)
         }
-        listTransitionAdded.forEach {
-            groupFilterDefault.filters.remove(it)
-        }
+        notifyTransitionChange(null)
         listFilterAdded.clear()
         listTransitionAdded.clear()
         groupFilterAdjusts.clear()
@@ -134,6 +134,8 @@ class SpecialPlayControl(private val context: Context) {
 
         // Make preview remove
         notifyPreviewCreateFilter()
+
+        // Make transition is null
     }
 
     /**
@@ -164,7 +166,17 @@ class SpecialPlayControl(private val context: Context) {
 
                 }
                 SPECIAL_TYPE_TRANSITION -> {
-
+                    if (it.beginAt <= durationPlaying && it.endAt > durationPlaying) {
+                        // Add filter
+                        handleTransition(
+                            true,
+                            it,
+                            1.0f - ((durationPlaying - it.beginAt).toFloat() * 1.0f / 2000)
+                        )
+                    } else {
+                        // Remove filter
+                        handleTransition(false, it, 0f)
+                    }
                 }
                 SPECIAL_TYPE_GRAPH -> {
 
@@ -223,11 +235,65 @@ class SpecialPlayControl(private val context: Context) {
     }
 
     /**
+     * Handle transition
+     */
+    private fun handleTransition(isAdd: Boolean, specialModel: SpecialModel, progress: Float) {
+        if (isAdd) {
+            if (!specialModel.isAdded && specialModel.id != ITEM_TRANSITION_NONE) {
+                specialModel.isAdded = true
+
+                var abstractTransition: AbstractTransition? = null
+                listTransitionAdded.forEach { transition ->
+                    if (transition.specialModel?.id == specialModel.id && transition.specialModel?.beginAt == specialModel.beginAt && transition.specialModel?.endAt == specialModel.endAt) {
+                        abstractTransition = transition
+                        return@forEach
+                    }
+                }
+
+                if (abstractTransition == null) {
+                    // Add new special
+                    abstractTransition = getTransitionById(specialModel.id.toInt(), context)
+                    abstractTransition!!.specialModel = specialModel
+                    listTransitionAdded.add(abstractTransition!!)
+                }
+
+                // Update view
+                abstractTransition!!.progress = progress
+                notifyTransitionChange(abstractTransition)
+            }
+        } else {
+            if (specialModel.isAdded) {
+                listTransitionAdded.forEachIndexed { _, transition ->
+                    if (transition.specialModel?.id == specialModel.id && transition.specialModel?.beginAt == specialModel.beginAt && transition.specialModel?.endAt == specialModel.endAt) {
+                        // Update view
+                        notifyTransitionChange(null)
+                        transition.progress = 0f
+                        Timber.e("Remove transition ok")
+                        return@forEachIndexed
+                    }
+                }
+
+                specialModel.isAdded = false
+            }
+        }
+    }
+
+    /**
      * Add filter to preview
      */
     private fun notifyPreviewCreateFilter() {
         CoroutineScope(Dispatchers.Default).launch {
             glPlayerView?.addFilterRender(groupFilterDefault)
+            glPlayerView?.requestRender()
+        }
+    }
+
+    /**
+     * Update transition
+     */
+    private fun notifyTransitionChange(abstractTransition: AbstractTransition?) {
+        CoroutineScope(Dispatchers.Default).launch {
+            glPlayerView?.updateTransition(abstractTransition)
             glPlayerView?.requestRender()
         }
     }

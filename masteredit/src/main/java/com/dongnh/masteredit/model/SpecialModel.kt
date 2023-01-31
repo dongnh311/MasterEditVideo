@@ -46,6 +46,10 @@ class SpecialModel {
         itemClone.intensity = inputItem.intensity
         itemClone.duration = inputItem.duration
         itemClone.isChoose = inputItem.isChoose
+        itemClone.indexBefore = inputItem.indexBefore
+        itemClone.indexNext = inputItem.indexNext
+        itemClone.itemIdBefore = inputItem.itemIdBefore
+        itemClone.itemIdNext = inputItem.itemIdNext
         return itemClone
     }
 }

@@ -11,7 +11,8 @@ import com.bumptech.glide.Glide
 import com.dongnh.masteredit.model.SpecialModel
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.databinding.ItemSpecialBinding
-import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
+import com.dongnh.mastereditvideo.utils.exts.isItemTransparent
+import com.dongnh.mastereditvideo.utils.exts.isTransitionItem
 import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 
 /**
@@ -64,22 +65,29 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
             binding.filterName.text = item.name
 
             // Touch
-            if (isNotItemNone(item)) {
-                binding.parentView.setOnTouchListener { _, event ->
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            onSpecialItemListener?.onItemSpecialTouchDown(item, position)
-                        }
-                        MotionEvent.ACTION_UP -> {
-                            onSpecialItemListener?.onItemSpecialTouchUp(item, position)
-                        }
-                    }
-                    return@setOnTouchListener true
-                }
-            } else {
+            if (isItemTransparent(item)) {
                 // Click
                 binding.parentView.setOnClickListener {
                     onSpecialItemListener?.onItemSpecialClick(item, position)
+                }
+            } else {
+                if (isTransitionItem(item)) {
+                    // Click
+                    binding.parentView.setOnClickListener {
+                        onSpecialItemListener?.onItemSpecialClick(item, position)
+                    }
+                } else {
+                    binding.parentView.setOnTouchListener { _, event ->
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                onSpecialItemListener?.onItemSpecialTouchDown(item, position)
+                            }
+                            MotionEvent.ACTION_UP -> {
+                                onSpecialItemListener?.onItemSpecialTouchUp(item, position)
+                            }
+                        }
+                        return@setOnTouchListener true
+                    }
                 }
             }
         }

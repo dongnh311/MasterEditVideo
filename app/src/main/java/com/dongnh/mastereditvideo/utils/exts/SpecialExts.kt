@@ -15,15 +15,27 @@ import com.dongnh.masteredit.model.SpecialModel
  * Check is item is not item none
  */
 fun isNotItemNone(specialModel: SpecialModel): Boolean {
-    return specialModel.id != ITEM_EFFECT_NONE && specialModel.id != ITEM_FILTER_NONE
+    return specialModel.id != ITEM_EFFECT_NONE
+            && specialModel.id != ITEM_FILTER_NONE
             && specialModel.id != ITEM_GRAPH_NONE
             && specialModel.id != ITEM_TRANSITION_NONE
             && specialModel.id != ITEM_SPECIAL_NONE
 }
 
 /**
+ * Check item is item transparent, clear
+ */
+fun isItemTransparent(specialModel: SpecialModel): Boolean {
+    return specialModel.id == ITEM_EFFECT_NONE
+            || specialModel.id == ITEM_FILTER_NONE
+            || specialModel.id == ITEM_GRAPH_NONE
+            || specialModel.id == ITEM_TRANSITION_NONE
+            || specialModel.id == ITEM_SPECIAL_NONE
+}
+
+/**
  * Check if item is transition
  */
 fun isTransitionItem(specialModel: SpecialModel): Boolean {
-    return specialModel.id in ITEM_TRANSITION_NONE until ITEM_SPECIAL_NONE
+    return specialModel.id in ITEM_TRANSITION_NONE + 1 until ITEM_SPECIAL_NONE
 }

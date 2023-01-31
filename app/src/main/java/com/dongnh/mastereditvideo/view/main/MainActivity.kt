@@ -26,8 +26,8 @@ import com.dongnh.mastereditvideo.utils.control.DurationControl
 import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
 import com.dongnh.mastereditvideo.utils.dialog.DialogTool
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
+import com.dongnh.mastereditvideo.utils.exts.isItemTransparent
 import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
-import com.dongnh.mastereditvideo.utils.exts.isTransitionItem
 import com.dongnh.mastereditvideo.utils.interfaces.*
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
@@ -208,38 +208,37 @@ class MainActivity : AppCompatActivity() {
                         if (!this@MainActivity.isPlaying) {
                             this@MainActivity.setupButtonPlay()
                         }
-                    } else if (isTransitionItem(itemSpecial)) {
-                        Timber.e("Is Transition touch")
                     }
                 }
 
                 override fun onItemSpecialTouchUp(itemSpecial: SpecialModel, position: Int) {
                     if (isNotItemNone(itemSpecial)) {
-                        if (!isTransitionItem(itemSpecial)) {
-                            // Pause
-                            if (this@MainActivity.isPlaying) {
-                                this@MainActivity.setupButtonPause()
-                            }
-
-                            // Make end time
-                            itemSpecial.endAt =
-                                this@MainActivity.managerPlayerControl.durationPlayed
-
-                            this@MainActivity.dialogTool.alertDialog?.dismiss()
-                            Timber.e("New filter duration , start : ${itemSpecial.beginAt}, end :  ${itemSpecial.endAt}")
-                            this@MainActivity.mainBinding.viewTimeLine.drawItemFilter(itemSpecial)
-
-                            // Clone item
-                            val cloneSpecial = SpecialModel().cloneItem(itemSpecial)
-                            this@MainActivity.managerPlayerControl.addSpecialToPreview(cloneSpecial)
+                        // Pause
+                        if (this@MainActivity.isPlaying) {
+                            this@MainActivity.setupButtonPause()
                         }
+
+                        // Make end time
+                        itemSpecial.endAt =
+                            this@MainActivity.managerPlayerControl.durationPlayed
+
+                        this@MainActivity.dialogTool.alertDialog?.dismiss()
+                        Timber.e("New filter duration , start : ${itemSpecial.beginAt}, end :  ${itemSpecial.endAt}")
+                        this@MainActivity.mainBinding.viewTimeLine.drawItemFilter(itemSpecial)
+
+                        // Clone item
+                        val cloneSpecial = SpecialModel().cloneItem(itemSpecial)
+                        this@MainActivity.managerPlayerControl.addSpecialToPreview(cloneSpecial)
                     }
                 }
 
                 override fun onItemSpecialClick(itemSpecial: SpecialModel, position: Int) {
-                    if (!isNotItemNone(itemSpecial)) {
+                    if (isItemTransparent(itemSpecial)) {
                         Timber.e("onItemSpecialTouchDown item transparent click")
                         this@MainActivity.dialogTool.alertDialog?.dismiss()
+                    } else {
+                        // Transition add
+                        Timber.e("We have transition : ${itemSpecial.id}")
                     }
                 }
             })

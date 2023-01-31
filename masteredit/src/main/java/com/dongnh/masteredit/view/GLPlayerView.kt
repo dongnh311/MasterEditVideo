@@ -5,16 +5,18 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.Surface
-import com.dongnh.masteredit.enums.TypePlayerScale
+import com.dongnh.masteredit.base.AbstractTransition
 import com.dongnh.masteredit.const.VIEW_SIZE_16_9
 import com.dongnh.masteredit.const.VIEW_SIZE_9_16
+import com.dongnh.masteredit.enums.TypePlayerScale
 import com.dongnh.masteredit.gl.GLConfigChooser
 import com.dongnh.masteredit.gl.GLContextFactory
 import com.dongnh.masteredit.gl.GLFilterObject
 import com.dongnh.masteredit.gl.GLLookUpTableFilterObject
 import com.dongnh.masteredit.render.GLPlayerRenderer
 import com.dongnh.masteredit.utils.interfaces.OnGLFilterActionListener
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -139,6 +141,15 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
      */
     fun addFilterRender(glFilter: GLFilterObject) {
         renderer.addGLFilter(glFilter)
+    }
+
+    /**
+     * Update transition
+     */
+    fun updateTransition(abstractTransition: AbstractTransition?) {
+        if (renderer.transitionDraw != abstractTransition) {
+            renderer.transitionDraw = abstractTransition
+        }
     }
 
     /**

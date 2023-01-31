@@ -65,7 +65,7 @@ class PreViewLayoutControl(context: Context) {
                 filterGrammar
             )
         )
-        glPlayerView.addFilterRender(glFilterGroup)
+        glPlayerView.setFilterRender(glFilterGroup)
 
         glPlayerView.post {
             glPlayerView.setRotate(
@@ -95,7 +95,7 @@ class PreViewLayoutControl(context: Context) {
                 glFilterObject
             )
         )
-        glPlayerView.addFilterRender(filterGroup)
+        glPlayerView.setFilterRender(filterGroup)
     }
 
     /**

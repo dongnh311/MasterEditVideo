@@ -37,15 +37,15 @@ abstract class AbstractTransition(
     private var outputWidth = 0
     private var outputHeight = 0
 
-    private val offScreenTextureIds = IntArray(2)
+    private val offScreenTextureIds = IntArray(1)
 
     fun initTextureOutput(width: Int, height: Int) {
         this@AbstractTransition.outputWidth = width
         this@AbstractTransition.outputHeight = height
         GLES20.glGenTextures(offScreenTextureIds.size, offScreenTextureIds, 0)
-        for (mTextureId in offScreenTextureIds) {
+        for (textureId in offScreenTextureIds) {
             // bind to fbo texture cause we are going to do setting.
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
             GLES20.glTexImage2D(
                 GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height,
                 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null
@@ -100,7 +100,7 @@ abstract class AbstractTransition(
             setDrawerParams()
 
             drawer?.draw(
-                offScreenTextureIds[1],
+                offScreenTextureIds[0],
                 textureInput,
                 renderLeft,
                 renderBottom,
@@ -118,8 +118,8 @@ abstract class AbstractTransition(
 
     override fun toString(): String {
         return "AbstractTransition{" +
-                "mName='" + name + '\'' +
-                ", mType=" + type +
+                "name='" + name + '\'' +
+                ", type=" + type +
                 '}'
     }
 

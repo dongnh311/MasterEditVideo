@@ -139,8 +139,8 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
     /**
      * Add filter
      */
-    fun addFilterRender(glFilter: GLFilterObject) {
-        renderer.addGLFilter(glFilter)
+    fun setFilterRender(glFilter: GLFilterObject) {
+        renderer.setGLFilter(glFilter)
     }
 
     /**

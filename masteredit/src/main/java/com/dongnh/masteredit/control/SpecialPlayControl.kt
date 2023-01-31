@@ -68,7 +68,7 @@ class SpecialPlayControl(private val context: Context) {
      */
     fun configToPreview(glPlayerView: GLPlayerView) {
         this@SpecialPlayControl.glPlayerView = glPlayerView
-        glPlayerView.addFilterRender(groupFilterDefault)
+        glPlayerView.setFilterRender(groupFilterDefault)
     }
 
     /**
@@ -264,12 +264,10 @@ class SpecialPlayControl(private val context: Context) {
                 notifyTransitionChange(abstractTransition)
             } else {
                 // Update progress view
-                var abstractTransition: AbstractTransition? = null
                 listTransitionAdded.forEach { transition ->
                     if (transition.specialModel?.id == specialModel.id && transition.specialModel?.beginAt == specialModel.beginAt && transition.specialModel?.endAt == specialModel.endAt) {
-                        abstractTransition = transition
-                        abstractTransition!!.progress = progress
-                        notifyTransitionChange(abstractTransition)
+                        transition.progress = progress
+                        notifyTransitionChange(transition)
                         return@forEach
                     }
                 }
@@ -296,7 +294,7 @@ class SpecialPlayControl(private val context: Context) {
      */
     private fun notifyPreviewCreateFilter() {
         CoroutineScope(Dispatchers.Default).launch {
-            glPlayerView?.addFilterRender(groupFilterDefault)
+            glPlayerView?.setFilterRender(groupFilterDefault)
             glPlayerView?.requestRender()
         }
     }

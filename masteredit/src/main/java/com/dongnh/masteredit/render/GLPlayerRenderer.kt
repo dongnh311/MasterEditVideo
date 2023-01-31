@@ -74,7 +74,7 @@ class GLPlayerRenderer : GLFrameBufferObjectRenderer(), SurfaceTexture.OnFrameAv
     private var isNeedDraw = true
 
     // Add filter
-    fun addGLFilter(glFilterObject: GLFilterObject?) {
+    fun setGLFilter(glFilterObject: GLFilterObject?) {
         onGLFilterActionListener?.onGLFilterAdded(glFilterObject)
 
         glFilter = glFilterObject

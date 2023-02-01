@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
 import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
@@ -799,6 +800,48 @@ class TimeLineControl : FrameLayout {
     }
 
     /**
+     * Update view for transition
+     */
+    fun updateViewForTransition(index: Int, specialModel: SpecialModel) {
+        try {
+            val layoutOfTransition: LinearLayout =
+                this@TimeLineControl.itemTimeLineBinding.layoutEdit[1] as LinearLayout
+
+            // Update to data save
+            this@TimeLineControl.listTransition.forEachIndexed { indexTransition, special ->
+                if (indexTransition == index) {
+                    special.id = specialModel.id
+                    special.thumbnail = specialModel.thumbnail
+                }
+            }
+
+            // Update view
+            for (childIndex in 0 until layoutOfTransition.childCount) {
+                if (childIndex == index) {
+                    val transition = layoutOfTransition.getChildAt(childIndex) as LinearLayout
+
+                    // Update icon
+                    transition.forEach { viewChild ->
+                        if (viewChild is ImageView) {
+                            if (specialModel.id == ITEM_TRANSITION_NONE) {
+                                viewChild.setImageResource(R.drawable.ic_effect_transition)
+                            } else {
+                                Glide.with(context)
+                                    .load(Uri.parse("file:///android_asset/" + specialModel.thumbnail))
+                                    .thumbnail(0.01f)
+                                    .into(viewChild)
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (ex: java.lang.Exception) {
+            Timber.e(ex)
+        }
+    }
+
+    /**
      * Make edit view is validate
      */
     private fun invalidateWidthOfEditView() {
@@ -979,7 +1022,7 @@ class TimeLineControl : FrameLayout {
                 childViewFilter.mainAddView.tag = 0
                 childViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
                 onItemMediaChoose?.onItemSpecialChoose(
-                    childViewFilter.viewIndex.tag as Int
+                    -1
                 )
             }
         }
@@ -1000,7 +1043,7 @@ class TimeLineControl : FrameLayout {
                 childViewTransition.mainAddView.tag = 0
                 childViewTransition.mainAddView.setBackgroundResource(android.R.color.transparent)
                 onItemMediaChoose?.onItemSpecialChoose(
-                    childViewTransition.viewIndex.tag as Int
+                    -1
                 )
             }
         }

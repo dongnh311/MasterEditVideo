@@ -5,11 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.dongnh.masteredit.const.ITEM_TRANSITION_NONE
+import com.dongnh.masteredit.const.SPECIAL_TYPE_TRANSITION
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
@@ -28,6 +31,7 @@ import com.dongnh.mastereditvideo.utils.dialog.DialogTool
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.exts.isItemTransparent
 import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
+import com.dongnh.mastereditvideo.utils.exts.isTransitionItem
 import com.dongnh.mastereditvideo.utils.interfaces.*
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
@@ -63,6 +67,9 @@ class MainActivity : AppCompatActivity() {
 
     // Save index click on media
     private var indexMediaSelect = -1
+
+    // Save index item special click
+    private var indexSpecialClick = -1
 
     // Dialog mix volume
     private val dialogMixVolume by lazy {
@@ -234,11 +241,59 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onItemSpecialClick(itemSpecial: SpecialModel, position: Int) {
                     if (isItemTransparent(itemSpecial)) {
-                        Timber.e("onItemSpecialTouchDown item transparent click")
+                        Timber.e("onItemSpecialClick item transparent click")
+                        if (indexSpecialClick == -1) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Please select transition for this",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            // Clear transition
+                            val specialModel = SpecialModel()
+                            specialModel.id = ITEM_TRANSITION_NONE
+                            specialModel.type = SPECIAL_TYPE_TRANSITION
+
+                            // Update to player
+                            this@MainActivity.managerPlayerControl.updateTransition(
+                                indexSpecialClick,
+                                specialModel
+                            )
+
+                            // Update to control
+                            this@MainActivity.mainBinding.viewTimeLine.updateViewForTransition(
+                                indexSpecialClick,
+                                specialModel
+                            )
+                        }
+
                         this@MainActivity.dialogTool.alertDialog?.dismiss()
                     } else {
                         // Transition add
-                        Timber.e("We have transition : ${itemSpecial.id}")
+                        if (indexSpecialClick == -1 || !isTransitionItem(itemSpecial)) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Please select transition for this",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Timber.e("We have transition : ${itemSpecial.id}")
+                            // Update to player
+                            this@MainActivity.managerPlayerControl.updateTransition(
+                                indexSpecialClick,
+                                itemSpecial
+                            )
+
+                            // Update to control
+                            this@MainActivity.mainBinding.viewTimeLine.updateViewForTransition(
+                                indexSpecialClick,
+                                itemSpecial
+                            )
+
+                            // Move to start
+                            moveVideoPlayToStart()
+                        }
+
                         this@MainActivity.dialogTool.alertDialog?.dismiss()
                     }
                 }
@@ -325,6 +380,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onItemSpecialChoose(index: Int) {
+                Timber.e("Index of special choose : $index")
+                indexSpecialClick = index
             }
 
             override fun onMusicChoose(index: Int) {

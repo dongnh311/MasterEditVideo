@@ -249,7 +249,7 @@ class ManagerPlayerMedia(private val context: Context,
                     durationOfMedia += mediaModel.endAt - mediaModel.beginAt
                     if (index < this@ManagerPlayerMedia.listMediaAdded.size - 1) {
                         val specialModel = SpecialModel()
-                        specialModel.id = 600004 // TODO : For test
+                        specialModel.id = ITEM_TRANSITION_NONE
                         specialModel.type = SPECIAL_TYPE_TRANSITION
                         specialModel.indexBefore = index
                         specialModel.indexNext = index + 1
@@ -434,6 +434,30 @@ class ManagerPlayerMedia(private val context: Context,
 
         // Update volume for video player
         this@ManagerPlayerMedia.videoPlayerControl?.updateVolumeForMedia(listMediaModel)
+    }
+
+    /**
+     * Update transition for special control
+     */
+    fun updateTransition(index: Int, specialModel: SpecialModel) {
+        var specialTransition: SpecialModel? = null
+        var indexUpdate = -1
+
+        // Update to preview
+        this@ManagerPlayerMedia.listTransition.forEachIndexed { indexTransition, special ->
+            if (indexTransition == index) {
+                special.id = specialModel.id
+                special.thumbnail = specialModel.thumbnail
+                specialTransition = special
+                indexUpdate = indexTransition
+                return@forEachIndexed
+            }
+        }
+        // Update to manager special
+        if (indexUpdate != -1) {
+            specialPlayControl.updateTransition(indexUpdate, specialTransition!!)
+        }
+
     }
 
     /**

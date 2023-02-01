@@ -79,6 +79,25 @@ class SpecialPlayControl(private val context: Context) {
     }
 
     /**
+     * Update transition to view
+     */
+    fun updateTransition(index: Int, specialModel: SpecialModel) {
+        groupFilterAdjusts.forEachIndexed { indexItem, special ->
+            if (indexItem == index && special.type == SPECIAL_TYPE_TRANSITION) {
+                special.id = specialModel.id
+                special.thumbnail = specialModel.thumbnail
+                special.isAdded = false
+                return@forEachIndexed
+            }
+        }
+
+        // Remove on list create
+        listFilterAdded.removeIf { glBase ->
+            glBase.specialModel?.beginAt == specialModel.beginAt && glBase.specialModel?.endAt == specialModel.endAt
+        }
+    }
+
+    /**
      * Remove special
      */
     fun removeSpecial(specialModel: SpecialModel) {

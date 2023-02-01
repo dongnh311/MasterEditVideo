@@ -39,3 +39,10 @@ fun isItemTransparent(specialModel: SpecialModel): Boolean {
 fun isTransitionItem(specialModel: SpecialModel): Boolean {
     return specialModel.id in ITEM_TRANSITION_NONE + 1 until ITEM_SPECIAL_NONE
 }
+
+/**
+ * Check if item is filter
+ */
+fun isFilterItem(specialModel: SpecialModel): Boolean {
+    return specialModel.id in ITEM_FILTER_NONE + 1 until ITEM_GRAPH_NONE
+}

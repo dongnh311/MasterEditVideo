@@ -97,6 +97,19 @@ class SpecialPlayControl(private val context: Context) {
         }
     }
 
+    fun removeFilter(indexSelect: Int) {
+        var itemNeedRemove: SpecialModel? = null
+        listFilterAdded.forEachIndexed { index, glFilter ->
+            if (index == indexSelect && glFilter.specialModel != null) {
+                itemNeedRemove = glFilter.specialModel
+                return@forEachIndexed
+            }
+        }
+
+        // Remove if need
+        itemNeedRemove?.let { removeSpecial(it) }
+    }
+
     /**
      * Remove special
      */
@@ -200,6 +213,9 @@ class SpecialPlayControl(private val context: Context) {
                     }
                 }
                 SPECIAL_TYPE_GRAPH -> {
+
+                }
+                SPECIAL_TYPE_SPECIAL -> {
 
                 }
                 SPECIAL_TYPE_NONE -> {

@@ -470,8 +470,8 @@ class ManagerPlayerMedia(private val context: Context,
     /**
      * Remove special
      */
-    fun removeSpecialFromPreview(specialModel: SpecialModel) {
-        this@ManagerPlayerMedia.specialPlayControl.removeSpecial(specialModel)
+    fun removeFilterFromPreview(index: Int) {
+        this@ManagerPlayerMedia.specialPlayControl.removeFilter(index)
     }
 
     /**

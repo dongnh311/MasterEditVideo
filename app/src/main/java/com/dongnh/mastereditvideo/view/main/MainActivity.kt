@@ -11,8 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.dongnh.masteredit.const.ITEM_TRANSITION_NONE
-import com.dongnh.masteredit.const.SPECIAL_TYPE_TRANSITION
+import com.dongnh.masteredit.const.*
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
@@ -22,6 +21,7 @@ import com.dongnh.masteredit.utils.exts.deleteFolderIfExit
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
 import com.dongnh.mastereditvideo.const.*
+import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
 import com.dongnh.mastereditvideo.databinding.ActivityMainBinding
 import com.dongnh.mastereditvideo.model.MixSoundModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
@@ -245,29 +245,54 @@ class MainActivity : AppCompatActivity() {
                         if (indexSpecialClick == -1) {
                             Toast.makeText(
                                 this@MainActivity,
-                                "Please select transition for this",
+                                "Please select item special for action",
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
-                            // Clear transition
-                            val specialModel = SpecialModel()
-                            specialModel.id = ITEM_TRANSITION_NONE
-                            specialModel.type = SPECIAL_TYPE_TRANSITION
+                            when (itemSpecial.id) {
+                                ITEM_TRANSITION_NONE -> {
+                                    // Clear transition
+                                    val specialModel = SpecialModel()
+                                    specialModel.id = ITEM_TRANSITION_NONE
+                                    specialModel.type = SPECIAL_TYPE_TRANSITION
 
-                            // Update to player
-                            this@MainActivity.managerPlayerControl.updateTransition(
-                                indexSpecialClick,
-                                specialModel
-                            )
+                                    // Update to player
+                                    this@MainActivity.managerPlayerControl.updateTransition(
+                                        indexSpecialClick,
+                                        specialModel
+                                    )
 
-                            // Update to control
-                            this@MainActivity.mainBinding.viewTimeLine.updateViewForTransition(
-                                indexSpecialClick,
-                                specialModel
-                            )
+                                    // Update to control
+                                    this@MainActivity.mainBinding.viewTimeLine.updateViewForTransition(
+                                        indexSpecialClick,
+                                        specialModel
+                                    )
+
+                                    indexSpecialClick = -1
+                                }
+                                ITEM_FILTER_NONE -> {
+                                    // Clear filter
+                                    this@MainActivity.mainBinding.viewTimeLine.removeFilterAdded(
+                                        indexSpecialClick,
+                                        itemSpecial
+                                    )
+                                    this@MainActivity.managerPlayerControl.removeFilterFromPreview(
+                                        indexSpecialClick
+                                    )
+
+                                    indexSpecialClick = -1
+                                }
+                                ITEM_EFFECT_NONE -> {
+
+                                }
+                                ITEM_GRAPH_NONE -> {
+
+                                }
+                                ITEM_SPECIAL_NONE -> {
+
+                                }
+                            }
                         }
-
-                        this@MainActivity.dialogTool.alertDialog?.dismiss()
                     } else {
                         // Transition add
                         if (indexSpecialClick == -1 || !isTransitionItem(itemSpecial)) {
@@ -293,9 +318,8 @@ class MainActivity : AppCompatActivity() {
                             // Move to start
                             moveVideoPlayToStart()
                         }
-
-                        this@MainActivity.dialogTool.alertDialog?.dismiss()
                     }
+                    this@MainActivity.dialogTool.alertDialog?.dismiss()
                 }
             })
         }

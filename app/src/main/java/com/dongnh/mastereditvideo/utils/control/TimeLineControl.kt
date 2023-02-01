@@ -781,7 +781,7 @@ class TimeLineControl : FrameLayout {
                     adjMargin = 0.0
                 }
 
-                layout.setMargins(adjMargin.roundToInt(), marginItem / 4, 0, marginItem / 4)
+                layout.setMargins(adjMargin.roundToInt(), 0, 0, 0)
 
                 linearLayoutViewFilter.mainAddView.layoutParams = layout
                 linearLayoutViewFilter.mainAddView.setBackgroundResource(android.R.color.transparent)
@@ -797,6 +797,17 @@ class TimeLineControl : FrameLayout {
         } catch (e: java.lang.Exception) {
             Timber.e(e)
         }
+    }
+
+    /**
+     * Remove filter added
+     */
+    fun removeFilterAdded(index: Int, specialModel: SpecialModel) {
+        // Remove on list
+        this@TimeLineControl.listFilter.removeAt(index)
+
+        // Redraw
+        drawItemFilter(null)
     }
 
     /**

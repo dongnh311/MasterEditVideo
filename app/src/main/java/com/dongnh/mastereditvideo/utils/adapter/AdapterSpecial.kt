@@ -67,17 +67,17 @@ class AdapterSpecial : RecyclerView.Adapter<AdapterSpecial.ItemViewHolder>() {
             // Touch
             if (isItemTransparent(item)) {
                 // Click
-                binding.parentView.setOnClickListener {
+                binding.filterThumbnail.setOnClickListener {
                     onSpecialItemListener?.onItemSpecialClick(item, position)
                 }
             } else {
                 if (isTransitionItem(item)) {
                     // Click
-                    binding.parentView.setOnClickListener {
+                    binding.filterThumbnail.setOnClickListener {
                         onSpecialItemListener?.onItemSpecialClick(item, position)
                     }
                 } else {
-                    binding.parentView.setOnTouchListener { _, event ->
+                    binding.filterThumbnail.setOnTouchListener { _, event ->
                         when (event.action) {
                             MotionEvent.ACTION_DOWN -> {
                                 onSpecialItemListener?.onItemSpecialTouchDown(item, position)

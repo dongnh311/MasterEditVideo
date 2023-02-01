@@ -1,6 +1,7 @@
 package com.dongnh.masteredit.utils.exomanager
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.media.ExifInterface
 import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.io.File
 
+
 /**
  * Project : MasterEditVideo
  * Created by DongNH on 06/01/2023.
@@ -32,7 +34,9 @@ import java.io.File
 class ExoManager(private val context: Context) {
 
     // Exo
-    var exoPlayer: ExoPlayer
+    var exoPlayer: ExoPlayer = ExoPlayer.Builder(context)
+        .setRenderersFactory(DefaultRenderersFactory(context))
+        .build()
 
     // Make auto play
     private var startAutoPlay = true
@@ -54,9 +58,6 @@ class ExoManager(private val context: Context) {
     var resolution : FormatVideoOut = FormatVideoOut.RESOLUTION_HD
 
     init {
-        exoPlayer = ExoPlayer.Builder(context)
-            .setRenderersFactory(DefaultRenderersFactory(context))
-            .build()
 
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
         val playerEventListener = PlayerEventListener(exoPlayer)
@@ -114,16 +115,20 @@ class ExoManager(private val context: Context) {
                         Uri.parse(it.mediaPath)
                     }
                     MEDIA_TYPE_IMAGE -> {
-                        val path = convertImageToVideo(it).shareIn(
-                            scope = this,
-                            replay = 1,
-                            started = SharingStarted.WhileSubscribed()
-                        )
-                        val result = path.first()
+                        if (it.pathVideoTransform.isEmpty()) {
+                            val path = convertImageToVideo(it).shareIn(
+                                scope = this,
+                                replay = 1,
+                                started = SharingStarted.WhileSubscribed()
+                            )
+                            val result = path.first()
 
-                        mimeTypes = MimeTypes.VIDEO_MP4
-                        Timber.e("pathString = $result")
-                        Uri.parse(result)
+                            mimeTypes = MimeTypes.VIDEO_MP4
+                            Timber.e("pathString = $result")
+                            Uri.parse(result)
+                        } else {
+                            Uri.parse(it.pathVideoTransform)
+                        }
                     }
                     MEDIA_TYPE_TRANSITION -> {
                         mimeTypes = MimeTypes.VIDEO_MP4
@@ -148,15 +153,39 @@ class ExoManager(private val context: Context) {
     }
 
     /**
+     * Clear all media
+     */
+    fun resetAllMediaItem() {
+        val queueSize = exoPlayer.mediaItemCount
+        Timber.i("clearing items here queue size $queueSize")
+        for (i in queueSize downTo 0) {
+            if (i != exoPlayer.currentMediaItemIndex) {
+                exoPlayer.removeMediaItem(i)
+            }
+        }
+    }
+
+    /**
      * Convert image to video
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun convertImageToVideo(mediaModel: MediaModel) = callbackFlow {
         val fileInput = File(mediaModel.mediaPath)
-        val info = ExifInterface(mediaModel.mediaPath)
+        var withImage = 0
+        var heightImage = 0
+        try {
+            val info = ExifInterface(mediaModel.mediaPath)
 
-        val withImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0)
-        val heightImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+            withImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0)
+            heightImage = info.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+        } catch (ex: java.lang.Exception) {
+            Timber.e(ex)
+            val otp = BitmapFactory.Options()
+            otp.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(fileInput.absolutePath, otp)
+            withImage = otp.outWidth
+            heightImage = otp.outHeight
+        }
 
         var withToNewVideo = 1280
         var heightToNewVideo = 720
@@ -221,7 +250,7 @@ class ExoManager(private val context: Context) {
     /**
      * Release Player
      */
-    private fun releasePlayer() {
+    fun releasePlayerAndMedia() {
         updateStartPosition()
         exoPlayer.release()
         mediaItems.clear()

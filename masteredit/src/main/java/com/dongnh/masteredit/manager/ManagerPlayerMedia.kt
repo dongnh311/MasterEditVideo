@@ -284,7 +284,7 @@ class ManagerPlayerMedia(private val context: Context,
     /**
      * Release all media and player created
      */
-    fun releaseAllPlayer() {
+    private fun releaseAllPlayer() {
         clearAllMusicAdded()
         this@ManagerPlayerMedia.listMediaAdded.clear()
         videoPlayerControl?.releaseMedia()
@@ -479,5 +479,6 @@ class ManagerPlayerMedia(private val context: Context,
      */
     fun onDestroy() {
         releaseAllPlayer()
+        videoPlayerControl?.exoManager?.releasePlayerAndMedia()
     }
 }

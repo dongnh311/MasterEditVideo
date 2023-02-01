@@ -199,6 +199,5 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
      */
     fun releaseAll() {
         renderer.release()
-        exoPlayer?.release()
     }
 }

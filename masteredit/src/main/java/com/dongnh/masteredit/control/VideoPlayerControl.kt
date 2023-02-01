@@ -167,7 +167,7 @@ class VideoPlayerControl(context: Context) {
                 if (durationOfClip > currentPosition) {
                     durationOfClip -= (mediaMainObject.endAt - mediaMainObject.beginAt)
                     currentDurationPlayer =
-                        currentPosition + mediaMainObject.beginAt
+                        (currentPosition - durationOfClip) + mediaMainObject.beginAt
                     // Seek to next
                     exoManager.exoPlayer.seekTo(index, currentDurationPlayer)
                     exoManager.exoPlayer.volume = mediaModels[index].volume / 100.0F
@@ -184,7 +184,7 @@ class VideoPlayerControl(context: Context) {
     fun releaseMedia() {
         isPlaying = false
         mediaModels.clear()
-        exoManager.exoPlayer.release()
+        exoManager.resetAllMediaItem()
         playbackProgressObservable.cancellable()
     }
 

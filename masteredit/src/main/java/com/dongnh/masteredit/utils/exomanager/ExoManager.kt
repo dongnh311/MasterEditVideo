@@ -98,6 +98,7 @@ class ExoManager(private val context: Context) {
     /**
      * Create media for play
      */
+    @Suppress("DEPRECATION")
     fun createMediaItems(listMediaItem: MutableList<MediaModel>) {
         // Init media to play
         CoroutineScope(Dispatchers.Main).launch {
@@ -143,11 +144,11 @@ class ExoManager(private val context: Context) {
                     .setUri(url)
                     .setMimeType(mimeTypes)
                     .setSubtitleConfigurations(emptyList())
+                    .setDrmSessionForClearPeriods(true)
                 mediaItems.add(builder.build())
-
             }
 
-            exoPlayer.setMediaItems(mediaItems, false)
+            exoPlayer.addMediaItems(mediaItems)
             exoPlayer.prepare()
         }
     }
@@ -159,9 +160,7 @@ class ExoManager(private val context: Context) {
         val queueSize = exoPlayer.mediaItemCount
         Timber.i("clearing items here queue size $queueSize")
         for (i in queueSize downTo 0) {
-            if (i != exoPlayer.currentMediaItemIndex) {
-                exoPlayer.removeMediaItem(i)
-            }
+            exoPlayer.removeMediaItem(i)
         }
     }
 

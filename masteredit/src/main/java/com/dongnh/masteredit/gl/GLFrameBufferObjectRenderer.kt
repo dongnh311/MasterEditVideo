@@ -42,12 +42,14 @@ abstract class GLFrameBufferObjectRenderer : GLSurfaceView.Renderer {
      * Init new with and height for surface
      */
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        framebufferObject?.setup(width, height)
-        normalShader?.setFrameSize(width, height)
+        val widthRound = width / 2 * 2
+        val heightRound = height / 2 * 2
+        framebufferObject?.setup(widthRound, heightRound)
+        normalShader?.setFrameSize(widthRound, heightRound)
         listFilter.forEach {
-            it.setFrameSize(width, height)
+            it.setFrameSize(widthRound, heightRound)
         }
-        onSurfaceChanged(width, height)
+        onSurfaceChanged(widthRound, heightRound)
         framebufferObject?.getHeight().let {
             framebufferObject?.getWidth()?.let { width ->
                 GLES20.glViewport(

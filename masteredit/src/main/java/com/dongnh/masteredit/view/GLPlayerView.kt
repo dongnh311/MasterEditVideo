@@ -106,8 +106,10 @@ class GLPlayerView(context: Context, attrs: AttributeSet?) : GLSurfaceView(conte
             }
         }
 
-        Timber.e("onMeasure viewWidth = $viewWidth viewHeight = $viewHeight")
-        setMeasuredDimension(viewWidth, viewHeight)
+        val widthRound = viewWidth / 2 * 2
+        val heightRound = viewHeight / 2 * 2
+        Timber.e("onMeasure viewWidth = $widthRound viewHeight = $heightRound")
+        setMeasuredDimension(widthRound, heightRound)
     }
 
     /**

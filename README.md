@@ -10,12 +10,17 @@ Project demo using openGL to edit and view video.
 Feature function :
 - [x] Play video.
 - [x] Play image.
-- [] Play Music.
+- [x] Play Music.
 - [] Merge video and image.
 - [] Apply filter.
 - [] Apply effect.
-- [] Apply transition.
+- [x] Apply transition.
 - [] Trim video.
 - [] Trim music.
 - [] Mix music.
 - [] Export editer video.
+
+Library using :
+ - Exoplayer.
+ - ffmpeg.
+ - OpenGL.

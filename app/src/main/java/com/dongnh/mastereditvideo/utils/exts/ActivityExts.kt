@@ -3,7 +3,8 @@ package com.dongnh.mastereditvideo.utils.exts
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.os.Build
+import androidx.core.app.ActivityCompat
 
 /**
  * Project : MasterEditVideo
@@ -16,10 +17,25 @@ import androidx.core.content.ContextCompat
 /**
  * Check permission storage
  */
-fun Activity.checkPermissionStorage(): Boolean = ContextCompat.checkSelfPermission(
-    this,
-    Manifest.permission.READ_EXTERNAL_STORAGE
-) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-    this,
-    Manifest.permission.WRITE_EXTERNAL_STORAGE
-) == PackageManager.PERMISSION_GRANTED
+fun Activity.checkPermissionStorage(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        checkSafePermission(Manifest.permission.READ_MEDIA_IMAGES) &&
+                checkSafePermission(Manifest.permission.READ_MEDIA_VIDEO)
+    } else {
+        checkSafePermission(Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                checkSafePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+}
+
+/**
+ * Safe check permission
+ *
+ * @param targetPermission
+ * @return
+ */
+fun Activity.checkSafePermission(targetPermission: String): Boolean {
+    return (ActivityCompat.checkSelfPermission(
+        this,
+        targetPermission
+    ) == PackageManager.PERMISSION_GRANTED)
+}

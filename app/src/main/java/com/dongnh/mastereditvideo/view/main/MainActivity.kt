@@ -2,6 +2,7 @@ package com.dongnh.mastereditvideo.view.main
 
 import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,7 +12,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.dongnh.masteredit.const.*
+import com.dongnh.masteredit.const.ITEM_EFFECT_NONE
+import com.dongnh.masteredit.const.ITEM_FILTER_NONE
+import com.dongnh.masteredit.const.ITEM_GRAPH_NONE
+import com.dongnh.masteredit.const.ITEM_SPECIAL_NONE
+import com.dongnh.masteredit.const.ITEM_TRANSITION_NONE
+import com.dongnh.masteredit.const.SPECIAL_TYPE_TRANSITION
 import com.dongnh.masteredit.manager.ManagerPlayerMedia
 import com.dongnh.masteredit.model.MediaModel
 import com.dongnh.masteredit.model.MusicModel
@@ -20,8 +26,13 @@ import com.dongnh.masteredit.utils.exts.createMediaTransformPath
 import com.dongnh.masteredit.utils.exts.deleteFolderIfExit
 import com.dongnh.masteredit.utils.interfaces.VideoEventLister
 import com.dongnh.mastereditvideo.R
-import com.dongnh.mastereditvideo.const.*
+import com.dongnh.mastereditvideo.const.MEDIA_IMAGE
+import com.dongnh.mastereditvideo.const.MEDIA_TYPE_MUSIC
 import com.dongnh.mastereditvideo.const.MEDIA_TYPE_VIDEO
+import com.dongnh.mastereditvideo.const.MEDIA_VIDEO
+import com.dongnh.mastereditvideo.const.NAME_SEND_PICK_MEDIA
+import com.dongnh.mastereditvideo.const.VIDEO_IS_PAUSE
+import com.dongnh.mastereditvideo.const.VIDEO_IS_PLAY
 import com.dongnh.mastereditvideo.databinding.ActivityMainBinding
 import com.dongnh.mastereditvideo.model.MixSoundModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
@@ -32,7 +43,11 @@ import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
 import com.dongnh.mastereditvideo.utils.exts.isItemTransparent
 import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
 import com.dongnh.mastereditvideo.utils.exts.isTransitionItem
-import com.dongnh.mastereditvideo.utils.interfaces.*
+import com.dongnh.mastereditvideo.utils.interfaces.OnConfirmClickMixSound
+import com.dongnh.mastereditvideo.utils.interfaces.OnDurationTrackScrollListener
+import com.dongnh.mastereditvideo.utils.interfaces.OnItemMediaChoose
+import com.dongnh.mastereditvideo.utils.interfaces.OnMusicSelectListener
+import com.dongnh.mastereditvideo.utils.interfaces.OnSpecialItemListener
 import com.dongnh.mastereditvideo.view.pickmedia.MediaPickActivity
 import com.dongnh.mastereditvideo.view.pickmusic.PickMusicFragment
 import kotlinx.coroutines.launch
@@ -105,11 +120,23 @@ class MainActivity : AppCompatActivity() {
 
         // Request permission first
         if (!checkPermissionStorage()) {
-            requestPermissionLauncherStorage.launch(
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
+            var listPermission = arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA,
+            )
+
+            // Permission for notify of android 33
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                listPermission = arrayOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.CAMERA,
                 )
+            }
+            requestPermissionLauncherStorage.launch(
+                listPermission
             )
         }
 

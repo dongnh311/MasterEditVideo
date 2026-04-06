@@ -71,7 +71,9 @@ class GLBaseFilterObject(private val context: Context, private var pathImage: St
     init {
         this@GLBaseFilterObject.vertexShaderSource = VERTEX_SHADER_LUT
         this@GLBaseFilterObject.fragmentShaderSource = FRAGMENT_SHADER_LUT
-        initBitmapLUT(pathImage)
+        if (pathImage.isNotEmpty()) {
+            initBitmapLUT(pathImage)
+        }
     }
 
     /**
@@ -79,6 +81,7 @@ class GLBaseFilterObject(private val context: Context, private var pathImage: St
      */
     private fun initBitmapLUT(pathImage: String) {
         this@GLBaseFilterObject.pathImage = pathImage
+        if (pathImage.isEmpty()) return
         bitmap =
             BitmapFactory.decodeStream(context.assets.open(pathImage))
 

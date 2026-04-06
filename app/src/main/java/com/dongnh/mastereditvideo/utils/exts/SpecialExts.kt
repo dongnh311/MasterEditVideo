@@ -44,5 +44,12 @@ fun isTransitionItem(specialModel: SpecialModel): Boolean {
  * Check if item is filter
  */
 fun isFilterItem(specialModel: SpecialModel): Boolean {
-    return specialModel.id in ITEM_FILTER_NONE + 1 until ITEM_GRAPH_NONE
+    return specialModel.id in ITEM_FILTER_NONE + 1 until ITEM_EFFECT_NONE
+}
+
+/**
+ * Check if item is effect
+ */
+fun isEffectItem(specialModel: SpecialModel): Boolean {
+    return specialModel.id in ITEM_EFFECT_NONE + 1 until ITEM_GRAPH_NONE
 }

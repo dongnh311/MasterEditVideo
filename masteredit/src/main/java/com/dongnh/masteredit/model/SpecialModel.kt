@@ -21,6 +21,9 @@ class SpecialModel {
     var lut: String = ""
     var intensity: Float = 0.0F
 
+    // For effect shader
+    var shader: String = ""
+
     // Duration on view
     var duration: Long = -1
 
@@ -44,6 +47,7 @@ class SpecialModel {
         itemClone.endAt = inputItem.endAt
         itemClone.lut = inputItem.lut
         itemClone.intensity = inputItem.intensity
+        itemClone.shader = inputItem.shader
         itemClone.duration = inputItem.duration
         itemClone.isChoose = inputItem.isChoose
         itemClone.indexBefore = inputItem.indexBefore

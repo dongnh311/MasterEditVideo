@@ -468,10 +468,17 @@ class ManagerPlayerMedia(private val context: Context,
     }
 
     /**
-     * Remove special
+     * Remove filter
      */
     fun removeFilterFromPreview(index: Int) {
         this@ManagerPlayerMedia.specialPlayControl.removeFilter(index)
+    }
+
+    /**
+     * Remove effect
+     */
+    fun removeEffectFromPreview(index: Int) {
+        this@ManagerPlayerMedia.specialPlayControl.removeEffect(index)
     }
 
     /**

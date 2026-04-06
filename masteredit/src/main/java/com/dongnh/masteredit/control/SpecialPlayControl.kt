@@ -6,6 +6,7 @@ import com.dongnh.masteredit.const.*
 import com.dongnh.masteredit.filter.GLBaseFilterObject
 import com.dongnh.masteredit.filter.GLBrightnessFilterObject
 import com.dongnh.masteredit.filter.GLContrastFilterObject
+import com.dongnh.masteredit.filter.GLEffectFilterObject
 import com.dongnh.masteredit.filter.GLGammaFilterObject
 import com.dongnh.masteredit.gl.GLFilterGroupObject
 import com.dongnh.masteredit.model.SpecialModel
@@ -40,6 +41,9 @@ class SpecialPlayControl(private val context: Context) {
 
     // List GL created
     private val listFilterAdded: MutableList<GLBaseFilterObject> = mutableListOf()
+
+    // List Effect GL created
+    private val listEffectAdded: MutableList<GLEffectFilterObject> = mutableListOf()
 
     // List Transition created
     private val listTransitionAdded: MutableList<AbstractTransition> = mutableListOf()
@@ -142,6 +146,20 @@ class SpecialPlayControl(private val context: Context) {
         if (indexToRemove >= 0) {
             listFilterAdded.removeAt(indexToRemove)
         }
+
+        // Also check effects
+        var indexEffectToRemove = -1
+        listEffectAdded.forEachIndexed { index, glEffect ->
+            if (glEffect.specialModel?.id == specialModel.id && glEffect.specialModel?.beginAt == specialModel.beginAt && glEffect.specialModel?.endAt == specialModel.endAt) {
+                indexEffectToRemove = index
+                return@forEachIndexed
+            }
+        }
+
+        // Remove if find
+        if (indexEffectToRemove >= 0) {
+            listEffectAdded.removeAt(indexEffectToRemove)
+        }
     }
 
     /**
@@ -151,8 +169,12 @@ class SpecialPlayControl(private val context: Context) {
         listFilterAdded.forEach {
             groupFilterDefault.filters.remove(it)
         }
+        listEffectAdded.forEach {
+            groupFilterDefault.filters.remove(it)
+        }
         notifyTransitionChange(null)
         listFilterAdded.clear()
+        listEffectAdded.clear()
         listTransitionAdded.clear()
         groupFilterAdjusts.clear()
 
@@ -195,7 +217,13 @@ class SpecialPlayControl(private val context: Context) {
                     }
                 }
                 SPECIAL_TYPE_EFFECT -> {
-
+                    if (it.beginAt <= durationPlaying && it.endAt > durationPlaying) {
+                        // Add effect
+                        handleEffect(true, it)
+                    } else {
+                        // Remove effect
+                        handleEffect(false, it)
+                    }
                 }
                 SPECIAL_TYPE_TRANSITION -> {
                     if (it.beginAt <= durationPlaying && it.endAt > durationPlaying) {
@@ -269,6 +297,67 @@ class SpecialPlayControl(private val context: Context) {
                 specialModel.isAdded = false
             }
         }
+    }
+
+    /**
+     * Add or remove effect
+     */
+    private fun handleEffect(isAdd: Boolean, specialModel: SpecialModel) {
+        if (isAdd) {
+            if (!specialModel.isAdded) {
+                specialModel.isAdded = true
+
+                var glEffectFilterObject: GLEffectFilterObject? = null
+                listEffectAdded.forEach { glEffect ->
+                    if (glEffect.specialModel?.id == specialModel.id && glEffect.specialModel?.beginAt == specialModel.beginAt && glEffect.specialModel?.endAt == specialModel.endAt) {
+                        glEffectFilterObject = glEffect
+                        return@forEach
+                    }
+                }
+
+                if (glEffectFilterObject == null) {
+                    // Add new effect
+                    glEffectFilterObject =
+                        GLEffectFilterObject(this@SpecialPlayControl.context, specialModel.shader)
+                    glEffectFilterObject?.specialModel = specialModel
+
+                    listEffectAdded.add(glEffectFilterObject!!)
+                }
+
+                // Update view
+                groupFilterDefault.filters.add(glEffectFilterObject)
+                notifyPreviewCreateFilter()
+            }
+        } else {
+            if (specialModel.isAdded) {
+                listEffectAdded.forEachIndexed { _, glEffect ->
+                    if (glEffect.specialModel?.id == specialModel.id && glEffect.specialModel?.beginAt == specialModel.beginAt && glEffect.specialModel?.endAt == specialModel.endAt) {
+                        groupFilterDefault.filters.remove(glEffect)
+                        notifyPreviewCreateFilter()
+                        Timber.e("Remove effect ok")
+                        return@forEachIndexed
+                    }
+                }
+
+                specialModel.isAdded = false
+            }
+        }
+    }
+
+    /**
+     * Remove effect by index
+     */
+    fun removeEffect(indexSelect: Int) {
+        var itemNeedRemove: SpecialModel? = null
+        listEffectAdded.forEachIndexed { index, glEffect ->
+            if (index == indexSelect && glEffect.specialModel != null) {
+                itemNeedRemove = glEffect.specialModel
+                return@forEachIndexed
+            }
+        }
+
+        // Remove if need
+        itemNeedRemove?.let { removeSpecial(it) }
     }
 
     /**

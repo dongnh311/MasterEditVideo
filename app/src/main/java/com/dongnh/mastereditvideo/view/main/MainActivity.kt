@@ -310,7 +310,16 @@ class MainActivity : AppCompatActivity() {
                                     indexSpecialClick = -1
                                 }
                                 ITEM_EFFECT_NONE -> {
+                                    // Clear effect
+                                    this@MainActivity.mainBinding.viewTimeLine.removeFilterAdded(
+                                        indexSpecialClick,
+                                        itemSpecial
+                                    )
+                                    this@MainActivity.managerPlayerControl.removeEffectFromPreview(
+                                        indexSpecialClick
+                                    )
 
+                                    indexSpecialClick = -1
                                 }
                                 ITEM_GRAPH_NONE -> {
 

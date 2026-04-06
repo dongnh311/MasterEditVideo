@@ -1,62 +1,72 @@
 [
   {
-    "id": 0,
+    "id": 300000,
     "name": "Transparent",
     "isSelected": false,
-    "thumbnail": "effect/thumb/transparent.jpg"
+    "thumbnail": "effect/thumb/transparent.jpg",
+    "shader": ""
   },
   {
-    "id": 1,
+    "id": 300001,
     "name": "Brightness",
     "isSelected": false,
-    "thumbnail": "effect/thumb/brightness.png"
+    "thumbnail": "effect/thumb/brightness.png",
+    "shader": "effect/resource/ffshader/fragment/brightness.glsl"
   },
   {
-    "id": 2,
+    "id": 300002,
     "name": "Contrast",
     "isSelected": false,
-    "thumbnail": "effect/thumb/contrast.jpg"
+    "thumbnail": "effect/thumb/contrast.jpg",
+    "shader": "effect/resource/ffshader/fragment/contrast.glsl"
   },
   {
-    "id": 3,
+    "id": 300003,
     "name": "Cross Hatch",
     "isSelected": false,
-    "thumbnail": "effect/thumb/crosshatch.jpg"
+    "thumbnail": "effect/thumb/crosshatch.jpg",
+    "shader": "effect/resource/ffshader/fragment/crosshatch.glsl"
   },
   {
-    "id": 4,
+    "id": 300004,
     "name": "Gama",
     "isSelected": false,
-    "thumbnail": "effect/thumb/gama.jpg"
+    "thumbnail": "effect/thumb/gama.jpg",
+    "shader": "effect/resource/ffshader/fragment/gamma.glsl"
   },
   {
-    "id": 5,
+    "id": 300005,
     "name": "Hight\nShadow",
     "isSelected": false,
-    "thumbnail": "effect/thumb/hightlightshadown.jpg"
+    "thumbnail": "effect/thumb/hightlightshadown.jpg",
+    "shader": "effect/resource/ffshader/fragment/highlightshadow.glsl"
   },
   {
-    "id": 6,
+    "id": 300006,
     "name": "Hue",
     "isSelected": false,
-    "thumbnail": "effect/thumb/hue.jpg"
+    "thumbnail": "effect/thumb/hue.jpg",
+    "shader": "effect/resource/ffshader/fragment/hue.glsl"
   },
   {
-    "id": 7,
+    "id": 300007,
     "name": "Invert",
     "isSelected": false,
-    "thumbnail": "effect/thumb/invert.jpg"
+    "thumbnail": "effect/thumb/invert.jpg",
+    "shader": "effect/resource/ffshader/fragment/invert.glsl"
   },
   {
-    "id": 8,
+    "id": 300008,
     "name": "Gray\nScale",
     "isSelected": false,
-    "thumbnail": "effect/thumb/gray.jpg"
+    "thumbnail": "effect/thumb/gray.jpg",
+    "shader": "effect/resource/ffshader/fragment/grayscale.glsl"
   },
   {
-    "id": 9,
+    "id": 300009,
     "name": "RGB",
     "isSelected": false,
-    "thumbnail": "effect/thumb/rbg.jpeg"
+    "thumbnail": "effect/thumb/rbg.jpeg",
+    "shader": "effect/resource/ffshader/fragment/rgb.glsl"
   }
 ]

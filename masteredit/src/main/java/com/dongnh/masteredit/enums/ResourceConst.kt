@@ -10,5 +10,7 @@ const val NAME_FOLDER_IMAGE2VIDEO = "image2video"
 const val NAME_SUB_FOLDER_IMAGE = "output"
 const val NAME_SUB_FOLDER_MUSIC = "music"
 
+const val NAME_SUB_FOLDER_EXPORT = "export"
+
 const val NAME_EXIF_MUSIC = ".mp3"
 const val NAME_EXIF_IMAGE_VIDEO = ".mp4"

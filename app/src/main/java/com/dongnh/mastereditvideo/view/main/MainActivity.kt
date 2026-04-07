@@ -1,9 +1,12 @@
 package com.dongnh.mastereditvideo.view.main
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -37,9 +40,16 @@ import com.dongnh.mastereditvideo.databinding.ActivityMainBinding
 import com.dongnh.mastereditvideo.model.MixSoundModel
 import com.dongnh.mastereditvideo.singleton.MyDataSingleton
 import com.dongnh.mastereditvideo.utils.control.DurationControl
+import com.dongnh.masteredit.enums.FormatVideoOut
+import com.dongnh.masteredit.export.ExportListener
+import com.dongnh.masteredit.export.ExportManager
+import com.dongnh.masteredit.utils.exts.createExportOutputPath
+import com.dongnh.mastereditvideo.utils.dialog.DialogExport
 import com.dongnh.mastereditvideo.utils.dialog.DialogMixVolume
 import com.dongnh.mastereditvideo.utils.dialog.DialogTool
+import com.dongnh.mastereditvideo.utils.interfaces.OnExportClickListener
 import com.dongnh.mastereditvideo.utils.exts.checkPermissionStorage
+import com.dongnh.mastereditvideo.utils.exts.safeRunOnUiThread
 import com.dongnh.mastereditvideo.utils.exts.isItemTransparent
 import com.dongnh.mastereditvideo.utils.exts.isNotItemNone
 import com.dongnh.mastereditvideo.utils.exts.isTransitionItem
@@ -94,6 +104,16 @@ class MainActivity : AppCompatActivity() {
     // Dialog tool
     private val dialogTool by lazy {
         DialogTool(this@MainActivity)
+    }
+
+    // Dialog export
+    private val dialogExport by lazy {
+        DialogExport(this@MainActivity)
+    }
+
+    // Export manager
+    private val exportManager by lazy {
+        ExportManager(this@MainActivity)
     }
 
     // Request permission for storage
@@ -394,6 +414,32 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Export video
+        dialogExport.onExportClickListener = object : OnExportClickListener {
+            override fun onStartExport(resolution: FormatVideoOut) {
+                startExportProcess(resolution)
+            }
+
+            override fun onCancelExport() {
+                exportManager.cancelExport()
+            }
+        }
+
+        mainBinding.btnExport.setOnClickListener {
+            this@MainActivity.setupButtonPause()
+
+            if (listMedia.isEmpty()) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.export_error_no_media),
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+
+            dialogExport.showDialogExport()
+        }
     }
 
     /**
@@ -561,8 +607,75 @@ class MainActivity : AppCompatActivity() {
         managerPlayerControl.onPause()
     }
 
+    /**
+     * Start export process with selected resolution
+     */
+    private fun startExportProcess(resolution: FormatVideoOut) {
+        val timestamp = System.currentTimeMillis()
+        val outputPath = createExportOutputPath(this) + "/export_$timestamp.mp4"
+
+        exportManager.exportListener = object : ExportListener {
+            override fun onExportProgress(percent: Int) {
+                safeRunOnUiThread { dialogExport.updateProgress(percent) }
+            }
+
+            override fun onExportComplete(outputPath: String) {
+                Timber.d("Export saved to: $outputPath")
+                saveToGallery(outputPath)
+                safeRunOnUiThread {
+                    dialogExport.showExportComplete()
+                    Toast.makeText(applicationContext, getString(R.string.export_complete), Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onExportError(message: String) {
+                Timber.e("Export error: $message")
+                safeRunOnUiThread { dialogExport.showExportError(message) }
+            }
+
+            override fun onExportCancelled() {
+                safeRunOnUiThread { dialogExport.dismiss() }
+            }
+        }
+
+        exportManager.exportVideo(listMedia, listMusic, resolution, outputPath)
+    }
+
+    private fun saveToGallery(filePath: String) {
+        try {
+            val file = java.io.File(filePath)
+            if (!file.exists()) return
+
+            val values = ContentValues().apply {
+                put(MediaStore.Video.Media.DISPLAY_NAME, file.name)
+                put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES + "/MasterEditVideo")
+                    put(MediaStore.Video.Media.IS_PENDING, 1)
+                }
+            }
+
+            val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
+            uri?.let {
+                contentResolver.openOutputStream(it)?.use { output ->
+                    file.inputStream().use { input -> input.copyTo(output) }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear()
+                    values.put(MediaStore.Video.Media.IS_PENDING, 0)
+                    contentResolver.update(it, values, null, null)
+                }
+                Timber.d("Saved to gallery: $it")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to save to gallery")
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        exportManager.exportListener = null
+        exportManager.cancelExport()
         managerPlayerControl.onDestroy()
         MyDataSingleton.resetValue()
     }

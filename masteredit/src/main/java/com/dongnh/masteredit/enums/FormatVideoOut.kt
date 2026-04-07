@@ -6,7 +6,7 @@ package com.dongnh.masteredit.enums
  * Email : hoaidongit5@gmail.com or hoaidongit5@dnkinno.com.
  * Phone : +84397199197.
  */
-enum class FormatVideoOut(width: Int, height: Int) {
+enum class FormatVideoOut(val width: Int, val height: Int) {
     RESOLUTION_HD(1280, 720),
     RESOLUTION_FULL_HD(1920, 1080),
     RESOLUTION_Q_HD(2560, 1440),

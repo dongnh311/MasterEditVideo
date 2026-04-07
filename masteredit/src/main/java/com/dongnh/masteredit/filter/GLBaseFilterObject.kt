@@ -124,7 +124,9 @@ class GLBaseFilterObject(private val context: Context, private var pathImage: St
     override fun onDraw() {
         GLES20.glUniform1i(getHandle("inputImageTexture"), inputImageTexture)
         GLES20.glUniform1i(getHandle("inputImageTextureLookup"), 3)
-        GLES20.glUniform1f(getHandle("intensity"), intensity)
+        // Use intensity=0 when no LUT is loaded to prevent visual corruption
+        val effectiveIntensity = if (pathImage.isEmpty()) 0.0f else intensity
+        GLES20.glUniform1f(getHandle("intensity"), effectiveIntensity)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE3)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, filterTextureId)

@@ -18,6 +18,16 @@
     <string name="dialog_mix_sound_header">Audio Mixing</string>
     <string name="dialog_mix_sound_btn_confirm">Confirm</string>
 
+    <!-- Export -->
+    <string name="export_header">Export Video</string>
+    <string name="export_resolution_hd">HD (1280x720)</string>
+    <string name="export_resolution_full_hd">Full HD (1920x1080)</string>
+    <string name="export_resolution_qhd">QHD (2560x1440)</string>
+    <string name="export_btn_start">Export</string>
+    <string name="export_progress">Exporting… %d%%</string>
+    <string name="export_complete">Export complete!</string>
+    <string name="export_error_no_media">Please add media before exporting</string>
+
     <!-- Common -->
     <string name="common_btn_ok">OK</string>
     <string name="common_btn_cancel">Cancel</string>

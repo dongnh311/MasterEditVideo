@@ -7,16 +7,15 @@ import timber.log.Timber
 
 /**
  * Project : MasterEditVideo
- * Created by DongNH.
  * GL filter that loads a GLSL fragment shader from assets and applies it as a video effect.
  */
-class GLEffectFilterObject(private val context: Context, shaderPath: String) :
+class GLEffectFilterObject(context: Context, shaderPath: String) :
     GLFilterObject(VERTEX_SHADER_EFFECT, loadShaderFromAssets(context, shaderPath)) {
 
     companion object {
         // Vertex shader that maps UV to -1..1 range so existing effect fragment shaders
         // (which use textureCoordinate * 0.5 + 0.5) work correctly
-        val VERTEX_SHADER_EFFECT = """
+        private val VERTEX_SHADER_EFFECT = """
             attribute highp vec3 position;
             attribute highp vec2 inputTextureCoordinate;
             varying highp vec2 textureCoordinate;
@@ -26,9 +25,6 @@ class GLEffectFilterObject(private val context: Context, shaderPath: String) :
             }
         """.trimIndent()
 
-        /**
-         * Load fragment shader source from assets file
-         */
         fun loadShaderFromAssets(context: Context, path: String): String {
             return try {
                 if (path.isEmpty()) {
@@ -44,11 +40,4 @@ class GLEffectFilterObject(private val context: Context, shaderPath: String) :
     }
 
     var specialModel: SpecialModel? = null
-
-    init {
-        this.vertexShaderSource = VERTEX_SHADER_EFFECT
-        if (shaderPath.isNotEmpty()) {
-            this.fragmentShaderSource = loadShaderFromAssets(context, shaderPath)
-        }
-    }
 }

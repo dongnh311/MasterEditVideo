@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 /**
@@ -38,4 +39,13 @@ fun Activity.checkSafePermission(targetPermission: String): Boolean {
         this,
         targetPermission
     ) == PackageManager.PERMISSION_GRANTED)
+}
+
+/**
+ * Run a block on the UI thread only if the Activity is not destroyed
+ */
+fun AppCompatActivity.safeRunOnUiThread(block: () -> Unit) {
+    if (!isDestroyed) {
+        runOnUiThread(block)
+    }
 }
